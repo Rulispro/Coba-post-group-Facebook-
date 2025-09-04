@@ -16,11 +16,8 @@ jobs:
           node-version: 18
       
       - name: Install dependencies
-        run: |
-          rm -f package-lock.json
-          npm install puppeteer@latest --force
-          npm ls puppeteer
-
+        run:  npm install puppeteer
+          
 
       - name: Run bot
         run: node docs/index.js
