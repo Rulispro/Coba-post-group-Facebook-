@@ -39,68 +39,69 @@ const fs = require('fs');
   // Buka grup
   await page.goto(groupUrl, { waitUntil: 'networkidle2' });
 
-  // 🔎 Cari elemen "Write something" / "Tulis sesuatu"
-  // Langsung cari tombol composer di page context, bukan evaluateHandle
-const composerBtn = await page.$x(
-  "//span[contains(text(),'Write something') or contains(text(),'Tulis sesuatu') or contains(text(),'Buat postingan')]"
-);
+  // 🔎 Cari tombol "Write something" / "Tulis sesuatu" / "Buat postingan"
+  const composerBtn = await page.$x(
+    "//span[contains(text(),'Write something') or contains(text(),'Tulis sesuatu') or contains(text(),'Buat postingan')]"
+  );
 
-if (composerBtn.length === 0) {
-  console.log("❌ Tidak ketemu tombol composer");
-  await browser.close();
-  return;
-}
+  if (composerBtn.length === 0) {
+    console.log("❌ Tidak ketemu tombol composer");
+    await browser.close();
+    return;
+  }
 
-// klik span → lalu naik ke parent tombol
-const composerBox = await composerBtn[0].evaluateHandle(el =>
-  el.closest("div[role='textbox']") || el.closest("div[data-mcomponent]") || el.parentElement
-);
+  // klik span → lalu naik ke parent tombol
+  const composerBox = await composerBtn[0].evaluateHandle(el =>
+    el.closest("div[role='textbox']") ||
+    el.closest("div[data-mcomponent]") ||
+    el.parentElement
+  );
 
-if (composerBox) {
+  if (!composerBox) {
+    console.log("❌ Tidak ketemu element box composer");
+    await browser.close();
+    return;
+  }
+
   await composerBox.asElement().click();
   console.log("✅ Composer dibuka aman 👍");
-} else {
-  console.log("❌ Tidak ketemu element box composer");
-}
+
+  // kasih delay kecil biar textarea siap
+  await page.waitForTimeout(1500);
 
   // tunggu textarea
-    const textareaSelector = "textarea[name='xc_message'], textarea";
-    await page.waitForSelector(textareaSelector, { timeout: 10000 });
+  const textareaSelector = "textarea[name='xc_message'], textarea";
+  await page.waitForSelector(textareaSelector, { timeout: 10000 });
 
-    // isi caption
-    await page.$eval(textareaSelector, (el, caption) => {
-      el.value = caption;
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-      el.dispatchEvent(new Event("change", { bubbles: true }));
-    }, caption);
-    console.log("✅ Caption berhasil diisi:", caption);
+  // isi caption
+  await page.$eval(textareaSelector, (el, caption) => {
+    el.value = caption;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }, caption);
+  console.log("✅ Caption berhasil diisi:", caption);
 
-    // 🔎 Cari tombol POST (versi baru)
-    const postBtnHandle = await page.evaluateHandle(() => {
-      const span = [...document.querySelectorAll("span")]
-        .find(el => {
-          const txt = el.innerText?.trim().toLowerCase();
-          return txt === "post" || txt === "bagikan" || txt === "share";
-        });
+  // 🔎 Cari tombol POST
+  const postBtnHandle = await page.evaluateHandle(() => {
+    const span = [...document.querySelectorAll("span")]
+      .find(el => {
+        const txt = el.innerText?.trim().toLowerCase();
+        return txt === "post" || txt === "bagikan" || txt === "share";
+      });
+    if (!span) return null;
+    return span.closest("div[role=button]") || null;
+  });
 
-      if (!span) return null;
-      return span.closest("div[role=button]") || null;
-    });
-
-    if (!postBtnHandle) {
-      console.log("❌ Tombol POST tidak ketemu");
-    } else {
-      const postBtn = postBtnHandle.asElement();
-      if (postBtn) {
-        await postBtn.click();
-        console.log("✅ Tombol POST berhasil diklik");
-      } else {
-        console.log("❌ Gagal convert tombol ke element handle");
-      }
-    }
-
+  if (!postBtnHandle) {
+    console.log("❌ Tombol POST tidak ketemu");
   } else {
-    console.log("❌ Gagal convert composer ke element handle");
+    const postBtn = postBtnHandle.asElement();
+    if (postBtn) {
+      await postBtn.click();
+      console.log("✅ Tombol POST berhasil diklik");
+    } else {
+      console.log("❌ Gagal convert tombol ke element handle");
+    }
   }
 
   await browser.close();
