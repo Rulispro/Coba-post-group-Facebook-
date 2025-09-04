@@ -40,36 +40,30 @@ const fs = require('fs');
   await page.goto(groupUrl, { waitUntil: 'networkidle2' });
 
   // 🔎 Cari elemen "Write something" / "Tulis sesuatu"
-  const composer = await page.evaluateHandle(() => {
-    const span = [...document.querySelectorAll("span")]
-      .find(e =>
-        e.innerText?.toLowerCase().includes("write something") ||
-        e.innerText?.toLowerCase().includes("tulis sesuatu") ||
-        e.innerText?.toLowerCase().includes("buat postingan")
-      );
+  // Langsung cari tombol composer di page context, bukan evaluateHandle
+const composerBtn = await page.$x(
+  "//span[contains(text(),'Write something') or contains(text(),'Tulis sesuatu') or contains(text(),'Buat postingan')]"
+);
 
-    if (!span) return null;
+if (composerBtn.length === 0) {
+  console.log("❌ Tidak ketemu tombol composer");
+  await browser.close();
+  return;
+}
 
-    let el =
-      span.closest("div[data-mcomponent='TextArea']") ||
-      span.closest("div[role='textbox']") ||
-      span.parentElement;
+// klik span → lalu naik ke parent tombol
+const composerBox = await composerBtn[0].evaluateHandle(el =>
+  el.closest("div[role='textbox']") || el.closest("div[data-mcomponent]") || el.parentElement
+);
 
-    return el;
-  });
+if (composerBox) {
+  await composerBox.asElement().click();
+  console.log("✅ Composer dibuka aman 👍");
+} else {
+  console.log("❌ Tidak ketemu element box composer");
+}
 
-  if (!composer) {
-    console.log("❌ Tidak ketemu tombol composer");
-    await browser.close();
-    return;
-  }
-
-  const box = await composer.asElement();
-  if (box) {
-    await box.click();
-    console.log("✅ Composer dibuka aman 👍");
-
-    // tunggu textarea
+  // tunggu textarea
     const textareaSelector = "textarea[name='xc_message'], textarea";
     await page.waitForSelector(textareaSelector, { timeout: 10000 });
 
