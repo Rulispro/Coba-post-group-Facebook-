@@ -1,0 +1,20 @@
+[
+  {
+    "domain": ".facebook.com",
+    "name": "c_user",
+    "value": "61576977154304",
+    "path": "/",
+    "expires": 1699999999,
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "domain": ".facebook.com",
+    "name": "xs",
+    "value": "49:6uG-HF6AReEggg:2:1749035626:-1:-1",
+    "path": "/",
+    "expires": 1699999999,
+    "httpOnly": false,
+    "secure": true
+  },
+]
