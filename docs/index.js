@@ -81,18 +81,30 @@ const fs = require('fs');
     }, caption);
     console.log("✅ Caption berhasil diisi:", caption);
 
-    // cari tombol POST
-    const postSpanXPath = "//span[text()='Post' or text()='Bagikan']";
-    const [span] = await page.$x(postSpanXPath);
-    if (span) {
-      let clickable = await span.evaluateHandle(el =>
-        el.closest("div[role=button], div[data-mcomponent], div[tabindex]") || el.parentElement
-      );
-      await clickable.asElement().click();
-      console.log("✅ Tombol POST diklik");
+    // 🔎 Cari tombol POST (versi baru)
+    const postBtnHandle = await page.evaluateHandle(() => {
+      const span = [...document.querySelectorAll("span")]
+        .find(el => {
+          const txt = el.innerText?.trim().toLowerCase();
+          return txt === "post" || txt === "bagikan" || txt === "share";
+        });
+
+      if (!span) return null;
+      return span.closest("div[role=button]") || null;
+    });
+
+    if (!postBtnHandle) {
+      console.log("❌ Tombol POST tidak ketemu");
     } else {
-      console.log("❌ Tidak ketemu tombol POST");
+      const postBtn = postBtnHandle.asElement();
+      if (postBtn) {
+        await postBtn.click();
+        console.log("✅ Tombol POST berhasil diklik");
+      } else {
+        console.log("❌ Gagal convert tombol ke element handle");
+      }
     }
+
   } else {
     console.log("❌ Gagal convert composer ke element handle");
   }
