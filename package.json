@@ -1,0 +1,11 @@
+{
+  "name": "coba-post-group-facebook",
+  "version": "1.0.0",
+  "main": "docs/index.js",
+  "scripts": {
+    "start": "node docs/index.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.11.0"
+  }
+}
