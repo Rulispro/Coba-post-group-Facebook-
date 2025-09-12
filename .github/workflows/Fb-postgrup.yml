@@ -1,4 +1,4 @@
-name: Run Facebook Bot
+name: Run Instagram Bot
 
 on:
   workflow_dispatch:
@@ -6,18 +6,20 @@ on:
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      # Cache node_modules biar install cepat
+      - name: Cache node_modules
+        uses: actions/cache@v3
         with:
-          node-version: 18
-      
+          path: node_modules
+          key: ${{ runner.os }}-modules-${{ hashFiles('package-lock.json') }}
+
       - name: Install dependencies
-        run:  npm install puppeteer
-          
+        run: npm ci
 
       - name: Run bot
-        run: node docs/index.js
+        run: node index.js
