@@ -1,7 +1,9 @@
-name: Run Instagram Bot
+name: Facebook Bot
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * *"
 
 jobs:
   run-bot:
@@ -11,15 +13,18 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Cache node_modules biar install cepat
-      - name: Cache node_modules
-        uses: actions/cache@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-modules-${{ hashFiles('package-lock.json') }}
+          node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install 
+        run: npm install
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
       - name: Run bot
         run: node index.js
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
