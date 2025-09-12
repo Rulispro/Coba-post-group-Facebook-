@@ -56,50 +56,63 @@ const fs = require("fs");
     await page.waitForTimeout(4000);
 
     // =========================
-    // 3. Klik Composer
+    // 3. Cari & Klik Composer (versi fleksibel)
     // =========================
-    console.log("👉 Mencari tombol composer...");
-    const composerFound = await page.evaluate(() => {
-      const spans = [...document.querySelectorAll("span")];
-      console.log("DEBUG: Jumlah span =", spans.length);
+    console.log("👉 Cari tombol composer...");
 
-      const span = spans.find(
-        (e) =>
-          e.innerText?.toLowerCase().includes("write something") ||
-          e.innerText?.toLowerCase().includes("tulis sesuatu") ||
-          e.innerText?.toLowerCase().includes("buat postingan")
-      );
+    const composerClicked = await page.evaluate(async () => {
+      const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-      if (!span) {
-        console.log("❌ Tidak ketemu span composer. Contoh span pertama:", spans[0]?.outerHTML);
+      // kata kunci yg mungkin dipakai Facebook
+      const keywords = [
+        "write something",
+        "tulis sesuatu",
+        "buat postingan",
+        "create a public post",
+      ];
+
+      // ambil semua kandidat elemen
+      const candidates = [...document.querySelectorAll("span, div, button")];
+      console.log("DEBUG: Total kandidat =", candidates.length);
+
+      let target = null;
+      for (let el of candidates) {
+        const txt = (el.innerText || "").toLowerCase();
+        if (keywords.some((k) => txt.includes(k))) {
+          console.log("✅ Ketemu kandidat composer:", txt, el.outerHTML);
+
+          // cari parent yg bisa diklik
+          target =
+            el.closest("div[role='button']") ||
+            el.closest("div[data-mcomponent]") ||
+            el.closest("div") ||
+            el;
+
+          break;
+        }
+      }
+
+      if (!target) {
+        console.log("❌ Tidak ada composer dengan teks:", keywords.join(", "));
         return false;
       }
 
-      console.log("✅ Span composer ditemukan:", span.innerText, span.outerHTML);
+      console.log("DEBUG: Target klik =", target.tagName, target.className);
 
-      let el =
-        span.closest("div[data-mcomponent='TextArea']") ||
-        span.closest("div[role='textbox']") ||
-        span.parentElement;
-
-      if (!el) {
-        console.log("❌ Tidak ketemu container composer dari span:", span.outerHTML);
-        return false;
-      }
-
-      console.log("DEBUG: Klik element composer:", el.className, el.outerHTML);
-
+      // klik manual pakai event
       ["mousedown", "mouseup", "click"].forEach((type) => {
-        el.dispatchEvent(
+        target.dispatchEvent(
           new MouseEvent(type, { bubbles: true, cancelable: true, view: window })
         );
       });
+
+      await delay(2000);
       return true;
     });
 
-    if (!composerFound) throw new Error("❌ Composer button not found");
+    if (!composerClicked) throw new Error("❌ Composer button not found");
 
-    console.log("✅ Composer diklik");
+    console.log("✅ Composer berhasil diklik");
 
     // =========================
     // 4. Isi Caption
@@ -107,7 +120,6 @@ const fs = require("fs");
     console.log("⌛ Menunggu textarea muncul...");
     await page.waitForSelector("textarea", { timeout: 15000 });
 
-    // debug list textarea
     const textareas = await page.evaluate(() => {
       return [...document.querySelectorAll("textarea")].map((t) => ({
         placeholder: t.getAttribute("placeholder"),
