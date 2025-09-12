@@ -38,71 +38,56 @@ const fs = require('fs');
 
   // Buka grup
   await page.goto(groupUrl, { waitUntil: 'networkidle2' });
+// buka grup
+await page.goto("https://m.facebook.com/groups/123456789", { waitUntil: "networkidle2" });
+await page.waitForTimeout(5000);
 
-  // 🔎 Cari tombol "Write something" / "Tulis sesuatu" / "Buat postingan"
-  const composerBtn = await page.$x(
-    "//span[contains(text(),'Write something') or contains(text(),'Tulis sesuatu') or contains(text(),'Buat postingan')]"
-  );
+// buka composer dengan simulate click/tap
+await page.evaluate(() => {
+  const span = [...document.querySelectorAll("span")]
+    .find(e =>
+      e.innerText?.toLowerCase().includes("write something") ||
+      e.innerText?.toLowerCase().includes("tulis sesuatu")
+    );
 
-  if (composerBtn.length === 0) {
+  if (!span) {
     console.log("❌ Tidak ketemu tombol composer");
-    await browser.close();
     return;
   }
 
-  // klik span → lalu naik ke parent tombol
-  const composerBox = await composerBtn[0].evaluateHandle(el =>
-    el.closest("div[role='textbox']") ||
-    el.closest("div[data-mcomponent]") ||
-    el.parentElement
-  );
+  let el =
+    span.closest("div[data-mcomponent='TextArea']") ||
+    span.closest("div[role='textbox']") ||
+    span.parentElement;
 
-  if (!composerBox) {
-    console.log("❌ Tidak ketemu element box composer");
-    await browser.close();
+  if (!el) {
+    console.log("❌ Tidak ketemu elemen klik");
     return;
   }
 
-  await composerBox.asElement().click();
-  console.log("✅ Composer dibuka aman 👍");
-
-  // kasih delay kecil biar textarea siap
-  await page.waitForTimeout(1500);
-
-  // tunggu textarea
-  const textareaSelector = "textarea[name='xc_message'], textarea";
-  await page.waitForSelector(textareaSelector, { timeout: 10000 });
-
-  // isi caption
-  await page.$eval(textareaSelector, (el, caption) => {
-    el.value = caption;
-    el.dispatchEvent(new Event("input", { bubbles: true }));
-    el.dispatchEvent(new Event("change", { bubbles: true }));
-  }, caption);
-  console.log("✅ Caption berhasil diisi:", caption);
-
-  // 🔎 Cari tombol POST
-  const postBtnHandle = await page.evaluateHandle(() => {
-    const span = [...document.querySelectorAll("span")]
-      .find(el => {
-        const txt = el.innerText?.trim().toLowerCase();
-        return txt === "post" || txt === "bagikan" || txt === "share";
-      });
-    if (!span) return null;
-    return span.closest("div[role=button]") || null;
+  ["mousedown", "mouseup", "click"].forEach(type => {
+    el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
   });
 
-  if (!postBtnHandle) {
-    console.log("❌ Tombol POST tidak ketemu");
-  } else {
-    const postBtn = postBtnHandle.asElement();
-    if (postBtn) {
-      await postBtn.click();
-      console.log("✅ Tombol POST berhasil diklik");
-    } else {
-      console.log("❌ Gagal convert tombol ke element handle");
-    }
-  }
+  console.log("✅ Composer dibuka aman 👍");
+});
+
+// tunggu textarea muncul setelah klik composer
+await page.waitForSelector("textarea", { timeout: 15000 });
+
+// isi pesan
+await page.type("textarea", "Hello, ini posting otomatis dengan Puppeteer!", { delay: 50 });
+
+// tombol kirim biasanya button dengan text "Post" / "Kirim"
+await page.evaluate(() => {
+  const btn = [...document.querySelectorAll("button, input[type='submit']")]
+    .find(b => b.innerText?.toLowerCase().includes("post") ||
+               b.innerText?.toLowerCase().includes("kirim"));
+  if (btn) btn.click();
+});
+
+console.log("✅ Postingan berhasil dikirim");
+    
 
   await browser.close();
 })();
