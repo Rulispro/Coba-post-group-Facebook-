@@ -33,8 +33,12 @@ const fs = require("fs");
       ],
     });
 
-    const page = await browser.newPage();
-
+   const page = await browser.newPage();
+   
+    page.on("console", msg => {
+  console.log("BROWSER LOG:", msg.text());
+});
+    
     // User-Agent mirip Chrome Android
     await page.setUserAgent(
       "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 " +
