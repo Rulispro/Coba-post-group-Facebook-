@@ -5,14 +5,12 @@ const fs = require("fs");
 // =========================
 // Fungsi helper
 // =========================
-
-// cari elemen berdasarkan placeholder / aria-label / innerText
 async function getElementByPlaceholder(page, texts) {
   const handle = await page.evaluateHandle((placeholders) => {
     const els = [...document.querySelectorAll("input, textarea, div[role='textbox'], div[role='button']")];
     for (let el of els) {
       const ph = el.getAttribute("placeholder") || el.getAttribute("aria-label") || el.innerText || "";
-      if (placeholders.some(p => ph.toLowerCase().includes(p.toLowerCase()))) {
+      if (placeholders.some(p => ph.toLowerCase().includes(t.toLowerCase()))) {
         return el;
       }
     }
@@ -23,12 +21,11 @@ async function getElementByPlaceholder(page, texts) {
   return handle.asElement();
 }
 
-// klik tombol berdasarkan text/aria-label
 async function clickButtonByText(page, texts) {
   const handle = await page.evaluateHandle((labels) => {
     const els = [...document.querySelectorAll("button, div[role='button'], input[type='submit']")];
     for (let el of els) {
-      const txt = (el.innerText || el.getAttribute("aria-label") || "").trim();
+      const txt = (el.innerText || el.getAttribute("aria-label") || el.getAttribute("placeholder") || "").trim();
       if (labels.some(t => txt.toLowerCase().includes(t.toLowerCase()))) {
         return el;
       }
@@ -41,11 +38,20 @@ async function clickButtonByText(page, texts) {
   if (!btn) return false;
 
   try {
+    // pakai click biasa
     await btn.click();
     return true;
   } catch {
-    return false;
+    try {
+      // fallback tap
+      const box = await btn.boundingBox();
+      if (box) {
+        await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+        return true;
+      }
+    } catch {}
   }
+  return false;
 }
 
 // =========================
@@ -56,8 +62,8 @@ async function clickButtonByText(page, texts) {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://facebook.com/groups/512223333438818/"; // ganti ID grup
-    const caption = "Halo 👋 ini posting otomatis Puppeteer versi placeholder fallback!";
+    const groupUrl = "https://facebook.com/groups/512223333438818/"; 
+    const caption = "Halo 👋 ini posting otomatis Puppeteer (click/tap fallback)!";
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -66,7 +72,6 @@ async function clickButtonByText(page, texts) {
     });
 
     const page = await browser.newPage();
-
     page.on("console", msg => console.log("BROWSER LOG:", msg.text()));
 
     await page.setUserAgent(
@@ -76,17 +81,13 @@ async function clickButtonByText(page, texts) {
     await page.setCookie(...cookies);
     console.log("✅ Cookies set");
 
-    await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
-    await page.waitForTimeout(2000);
-
-    console.log("🌐 Opening group:", groupUrl);
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
 
     // =========================
     // 1. Composer
     // =========================
-    console.log("👉 Cari composer via placeholder...");
+    console.log("👉 Cari composer...");
     let composer = await getElementByPlaceholder(page, [
       "Write something",
       "Tulis sesuatu",
@@ -96,21 +97,21 @@ async function clickButtonByText(page, texts) {
     ]);
 
     if (composer) {
-      console.log("✅ Composer ditemukan, klik...");
+      console.log("✅ Composer ditemukan, klik/tap...");
       try {
-        await composer.click();
+        await composer.click().catch(() => {});
         await page.waitForTimeout(2000);
       } catch (e) {
         console.log("⚠️ Gagal klik composer:", e.message);
       }
     } else {
-      console.log("❌ Composer tidak ditemukan (lanjut ke caption)");
+      console.log("❌ Composer tidak ditemukan (lanjut tetap)");
     }
 
     // =========================
     // 2. Caption
     // =========================
-    console.log("👉 Cari textbox caption via placeholder...");
+    console.log("👉 Cari textbox caption...");
     let textbox = await getElementByPlaceholder(page, [
       "Write something",
       "Tulis sesuatu",
@@ -120,7 +121,7 @@ async function clickButtonByText(page, texts) {
     if (textbox) {
       console.log("✅ Textbox ketemu, isi caption...");
       try {
-        await textbox.click();
+        await textbox.click().catch(() => {});
         await page.waitForTimeout(500);
         await textbox.type(caption, { delay: 50 });
       } catch (e) {
@@ -133,8 +134,14 @@ async function clickButtonByText(page, texts) {
     // =========================
     // 3. Tombol Post
     // =========================
-    console.log("👉 Klik tombol Post...");
-    let posted = await clickButtonByText(page, ["Post", "Kirim", "Bagikan", "Bagikan sekarang", "OK"]);
+    console.log("👉 Cari tombol Post...");
+    let posted = await clickButtonByText(page, [
+      "Post",
+      "Kirim",
+      "Bagikan",
+      "Bagikan sekarang",
+      "OK"
+    ]);
 
     if (posted) {
       console.log("✅ Post berhasil diklik!");
