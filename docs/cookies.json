@@ -1,20 +1,14 @@
 [
-  {
-    "domain": ".facebook.com",
-    "name": "c_user",
-    "value": "61576977154304",
-    "path": "/",
-    "expires": 1699999999,
-    "httpOnly": false,
-    "secure": true
-  },
-  {
-    "domain": ".facebook.com",
-    "name": "xs",
-    "value": "49:6uG-HF6AReEggg:2:1749035626:-1:-1",
-    "path": "/",
-    "expires": 1699999999,
-    "httpOnly": false,
-    "secure": true
-  }
+  { name: "vpd", value: "v1%3B687x360x2", domain: ".m.facebook.com", path: "/" },
+  { name: "datr", value: "iBMvaCqNx_7oHwU8c5Sbh5Yr", domain: ".m.facebook.com", path: "/" },
+  { name: "sb", value: "YO0vaBG7l7Bn0v1Z9oxA0Vna", domain: ".m.facebook.com", path: "/" },
+  { name: "pas", value: "61575648700170%3AMFIKMHEhzH%2C100037748052955%3ASlAZUgBhu0%2C61576403453177%3AmX7V7BJF4W%2C61575555022850%3AWsy1YA90w7", domain: ".m.facebook.com", path: "/" },
+  { name: "locale", value: "id_ID", domain: ".m.facebook.com", path: "/" },
+  { name: "m_pixel_ratio", value: "2", domain: ".m.facebook.com", path: "/" },
+  { name: "wd", value: "360x825", domain: ".m.facebook.com", path: "/" },
+  { name: "c_user", value: "61575555022850", domain: ".m.facebook.com", path: "/" },
+  { name: "xs", value: "27%3ARoSWIGHmXgZ9Gg%3A2%3A1757406658%3A-1%3A-1", domain: ".m.facebook.com", path: "/" },
+  { name: "fr", value: "0qLmETROm9y5pc0W6.AWeYeBe2Of-D_Tj5_qo7YZe90-Mo6EAW4o9LS-TJI0-7mEEn2zk.BoOvn3..AAA.0.0.Bov-XX.AWdEqVyCjz07RikOFK3ASNbp02c", domain: ".m.facebook.com", path: "/" },
+  { name: "wl_cbv", value: "v2%3Bclient_version%3A2917%3Btimestamp%3A1757406679", domain: ".m.facebook.com", path: "/" },
+  { name: "fbl_st", value: "100639263%3BT%3A29290111", domain: ".m.facebook.com", path: "/" }
 ]
