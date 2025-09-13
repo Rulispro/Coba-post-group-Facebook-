@@ -118,9 +118,7 @@ if (banner) {
   console.log("ℹ️ Banner tidak muncul");
 }
 //===================
-    // 1. Scan & klik composer
-    // =========================
-    // =========================
+
 // 1. Scan & klik composer
 // =========================
 await scanElements(page, "Composer sebelum klik");
@@ -134,7 +132,6 @@ if (composer) {
 } else {
   console.log("❌ Composer tidak ditemukan");
 }
-
 
     // =========================
     // 2. Scan & isi textbox caption
