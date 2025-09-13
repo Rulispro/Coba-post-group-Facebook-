@@ -2,13 +2,15 @@ const puppeteer = require("puppeteer");
 const fs = require("fs");
 
 // =========================
-// Helper
+// Fungsi helper
 // =========================
+
+// klik/tap aman (mobile/desktop)
 async function safeClick(el) {
   if (!el) return false;
   try {
     if (typeof el.tap === "function") {
-      await el.tap(); // mobile
+      await el.tap();  // mobile
     } else {
       await el.click(); // desktop
     }
@@ -19,9 +21,10 @@ async function safeClick(el) {
   }
 }
 
+// klik tombol berdasarkan text/aria-label
 async function clickButtonByText(page, texts) {
   const handle = await page.evaluateHandle((labels) => {
-    const els = [...document.querySelectorAll("button, div[role='button'], span")];
+    const els = [...document.querySelectorAll("button, div[role='button'], input[type='submit']")];
     for (let el of els) {
       const txt = (el.innerText || el.getAttribute("aria-label") || "").trim();
       if (labels.some(t => txt.toLowerCase().includes(t.toLowerCase()))) {
@@ -47,7 +50,7 @@ async function clickButtonByText(page, texts) {
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
     const groupUrl = "https://facebook.com/groups/512223333438818/"; // ganti ID grup
-    const caption = "Halo 👋 ini posting otomatis Puppeteer 👍";
+    const caption = "Halo 👋 ini posting otomatis Puppeteer dengan tap()!";
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -73,67 +76,84 @@ async function clickButtonByText(page, texts) {
     await page.waitForTimeout(4000);
 
     // =========================
-    // 1. Klik composer parent
+    // 1. Cari composer parent
     // =========================
-    console.log("👉 Cari composer parent...");
-    try {
-      await page.waitForSelector("div.m.bg-s14[tabindex='0']", { timeout: 5000 });
-      await page.click("div.m.bg-s14[tabindex='0']");
-      console.log("✅ Composer diklik");
-    } catch {
-      console.log("❌ Composer parent tidak ditemukan");
+    console.log("👉 Cari composer...");
+    const composerHandle = await page.evaluateHandle(() => {
+      const keywords = [
+        "Write something",
+        "Apa yang Anda pikirkan",
+        "Tulis sesuatu",
+        "Create a post",
+        "Buat postingan"
+      ];
+      const all = [...document.querySelectorAll("div[role='button'], span, div")];
+      for (let el of all) {
+        const txt = (el.innerText || el.getAttribute("aria-label") || "").trim();
+        if (keywords.some(k => txt.toLowerCase().includes(k.toLowerCase()))) {
+          return el.closest("div[role='button'], div[tabindex], button") || el;
+        }
+      }
+      return null;
+    });
+
+    let composer = composerHandle ? composerHandle.asElement() : null;
+    if (composer) {
+      console.log("✅ Composer ditemukan, klik...");
+      await safeClick(composer);
+      await page.waitForTimeout(3000);
+    } else {
+      throw new Error("❌ Composer tidak ditemukan");
     }
 
     // =========================
-    // 2. Tunggu composer terbuka
-    // =========================
-    await page.waitForTimeout(2000);
-
-    // =========================
-    // 3. Cari textbox caption
+    // 2. Cari textbox caption
     // =========================
     console.log("👉 Cari textbox caption...");
-    const captionSelectors = [
-      "div[role='textbox'][aria-label='Write something']",
-      "div[role='textbox'][aria-label='Tulis sesuatu']",
-      "div[role='textbox'][aria-label='Buat postingan publik']",
-      "div[role='textbox'][aria-label='Create a public post']",
-      "div[role='textbox'][aria-label=\"What's on your mind?\"]",
-      "div[role='textbox']" // fallback
-    ];
-
-    let textbox = null;
-    for (const sel of captionSelectors) {
-      textbox = await page.$(sel);
-      if (textbox) {
-        console.log("🎯 Textbox ditemukan dengan selector:", sel);
-        await textbox.click();
-        await page.type(sel, caption, { delay: 50 });
-        console.log("✅ Caption berhasil diisi");
-        break;
+    const textboxHandle = await page.evaluateHandle(() => {
+      const candidates = [
+        "Write something",
+        "Apa yang Anda pikirkan",
+        "Tulis sesuatu",
+        "Create a public post",
+        "Buat postingan publik",
+      ];
+      const all = [...document.querySelectorAll("div[role='textbox']")];
+      for (let el of all) {
+        const label = el.getAttribute("aria-label") || "";
+        if (candidates.some(c => label.toLowerCase().includes(c.toLowerCase()))) {
+          return el;
+        }
       }
+      return all.length ? all[0] : null; // fallback
+    });
+
+    let textbox = textboxHandle ? textboxHandle.asElement() : null;
+    if (textbox) {
+      console.log("✅ Textbox ditemukan, isi caption...");
+      await textbox.click();
+      await page.type("div[role='textbox']", caption, { delay: 50 });
+    } else {
+      throw new Error("❌ Textbox tidak ditemukan");
     }
 
-    if (!textbox) throw new Error("❌ Textbox tidak ditemukan");
-
     // =========================
-    // 4. Klik tombol Post
+    // 3. Klik tombol Post
     // =========================
-    console.log("👉 Cari tombol Post...");
+    console.log("👉 Klik tombol Post...");
     let posted = await clickButtonByText(page, ["Post", "Kirim", "Bagikan", "Bagikan sekarang", "OK"]);
 
     if (posted) {
       console.log("✅ Tombol Post berhasil diklik!");
     } else {
-      throw new Error("❌ Tombol Post tidak ketemu");
+      console.log("❌ Tombol Post tidak ketemu");
     }
 
     await page.waitForTimeout(5000);
     await browser.close();
-    console.log("🎉 Selesai!");
-
   } catch (err) {
     console.error("❌ Gagal posting:", err);
     process.exit(1);
   }
 })();
+          
