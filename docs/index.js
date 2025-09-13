@@ -80,7 +80,7 @@ async function findElementByKeyword(page, keywords = []) {
     const caption = "Halo 👋 ini posting otomatis Puppeteer!";
 
     const browser = await puppeteer.launch({
-      headless: false, // bisa diubah true/false
+      headless: true, // bisa diubah true/false
       defaultViewport: { width: 412, height: 915, isMobile: true, hasTouch: true },
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
     });
