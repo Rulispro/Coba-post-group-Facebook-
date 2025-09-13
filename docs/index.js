@@ -5,12 +5,12 @@ const fs = require("fs");
 // Fungsi helper
 // =========================
 
-// klik/tap aman (mobile/desktop)
+// Safe klik / tap (mobile/desktop)
 async function safeClick(el) {
   if (!el) return false;
   try {
     if (typeof el.tap === "function") {
-      await el.tap(); // mobile
+      await el.tap();  // mobile
     } else {
       await el.click(); // desktop
     }
@@ -41,11 +41,12 @@ async function clickButtonByText(page, texts) {
   return await safeClick(btn);
 }
 
-// scanner debug (lihat 50 elemen pertama)
-async function scanElements(page, label = "Scan") {
+// =========================
+// Scan & log semua elemen penting
+async function scanAllElementsVerbose(page, label = "Scan") {
   console.log(`\n🔎 ${label} (50 elemen pertama)`);
   const elements = await page.evaluate(() => {
-    return [...document.querySelectorAll("div, span, button, a, textarea, input")]
+    return [...document.querySelectorAll("div, span, a, button, textarea, input")]
       .slice(0, 50)
       .map((el, i) => ({
         index: i,
@@ -55,14 +56,14 @@ async function scanElements(page, label = "Scan") {
         placeholder: el.getAttribute("placeholder"),
         role: el.getAttribute("role"),
         href: el.getAttribute("href"),
-        classes: el.className || ""
+        contenteditable: el.getAttribute("contenteditable"),
+        classes: el.className
       }));
   });
-  elements.forEach(el => {
-    console.log(`#${el.index}`, el);
-  });
+  elements.forEach(el => console.log(`#${el.index}`, el));
   return elements;
 }
+
 
 // =========================
 // Main
@@ -118,40 +119,64 @@ if (banner) {
   console.log("ℹ️ Banner tidak muncul");
 }
 //===================
+    // =========================
+// Composer detect & click
+const composerHandle = await page.$('a[href*="composer"], div[role="button"], span[dir="auto"]');
+if (composerHandle) {
+  console.log("✅ Composer ditemukan, klik/tap...");
+  await safeClick(composerHandle);
+  await page.waitForTimeout(2000);
+} else {
+  console.log("❌ Composer tidak ditemukan, scan semua elemen:");
+  await scanAllElementsVerbose(page, "Composer");
+}
+
+    // =========================
+// Textbox detect & click/tap
+const textboxHandle = await page.$('div[role="textbox"], div[contenteditable="true"], span[dir="auto"]');
+if (textboxHandle) {
+  console.log("✅ Textbox ditemukan, klik/tap...");
+  await safeClick(textboxHandle);
+  await page.waitForTimeout(1000);
+} else {
+  console.log("❌ Textbox tidak ditemukan, scan semua elemen:");
+  await scanAllElementsVerbose(page, "Textbox / Caption");
+}
+    
 
 // 1. Scan & klik composer
 // =========================
-await scanElements(page, "Composer sebelum klik");
+//await scanElements(page, "Composer sebelum klik");
 
-const composerHandle = await page.$('a[href*="composer"], span[dir="auto"]');
-let composer = composerHandle ? composerHandle.asElement() : null;
-if (composer) {
-  console.log("✅ Composer ditemukan, klik...");
-  await safeClick(composer);
-  await page.waitForTimeout(3000);
-} else {
-  console.log("❌ Composer tidak ditemukan");
-}
+//const composerHandle = await page.$('a[href*="composer"], span[dir="auto"]');
+//let composer = composerHandle ? composerHandle.asElement() : null;
+//if (composer) {
+ // console.log("✅ Composer ditemukan, klik...");
+  //await safeClick(composer);
+  //await page.waitForTimeout(3000);
+//} else {
+ // console.log("❌ Composer tidak ditemukan");
+//}
 
     // =========================
     // 2. Scan & isi textbox caption
     // =========================
-    await scanElements(page, "Textbox / Caption");
+    //await scanElements(page, "Textbox / Caption");
 
-    const textboxHandle = await page.evaluateHandle(() => {
-      const all = [...document.querySelectorAll("div[role='textbox'], textarea")];
-      return all.length ? all[0] : null;
-    });
+   // const textboxHandle = await page.evaluateHandle(() => {
+      //const all = [...document.querySelectorAll("div[role='textbox'], textarea")];
+      //return all.length ? all[0] : null;
+    //});
 
-    let textbox = textboxHandle ? textboxHandle.asElement() : null;
-    if (textbox) {
-      console.log("✅ Textbox ditemukan, isi caption...");
-      await safeClick(textbox);
-      await page.type("div[role='textbox'], textarea", "Halo 👋 ini posting otomatis Puppeteer!", { delay: 50 });
-      await page.waitForTimeout(1000);
-    } else {
-      throw new Error("❌ Textbox tidak ditemukan");
-    }
+    //let textbox = textboxHandle ? textboxHandle.asElement() : null;
+    //if (textbox) {
+     // console.log("✅ Textbox ditemukan, isi caption...");
+     // await safeClick(textbox);
+      //await page.type("div[role='textbox'], textarea", "Halo 👋 ini posting otomatis Puppeteer!", { delay: 50 });
+      //await page.waitForTimeout(1000);
+   // } else {
+  //    throw new Error("❌ Textbox tidak ditemukan");
+    //}
 
     // =========================
     // 3. Scan & klik tombol Post
