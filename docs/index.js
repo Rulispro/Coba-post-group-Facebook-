@@ -76,7 +76,7 @@ async function scanElements(page, label = "Scan") {
     const caption = "Halo 👋 ini posting otomatis Puppeteer!";
 
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       defaultViewport: { width: 412, height: 915, isMobile: true, hasTouch: true },
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
     });
