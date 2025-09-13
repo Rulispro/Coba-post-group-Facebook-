@@ -73,7 +73,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://facebook.com/groups/512223333438818/"; // ganti ID grup
+    const groupUrl = "https://m.facebook.com/groups/5763845890292336//"; // ganti ID grup
     const caption = "Halo 👋 ini posting otomatis Puppeteer!";
 
     const browser = await puppeteer.launch({
