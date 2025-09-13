@@ -22,7 +22,7 @@ async function scanVisibleElements(page, keywords = [], label = "Scan") {
     return all
       .filter(el => {
         const rect = el.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0; // visible only
+        return rect.width > 0 && rect.height > 0; // hanya elemen visible
       })
       .map(el => {
         const txt = (el.innerText || "").trim();
@@ -49,8 +49,16 @@ async function findElementByKeyword(page, keywords = []) {
       if (rect.width === 0 || rect.height === 0) continue; // skip hidden
       const txt = (el.innerText || "").trim();
       const aria = el.getAttribute("aria-label") || "";
-      if (keywords.some(k => txt.toLowerCase().includes(k.toLowerCase()) 
-                             || aria.toLowerCase().includes(k.toLowerCase()))) {
+
+      // cek nested span/div juga
+      const nested = el.querySelectorAll("span, div");
+      for (let n of nested) {
+        if (keywords.some(k => (n.innerText || "").toLowerCase().includes(k.toLowerCase()))) {
+          return el;
+        }
+      }
+
+      if (keywords.some(k => txt.toLowerCase().includes(k.toLowerCase()) || aria.toLowerCase().includes(k.toLowerCase()))) {
         return el;
       }
     }
@@ -72,7 +80,7 @@ async function findElementByKeyword(page, keywords = []) {
     const caption = "Halo 👋 ini posting otomatis Puppeteer!";
 
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false, // bisa diubah true/false
       defaultViewport: { width: 412, height: 915, isMobile: true, hasTouch: true },
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
     });
@@ -82,23 +90,18 @@ async function findElementByKeyword(page, keywords = []) {
     await page.setUserAgent("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36");
     await page.setCookie(...cookies);
 
+    // buka halaman grup
     await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
     await page.waitForTimeout(2000);
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
-    await page.waitForTimeout(5000); // tunggu ekstra agar semua elemen render
+    await page.waitForTimeout(5000); // tunggu render ekstra
 
     // =========================
     // 1️⃣ Scan & klik composer
     // =========================
-    const composerKeywords = [
-      "Write something",
-      "Apa yang Anda pikirkan",
-      "Tulis sesuatu",
-      "Create a post",
-      "Buat postingan"
-    ];
-
+    const composerKeywords = ["Write something","Apa yang Anda pikirkan","Tulis sesuatu","Create a post","Buat postingan"];
     await scanVisibleElements(page, composerKeywords, "Composer sebelum klik");
+
     const composer = await findElementByKeyword(page, composerKeywords);
     if (!composer) throw new Error("❌ Composer tidak ditemukan");
     await safeClick(composer);
@@ -107,15 +110,9 @@ async function findElementByKeyword(page, keywords = []) {
     // =========================
     // 2️⃣ Scan & isi caption
     // =========================
-    const textboxKeywords = [
-      "Write something",
-      "Apa yang Anda pikirkan",
-      "Tulis sesuatu",
-      "Create a public post",
-      "Buat postingan publik",
-    ];
-
+    const textboxKeywords = ["Write something","Apa yang Anda pikirkan","Tulis sesuatu","Create a public post","Buat postingan publik"];
     await scanVisibleElements(page, textboxKeywords, "Textbox / Caption");
+
     const textbox = await findElementByKeyword(page, textboxKeywords);
     if (!textbox) throw new Error("❌ Textbox tidak ditemukan");
 
@@ -126,8 +123,9 @@ async function findElementByKeyword(page, keywords = []) {
     // =========================
     // 3️⃣ Scan & klik tombol Post
     // =========================
-    const postKeywords = ["Post", "Kirim", "Bagikan", "Bagikan sekarang", "OK"];
+    const postKeywords = ["Post","Kirim","Bagikan","Bagikan sekarang","OK"];
     await scanVisibleElements(page, postKeywords, "Tombol Post");
+
     const postButton = await findElementByKeyword(page, postKeywords);
     if (postButton) {
       await safeClick(postButton);
