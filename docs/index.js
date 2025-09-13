@@ -120,30 +120,21 @@ if (banner) {
 //===================
     // 1. Scan & klik composer
     // =========================
-    await scanElements(page, "Composer sebelum klik");
+    // =========================
+// 1. Scan & klik composer
+// =========================
+await scanElements(page, "Composer sebelum klik");
 
-    const composerHandle = await page.evaluateHandle(() => {
-      // kemungkinan composer bisa <a href="...composer..."> atau <span dir="auto">Write something</span>
-      const candidates = [
-        ...document.querySelectorAll("a[href*='composer'], div[role='button'], span")
-      ];
-      for (let el of candidates) {
-        const txt = (el.innerText || el.getAttribute("aria-label") || "").trim().toLowerCase();
-        if (txt.includes("write") || txt.includes("tulis") || txt.includes("posting")) {
-          return el;
-        }
-      }
-      return null;
-    });
+const composerHandle = await page.$('a[href*="composer"], span[dir="auto"]');
+let composer = composerHandle ? composerHandle.asElement() : null;
+if (composer) {
+  console.log("✅ Composer ditemukan, klik...");
+  await safeClick(composer);
+  await page.waitForTimeout(3000);
+} else {
+  console.log("❌ Composer tidak ditemukan");
+}
 
-    let composer = composerHandle ? composerHandle.asElement() : null;
-    if (composer) {
-      console.log("✅ Composer ditemukan, klik...");
-      await safeClick(composer);
-      await page.waitForTimeout(3000);
-    } else {
-      throw new Error("❌ Composer tidak ditemukan");
-    }
 
     // =========================
     // 2. Scan & isi textbox caption
