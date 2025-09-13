@@ -5,29 +5,36 @@ const fs = require("fs");
 // =========================
 // Fungsi helper
 // =========================
+// cari elemen berdasarkan placeholder / aria-label / innerText
 async function getElementByPlaceholder(page, texts) {
   const handle = await page.evaluateHandle((placeholders) => {
-    const els = [...document.querySelectorAll("input, textarea, div[role='textbox'], div[role='button']")];
+    const els = Array.from(document.querySelectorAll("input, textarea, div[role='textbox'], div[role='button']"));
     for (let el of els) {
       const ph = el.getAttribute("placeholder") || el.getAttribute("aria-label") || el.innerText || "";
-      if (placeholders.some(p => ph.toLowerCase().includes(t.toLowerCase()))) {
-        return el;
+      for (let i = 0; i < placeholders.length; i++) {
+        if (ph.toLowerCase().includes(placeholders[i].toLowerCase())) {
+          return el;
+        }
       }
     }
     return null;
   }, texts);
 
   if (!handle) return null;
-  return handle.asElement();
+  return handle.asElement(); // biar bisa .click(), .type()
 }
 
+
+// klik tombol berdasarkan text/aria-label
 async function clickButtonByText(page, texts) {
   const handle = await page.evaluateHandle((labels) => {
-    const els = [...document.querySelectorAll("button, div[role='button'], input[type='submit']")];
+    const els = Array.from(document.querySelectorAll("button, div[role='button'], input[type='submit']"));
     for (let el of els) {
-      const txt = (el.innerText || el.getAttribute("aria-label") || el.getAttribute("placeholder") || "").trim();
-      if (labels.some(t => txt.toLowerCase().includes(t.toLowerCase()))) {
-        return el;
+      const txt = (el.innerText || el.getAttribute("aria-label") || "").trim();
+      for (let i = 0; i < labels.length; i++) {
+        if (txt.toLowerCase().includes(labels[i].toLowerCase())) {
+          return el;
+        }
       }
     }
     return null;
@@ -37,6 +44,15 @@ async function clickButtonByText(page, texts) {
   const btn = handle.asElement();
   if (!btn) return false;
 
+  try {
+    await btn.click();
+    return true;
+  } catch (e) {
+    console.log("⚠️ Gagal klik tombol:", e.message);
+    return false;
+  }
+}
+  
   try {
     // pakai click biasa
     await btn.click();
