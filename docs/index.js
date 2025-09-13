@@ -2,13 +2,62 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 
+// =========================
+// Fungsi helper
+// =========================
+
+// cari elemen berdasarkan placeholder / aria-label / innerText
+async function getElementByPlaceholder(page, texts) {
+  const handle = await page.evaluateHandle((placeholders) => {
+    const els = [...document.querySelectorAll("input, textarea, div[role='textbox'], div[role='button']")];
+    for (let el of els) {
+      const ph = el.getAttribute("placeholder") || el.getAttribute("aria-label") || el.innerText || "";
+      if (placeholders.some(p => ph.toLowerCase().includes(p.toLowerCase()))) {
+        return el;
+      }
+    }
+    return null;
+  }, texts);
+
+  if (!handle) return null;
+  return handle.asElement();
+}
+
+// klik tombol berdasarkan text/aria-label
+async function clickButtonByText(page, texts) {
+  const handle = await page.evaluateHandle((labels) => {
+    const els = [...document.querySelectorAll("button, div[role='button'], input[type='submit']")];
+    for (let el of els) {
+      const txt = (el.innerText || el.getAttribute("aria-label") || "").trim();
+      if (labels.some(t => txt.toLowerCase().includes(t.toLowerCase()))) {
+        return el;
+      }
+    }
+    return null;
+  }, texts);
+
+  if (!handle) return false;
+  const btn = handle.asElement();
+  if (!btn) return false;
+
+  try {
+    await btn.click();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// =========================
+// Main
+// =========================
 (async () => {
   try {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
     const groupUrl = "https://facebook.com/groups/512223333438818/"; // ganti ID grup
-    const caption = "Halo 👋 ini posting otomatis Puppeteer versi placeholder!";
+    const caption = "Halo 👋 ini posting otomatis Puppeteer versi placeholder fallback!";
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -17,6 +66,7 @@ const fs = require("fs");
     });
 
     const page = await browser.newPage();
+
     page.on("console", msg => console.log("BROWSER LOG:", msg.text()));
 
     await page.setUserAgent(
@@ -26,46 +76,12 @@ const fs = require("fs");
     await page.setCookie(...cookies);
     console.log("✅ Cookies set");
 
+    await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
+    await page.waitForTimeout(2000);
+
+    console.log("🌐 Opening group:", groupUrl);
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
-
-    // =========================
-    // Fungsi bantu
-    // =========================
-    async function getElementByPlaceholder(page, texts) {
-      return await page.evaluateHandle((placeholders) => {
-        const els = [...document.querySelectorAll("input, textarea, div[role='textbox']")];
-        for (let el of els) {
-          const ph = el.getAttribute("placeholder") || el.getAttribute("aria-label") || "";
-          if (placeholders.some(p => ph.toLowerCase().includes(p.toLowerCase()))) {
-            return el;
-          }
-        }
-        return null;
-      }, texts);
-    }
-
-    async function clickButtonByText(page, texts) {
-      const btn = await page.evaluateHandle((labels) => {
-        const els = [...document.querySelectorAll("button, div[role='button'], input[type='submit']")];
-        for (let el of els) {
-          const txt = (el.innerText || el.getAttribute("aria-label") || el.getAttribute("placeholder") || "").trim();
-          if (labels.some(t => txt.toLowerCase().includes(t.toLowerCase()))) {
-            return el;
-          }
-        }
-        return null;
-      }, texts);
-
-      if (btn) {
-        const box = await btn.boundingBox();
-        if (box) {
-          await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-          return true;
-        }
-      }
-      return false;
-    }
 
     // =========================
     // 1. Composer
@@ -81,10 +97,14 @@ const fs = require("fs");
 
     if (composer) {
       console.log("✅ Composer ditemukan, klik...");
-      await composer.click({ delay: 50 });
-      await page.waitForTimeout(2000);
+      try {
+        await composer.click();
+        await page.waitForTimeout(2000);
+      } catch (e) {
+        console.log("⚠️ Gagal klik composer:", e.message);
+      }
     } else {
-      console.log("❌ Composer tidak ditemukan");
+      console.log("❌ Composer tidak ditemukan (lanjut ke caption)");
     }
 
     // =========================
@@ -99,9 +119,13 @@ const fs = require("fs");
 
     if (textbox) {
       console.log("✅ Textbox ketemu, isi caption...");
-      await textbox.click({ delay: 50 });
-      await page.waitForTimeout(500);
-      await textbox.type(caption, { delay: 50 });
+      try {
+        await textbox.click();
+        await page.waitForTimeout(500);
+        await textbox.type(caption, { delay: 50 });
+      } catch (e) {
+        console.log("⚠️ Gagal isi caption:", e.message);
+      }
     } else {
       console.log("❌ Textbox caption tidak ditemukan");
     }
@@ -110,13 +134,7 @@ const fs = require("fs");
     // 3. Tombol Post
     // =========================
     console.log("👉 Klik tombol Post...");
-    let posted = await clickButtonByText(page, [
-      "Post",
-      "Kirim",
-      "Bagikan",
-      "Bagikan sekarang",
-      "OK"
-    ]);
+    let posted = await clickButtonByText(page, ["Post", "Kirim", "Bagikan", "Bagikan sekarang", "OK"]);
 
     if (posted) {
       console.log("✅ Post berhasil diklik!");
