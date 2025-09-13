@@ -24,7 +24,6 @@ async function getElementByPlaceholder(page, texts) {
   return handle.asElement(); // biar bisa .click(), .type()
 }
 
-
 // klik tombol berdasarkan text/aria-label
 async function clickButtonByText(page, texts) {
   const handle = await page.evaluateHandle((labels) => {
@@ -45,30 +44,26 @@ async function clickButtonByText(page, texts) {
   if (!btn) return false;
 
   try {
+    // click biasa dulu
     await btn.click();
     return true;
   } catch (e) {
-    console.log("⚠️ Gagal klik tombol:", e.message);
-    return false;
-  }
-}
-  
-  try {
-    // pakai click biasa
-    await btn.click();
-    return true;
-  } catch {
+    console.log("⚠️ Gagal click biasa, coba fallback tap:", e.message);
     try {
-      // fallback tap
+      // fallback tap via touchscreen
       const box = await btn.boundingBox();
       if (box) {
         await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
         return true;
       }
-    } catch {}
+    } catch (e2) {
+      console.log("⚠️ Fallback tap juga gagal:", e2.message);
+    }
   }
+
   return false;
 }
+
 
 // =========================
 // Main
