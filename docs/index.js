@@ -181,15 +181,31 @@ if (textboxHandle) {
     // =========================
     // 3. Scan & klik tombol Post
     // =========================
-    await scanElements(page, "Tombol Post");
+    // =========================
+// 3️⃣ Scan & klik tombol Post dengan debug log
+// =========================
+const postCandidates = await page.$$('button, div[role="button"], input[type="submit"], a');
 
-    const postClicked = await clickButtonByText(page, ["Post", "Kirim", "Bagikan"]);
-    if (postClicked) {
-      console.log("✅ Tombol Post berhasil diklik!");
-    } else {
-      console.log("❌ Tombol Post tidak ketemu");
-    }
+let postClicked = false;
 
+for (const el of postCandidates) {
+  const name = await page.evaluate(e => (e.innerText || e.getAttribute("aria-label") || "").trim(), el);
+  
+  console.log("🔹 Tombol ditemukan:", name); // debug log nama tombol
+  
+  if (["post", "kirim", "bagikan"].some(t => name.toLowerCase().includes(t))) {
+    console.log("✅ Klik tombol:", name);
+    await safeClick(el);
+    postClicked = true;
+    break;
+  }
+}
+
+if (!postClicked) {
+  console.log("❌ Tombol Post tidak ketemu");
+}
+
+   
     await page.waitForTimeout(5000);
     await browser.close();
   } catch (err) {
