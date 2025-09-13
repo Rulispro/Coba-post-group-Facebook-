@@ -98,7 +98,26 @@ async function scanElements(page, label = "Scan") {
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
 
-    // =========================
+    
+    // =====// =========================
+// 0️⃣ Skip banner "Use Facebook App"
+// =========================
+console.log("🔹 Cek banner 'Use App'...");
+const bannerSelector = 'a[href*="use_store_link"], div.amcn';
+const banner = await page.$(bannerSelector);
+
+if (banner) {
+  console.log("✅ Banner ditemukan, klik untuk skip...");
+  try {
+    await banner.evaluate(el => el.click());
+    await page.waitForTimeout(1500); // tunggu hilang
+  } catch (e) {
+    console.log("⚠️ Gagal klik banner:", e.message);
+  }
+} else {
+  console.log("ℹ️ Banner tidak muncul");
+}
+//===================
     // 1. Scan & klik composer
     // =========================
     await scanElements(page, "Composer sebelum klik");
