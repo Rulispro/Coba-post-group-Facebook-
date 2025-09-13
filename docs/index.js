@@ -41,6 +41,27 @@ async function clickButtonByText(page, texts) {
   return await safeClick(btn);
 }
 
+// scan semua elemen penting
+async function scanAllElements(page, keywords = [], label = "Scan") {
+  const elements = await page.evaluate((keywords) => {
+    const all = [...document.querySelectorAll("div, span, button, textarea, input")];
+    return all.map(el => {
+      const txt = (el.innerText || "").trim();
+      const aria = el.getAttribute("aria-label") || "";
+      const role = el.getAttribute("role") || "";
+      const classes = el.className || "";
+      const parent = el.parentElement ? el.parentElement.tagName : null;
+      const matched = keywords.some(k => txt.toLowerCase().includes(k.toLowerCase()) 
+                                        || aria.toLowerCase().includes(k.toLowerCase()));
+      return { tag: el.tagName, txt, aria, role, classes, parent, matched };
+    });
+  }, keywords);
+
+  console.log(`🔎 ${label} (elemen yang matched keyword):`);
+  elements.filter(e => e.matched).forEach(e => console.log(e));
+  return elements;
+}
+
 // =========================
 // Main
 // =========================
@@ -50,10 +71,10 @@ async function clickButtonByText(page, texts) {
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
     const groupUrl = "https://facebook.com/groups/512223333438818/"; // ganti ID grup
-    const caption = "Halo 👋 ini posting otomatis Puppeteer dengan tap()!";
+    const caption = "Halo 👋 ini posting otomatis Puppeteer!";
 
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       defaultViewport: { width: 412, height: 915, isMobile: true, hasTouch: true },
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
     });
@@ -76,17 +97,19 @@ async function clickButtonByText(page, texts) {
     await page.waitForTimeout(4000);
 
     // =========================
-    // 1. Cari composer parent
+    // 1. Scan & klik composer
     // =========================
-    console.log("👉 Cari composer...");
-    const composerHandle = await page.evaluateHandle(() => {
-      const keywords = [
-        "Write something",
-        "Apa yang Anda pikirkan",
-        "Tulis sesuatu",
-        "Create a post",
-        "Buat postingan"
-      ];
+    const composerKeywords = [
+      "Write something",
+      "Apa yang Anda pikirkan",
+      "Tulis sesuatu",
+      "Create a post",
+      "Buat postingan"
+    ];
+
+    await scanAllElements(page, composerKeywords, "Composer sebelum klik");
+
+    const composerHandle = await page.evaluateHandle((keywords) => {
       const all = [...document.querySelectorAll("div[role='button'], span, div")];
       for (let el of all) {
         const txt = (el.innerText || el.getAttribute("aria-label") || "").trim();
@@ -95,7 +118,7 @@ async function clickButtonByText(page, texts) {
         }
       }
       return null;
-    });
+    }, composerKeywords);
 
     let composer = composerHandle ? composerHandle.asElement() : null;
     if (composer) {
@@ -107,42 +130,40 @@ async function clickButtonByText(page, texts) {
     }
 
     // =========================
-    // 2. Cari textbox caption
+    // 2. Scan & isi textbox caption
     // =========================
-    console.log("👉 Cari textbox caption...");
+    const textboxKeywords = [
+      "Write something",
+      "Apa yang Anda pikirkan",
+      "Tulis sesuatu",
+      "Create a public post",
+      "Buat postingan publik",
+    ];
+
+    await scanAllElements(page, textboxKeywords, "Textbox / Caption");
+
     const textboxHandle = await page.evaluateHandle(() => {
-      const candidates = [
-        "Write something",
-        "Apa yang Anda pikirkan",
-        "Tulis sesuatu",
-        "Create a public post",
-        "Buat postingan publik",
-      ];
-      const all = [...document.querySelectorAll("div[role='textbox']")];
-      for (let el of all) {
-        const label = el.getAttribute("aria-label") || "";
-        if (candidates.some(c => label.toLowerCase().includes(c.toLowerCase()))) {
-          return el;
-        }
-      }
-      return all.length ? all[0] : null; // fallback
+      const all = [...document.querySelectorAll("div[role='textbox'], textarea")];
+      return all.length ? all[0] : null; // fallback ambil pertama
     });
 
     let textbox = textboxHandle ? textboxHandle.asElement() : null;
     if (textbox) {
       console.log("✅ Textbox ditemukan, isi caption...");
       await textbox.click();
-      await page.type("div[role='textbox']", caption, { delay: 50 });
+      await page.type("div[role='textbox'], textarea", caption, { delay: 50 });
+      await page.waitForTimeout(1000);
     } else {
       throw new Error("❌ Textbox tidak ditemukan");
     }
 
     // =========================
-    // 3. Klik tombol Post
+    // 3. Scan & klik tombol Post
     // =========================
-    console.log("👉 Klik tombol Post...");
-    let posted = await clickButtonByText(page, ["Post", "Kirim", "Bagikan", "Bagikan sekarang", "OK"]);
+    const postKeywords = ["Post", "Kirim", "Bagikan", "Bagikan sekarang", "OK"];
+    await scanAllElements(page, postKeywords, "Tombol Post");
 
+    let posted = await clickButtonByText(page, postKeywords);
     if (posted) {
       console.log("✅ Tombol Post berhasil diklik!");
     } else {
@@ -156,4 +177,4 @@ async function clickButtonByText(page, texts) {
     process.exit(1);
   }
 })();
-          
+                        
