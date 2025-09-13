@@ -8,7 +8,7 @@ const fs = require("fs");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
     const groupUrl = "https://facebook.com/groups/512223333438818/"; // ganti ID grup
-    const caption = "Halo 👋 ini posting otomatis Puppeteer versi fallback log!";
+    const caption = "Halo 👋 ini posting otomatis Puppeteer versi placeholder!";
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -17,7 +17,6 @@ const fs = require("fs");
     });
 
     const page = await browser.newPage();
-
     page.on("console", msg => console.log("BROWSER LOG:", msg.text()));
 
     await page.setUserAgent(
@@ -27,66 +26,81 @@ const fs = require("fs");
     await page.setCookie(...cookies);
     console.log("✅ Cookies set");
 
-    await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
-    await page.waitForTimeout(2000);
-
-    console.log("🌐 Opening group:", groupUrl);
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
 
     // =========================
-    // 1. Composer
+    // Fungsi bantu
     // =========================
-    console.log("👉 Cari tombol composer via page.evaluate ...");
-    let composerClicked = await page.evaluate(() => {
-      const texts = ["Write something", "Tulis sesuatu", "Create a post", "Buat postingan"];
-      let target = null;
-      const spans = Array.from(document.querySelectorAll("div[role='button'] span"));
-      for (const s of spans) {
-        const txt = (s.innerText || "").trim();
-        if (texts.some(t => txt.toLowerCase().includes(t.toLowerCase()))) {
-          target = s.closest("div[role='button']");
-          break;
+    async function getElementByPlaceholder(page, texts) {
+      return await page.evaluateHandle((placeholders) => {
+        const els = [...document.querySelectorAll("input, textarea, div[role='textbox']")];
+        for (let el of els) {
+          const ph = el.getAttribute("placeholder") || el.getAttribute("aria-label") || "";
+          if (placeholders.some(p => ph.toLowerCase().includes(p.toLowerCase()))) {
+            return el;
+          }
+        }
+        return null;
+      }, texts);
+    }
+
+    async function clickButtonByText(page, texts) {
+      const btn = await page.evaluateHandle((labels) => {
+        const els = [...document.querySelectorAll("button, div[role='button'], input[type='submit']")];
+        for (let el of els) {
+          const txt = (el.innerText || el.getAttribute("aria-label") || el.getAttribute("placeholder") || "").trim();
+          if (labels.some(t => txt.toLowerCase().includes(t.toLowerCase()))) {
+            return el;
+          }
+        }
+        return null;
+      }, texts);
+
+      if (btn) {
+        const box = await btn.boundingBox();
+        if (box) {
+          await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+          return true;
         }
       }
-      if (target) {
-        ["mousedown", "mouseup", "click"].forEach(type =>
-          target.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }))
-        );
-        return true;
-      }
       return false;
-    });
-
-    if (!composerClicked) {
-      console.log("❌ Composer via evaluate tidak ditemukan, coba pakai page.$x ...");
-      const [btn] = await page.$x(
-        "//div[@role='button']//span[contains(text(),'Write') or contains(text(),'Tulis') or contains(text(),'Buat')]"
-      );
-      if (btn) {
-        await btn.click().catch(() => {});
-        composerClicked = true;
-      }
     }
 
-    if (composerClicked) {
-      console.log("✅ Composer berhasil diklik, tunggu 2 detik...");
+    // =========================
+    // 1. Composer
+    // =========================
+    console.log("👉 Cari composer via placeholder...");
+    let composer = await getElementByPlaceholder(page, [
+      "Write something",
+      "Tulis sesuatu",
+      "Apa yang Anda pikirkan",
+      "Create a post",
+      "Buat postingan"
+    ]);
+
+    if (composer) {
+      console.log("✅ Composer ditemukan, klik...");
+      await composer.click({ delay: 50 });
       await page.waitForTimeout(2000);
     } else {
-      console.log("❌ Composer button not found (skip ke caption)");
+      console.log("❌ Composer tidak ditemukan");
     }
 
     // =========================
-    // 2. Textbox Caption
+    // 2. Caption
     // =========================
-    console.log("👉 Cari textbox caption...");
-    let textbox = await page.$("textarea");
-    if (!textbox) {
-      textbox = await page.$("div[aria-label*='What']") || null;
-    }
+    console.log("👉 Cari textbox caption via placeholder...");
+    let textbox = await getElementByPlaceholder(page, [
+      "Write something",
+      "Tulis sesuatu",
+      "Apa yang Anda pikirkan"
+    ]);
 
     if (textbox) {
       console.log("✅ Textbox ketemu, isi caption...");
+      await textbox.click({ delay: 50 });
+      await page.waitForTimeout(500);
       await textbox.type(caption, { delay: 50 });
     } else {
       console.log("❌ Textbox caption tidak ditemukan");
@@ -95,44 +109,19 @@ const fs = require("fs");
     // =========================
     // 3. Tombol Post
     // =========================
-    console.log("👉 Cari tombol Post...");
-    let postBtn = null;
+    console.log("👉 Klik tombol Post...");
+    let posted = await clickButtonByText(page, [
+      "Post",
+      "Kirim",
+      "Bagikan",
+      "Bagikan sekarang",
+      "OK"
+    ]);
 
-    // coba evaluate
-    const clicked = await page.evaluate(() => {
-      const btns = Array.from(document.querySelectorAll("button, div[role='button'], input[type='submit']"));
-      const target = btns.find(
-        b =>
-          (b.innerText || "").toLowerCase().includes("post") ||
-          (b.innerText || "").toLowerCase().includes("kirim") ||
-          (b.innerText || "").toLowerCase().includes("bagikan")
-      );
-      if (target) {
-        ["mousedown", "mouseup", "click"].forEach(type =>
-          target.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }))
-        );
-        return true;
-      }
-      return false;
-    });
-
-    if (!clicked) {
-      console.log("❌ Tombol Post via evaluate tidak ketemu, coba pakai XPath...");
-      const [btn2] = await page.$x(
-        "//div[@role='button']//span[text()='Post' or text()='Kirim' or text()='Bagikan sekarang']"
-      );
-      if (btn2) {
-        await btn2.click().catch(() => {});
-        postBtn = true;
-      }
+    if (posted) {
+      console.log("✅ Post berhasil diklik!");
     } else {
-      postBtn = true;
-    }
-
-    if (postBtn) {
-      console.log("✅ Postingan dikirim!");
-    } else {
-      console.log("❌ Tombol Post gagal ditemukan");
+      console.log("❌ Tombol Post tidak ketemu");
     }
 
     await page.waitForTimeout(5000);
