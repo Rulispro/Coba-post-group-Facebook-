@@ -108,7 +108,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 
       if (
         isEditable ||
-        placeholder.includes("Apa yang Anda pikirkan") ||
+        placeholder.includes("Write something") ||
         (role === "button" && aria.toLowerCase().includes("write something")) ||
         (role === "button" && aria.toLowerCase().includes("create a public post"))
       ) {
