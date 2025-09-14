@@ -55,6 +55,10 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 
     const page = await browser.newPage();
     page.on("console", msg => console.log("BROWSER LOG:", msg.text()));
+    await page.evaluateOnNewDocument(() => {
+  Object.defineProperty(navigator, "webdriver", { get: () => false });
+});
+    
     await page.setUserAgent(
       "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
     );
