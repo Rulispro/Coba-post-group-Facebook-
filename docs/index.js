@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 
+// Fungsi klik aman
 async function safeClick(el) {
   if (!el) return false;
   try {
@@ -16,6 +17,7 @@ async function safeClick(el) {
   }
 }
 
+// Fungsi scan elemen verbose
 async function scanAllElementsVerbose(page, label = "Scan") {
   console.log(`\n🔎 ${label} (50 elemen pertama)`);
   const elements = await page.evaluate(() => {
@@ -42,11 +44,11 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://www.facebook.com/groups/5763845890292336/"; // Bisa web atau m.facebook.com
-    const caption = "Halo 👋 ini posting otomatis Puppeteer!";
+    const groupUrl = "https://m.facebook.com/groups/5763845890292336/"; // versi mobile
+    const caption = "Halo 👋 ini posting otomatis Puppeteer versi mobile!";
 
     const browser = await puppeteer.launch({
-      headless: true, // false supaya bisa lihat
+      headless: true,
       defaultViewport: { width: 412, height: 915, isMobile: true, hasTouch: true },
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
     });
@@ -63,7 +65,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(3000);
 
-    // ===== 1️⃣ Klik composer / write something / what's on your mind
+    // ===== 1️⃣ Klik composer / write something
     const composerSelectors = [
       'a[href*="composer"]',
       'div[role="button"]',
@@ -90,54 +92,40 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       await scanAllElementsVerbose(page, "Composer");
     }
 
-    // ===== 2️⃣ Isi caption
-    const textboxSelectors = [
-      'div[role="textbox"][contenteditable="true"]',
-      'textarea[name="xs_message"]',
-      'div[aria-label*="write something"]',
-      'div[aria-label*="what\'s on your mind"]',
-      'div[aria-label*="create a post"]',
-      'div[placeholder*="write something"]',
-      'div[placeholder*="create a public post"]',
-      'div[placeholder*="what\'s on your mind"]'
-    ];
+    // ===== 2️⃣ Isi caption (versi mobile)
+    await page.waitForSelector('div[role="main"]');
+    const parent = await page.$('div[role="main"]');
+    const allChildren = await parent.$$('*');
 
-    let typed = false;
-    for (const sel of textboxSelectors) {
-      const handle = await page.$(sel);
-      if (handle) {
-        console.log("✅ Textbox ditemukan:", sel);
-        await handle.focus();
-        await page.keyboard.type(caption, { delay: 50 });
-        typed = true;
-        await page.waitForTimeout(1000);
+    let textbox = null;
+    for (const el of allChildren) {
+      const isEditable = await el.evaluate(node => node.getAttribute('contenteditable') === 'true');
+      const placeholder = await el.evaluate(node => node.getAttribute('placeholder') || '');
+      if (isEditable || placeholder.includes("Apa yang Anda pikirkan")) {
+        textbox = el;
         break;
       }
     }
-    if (!typed) {
-      console.log("❌ Textbox / Caption tidak ditemukan, scan semua elemen");
+
+    if (!textbox) {
+      console.log('❌ Textbox / Caption tidak ditemukan, scan semua elemen');
       await scanAllElementsVerbose(page, "Textbox / Caption");
-    }
+    } else {
+      console.log('✅ Textbox ditemukan, klik dan isi teks');
+      await textbox.click({ clickCount: 2 });
+      await textbox.focus();
+      await page.keyboard.type(caption, { delay: 50 });
+      await page.waitForTimeout(1000);
 
-    // ===== 3️⃣ Klik tombol post
-    const postCandidates = await page.$$('button, div[role="button"], input[type="submit"], a');
-    let postClicked = false;
-
-    for (const el of postCandidates) {
-      const name = await page.evaluate(e => (e.innerText || e.getAttribute("aria-label") || "").trim(), el);
-      console.log("🔹 Tombol ditemukan:", name);
-      if (["post", "kirim", "bagikan", "create post"].some(t => name.toLowerCase().includes(t))) {
-        console.log("✅ Klik tombol:", name);
-        await safeClick(el);
-        postClicked = true;
-        break;
-      }
-    }
-
-    if (!postClicked) {
-      console.log("⚠️ Tombol post kata kunci tidak ditemukan, coba klik semua tombol");
-      for (const el of postCandidates) {
-        await safeClick(el);
+      // ===== 3️⃣ Klik tombol post (versi mobile)
+      const postButton = await page.$x("//div[@role='button' and contains(., 'Kirim')]");
+      if (postButton.length > 0) {
+        await safeClick(postButton[0]);
+        console.log('✅ Post berhasil dikirim');
+      } else {
+        console.log('⚠️ Tombol Post tidak ditemukan, scan semua tombol');
+        const postCandidates = await page.$$('button, div[role="button"], input[type="submit"], a');
+        for (const el of postCandidates) await safeClick(el);
       }
     }
 
