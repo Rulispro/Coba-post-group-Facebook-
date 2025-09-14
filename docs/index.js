@@ -48,11 +48,11 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://www.facebook.com/groups/5763845890292336/"; // ganti link grup
+    const groupUrl = "https://web.facebook.com/groups/5763845890292336/"; // ganti link grup
     const caption = "Halo 👋 ini posting otomatis Puppeteer!";
 
     const browser = await puppeteer.launch({
-      headless: false, // false supaya bisa lihat jalannya
+      headless: true, // false supaya bisa lihat jalannya
       defaultViewport: { width: 1200, height: 900 },
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
     });
