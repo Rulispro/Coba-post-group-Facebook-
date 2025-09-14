@@ -94,7 +94,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 
     // ===== 2️⃣ Klik launcherbox (biar fokus input)
     const launcherboxSelector = 'div[role="button"][tabindex="0"][aria-label*="create a post"]';
-    const launcherbox = await page.$(launcherboxSelector);
+    let launcherbox = await page.$(launcherboxSelector);
     if (launcherbox) {
       console.log("✅ Launcherbox tombol ditemukan");
       await safeClick(launcherbox);
