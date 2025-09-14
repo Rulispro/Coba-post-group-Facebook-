@@ -101,8 +101,17 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       await page.waitForTimeout(1500);
     } else {
       console.log("❌ Launcherbox tombol tidak ditemukan");
+      // 🔥 fallback untuk m.facebook.com
+  launcherbox = await page.$('a[href*="composer"]');
+  if (launcherbox) {
+    console.log("✅ Launcherbox (m.facebook) ditemukan");
+    await safeClick(launcherbox);
+    await page.waitForTimeout(1500);
+  } else {
+    console.log("❌ Launcherbox (m.facebook) juga tidak ditemukan");
+  }
     }
-
+    
     // ===== 3️⃣ Isi caption di textbox
     const textbox = await page.$('div[contenteditable="true"]');
     if (textbox) {
