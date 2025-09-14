@@ -92,16 +92,26 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       await scanAllElementsVerbose(page, "Composer");
     }
 
-    // ===== 2️⃣ Isi caption (versi mobile)
-    await page.waitForSelector('div[role="main"]');
-    const parent = await page.$('div[role="main"]');
-    const allChildren = await parent.$$('*');
+    // ===== 2️⃣ Isi caption (versi mobile, parent div[role="button"][tabindex="0"])
+    const parentSelector = 'div[role="button"][tabindex="0"]';
+    await page.waitForSelector(parentSelector);
+    const parent = await page.$(parentSelector);
 
+    const allChildren = await parent.$$('*');
     let textbox = null;
+
     for (const el of allChildren) {
       const isEditable = await el.evaluate(node => node.getAttribute('contenteditable') === 'true');
       const placeholder = await el.evaluate(node => node.getAttribute('placeholder') || '');
-      if (isEditable || placeholder.includes("Apa yang Anda pikirkan")) {
+      const role = await el.evaluate(node => node.getAttribute('role') || '');
+      const aria = await el.evaluate(node => node.getAttribute('aria-label') || '');
+
+      if (
+        isEditable ||
+        placeholder.includes("Apa yang Anda pikirkan") ||
+        (role === "button" && aria.toLowerCase().includes("write something")) ||
+        (role === "button" && aria.toLowerCase().includes("create a public post"))
+      ) {
         textbox = el;
         break;
       }
@@ -117,13 +127,15 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       await page.keyboard.type(caption, { delay: 50 });
       await page.waitForTimeout(1000);
 
-      // ===== 3️⃣ Klik tombol post (versi mobile)
-      const postButton = await page.$x("//div[@role='button' and contains(., 'Kirim')]");
+      // ===== Klik tombol Post versi mobile
+      const postButton = await page.$x(
+        "//div[@role='button' and contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'kirim')]"
+      );
       if (postButton.length > 0) {
         await safeClick(postButton[0]);
         console.log('✅ Post berhasil dikirim');
       } else {
-        console.log('⚠️ Tombol Post tidak ditemukan, scan semua tombol');
+        console.log('⚠️ Tombol Post tidak ditemukan, coba scan semua tombol');
         const postCandidates = await page.$$('button, div[role="button"], input[type="submit"], a');
         for (const el of postCandidates) await safeClick(el);
       }
