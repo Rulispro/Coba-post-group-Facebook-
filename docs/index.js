@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const fs = require("fs");
 
 // =========================
-// Fungsi helper
+// Helper
 // =========================
 async function safeClick(el) {
   if (!el) return false;
@@ -31,7 +31,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
         aria: el.getAttribute("aria-label"),
         placeholder: el.getAttribute("placeholder"),
         role: el.getAttribute("role"),
-        href: el.getAttribute("href"),
+        name: el.getAttribute("name"),
         contenteditable: el.getAttribute("contenteditable"),
         classes: el.className
       }));
@@ -48,85 +48,60 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://m.facebook.com/groups/5763845890292336/";
+    const groupUrl = "https://www.facebook.com/groups/5763845890292336/"; // ganti link grup
     const caption = "Halo 👋 ini posting otomatis Puppeteer!";
 
     const browser = await puppeteer.launch({
-      headless: true,
-      defaultViewport: { width: 412, height: 915, isMobile: true, hasTouch: true },
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"]
+      headless: false, // false supaya bisa lihat jalannya
+      defaultViewport: { width: 1200, height: 900 },
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
     });
 
     const page = await browser.newPage();
     page.on("console", msg => console.log("BROWSER LOG:", msg.text()));
-    await page.setUserAgent(
-      "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
-    );
+
+    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36");
     await page.setCookie(...cookies);
     console.log("✅ Cookies set");
 
+    await page.goto("https://www.facebook.com/", { waitUntil: "networkidle2" });
+    await page.waitForTimeout(2000);
+
+    console.log("🌐 Opening group:", groupUrl);
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(4000);
 
-    // ===== 1️⃣ Klik composer / write something
-    const composerSelectors = [
-      'a[href*="composer"]',
-      'div[role="button"]',
-      'span[dir="auto"][placeholder*="write"]',
-      'div[placeholder*="write something"]'
-    ];
-
-    let composerClicked = false;
-    for (const sel of composerSelectors) {
-      const handle = await page.$(sel);
-      if (handle) {
-        console.log("✅ Composer ditemukan:", sel);
-        await safeClick(handle);
-        composerClicked = true;
-        await page.waitForTimeout(2000);
-        break;
-      }
-    }
-
-    if (!composerClicked) {
-      console.log("❌ Composer tidak ditemukan, scan semua elemen");
+    // =========================
+    // Klik composer / placeholder "Write something"
+    let composerHandle = await page.$('div[aria-label*="Write something"], div[role="button"], span[dir="auto"]');
+    if (composerHandle) {
+      console.log("✅ Composer ditemukan, klik...");
+      await safeClick(composerHandle);
+      await page.waitForTimeout(2000);
+    } else {
+      console.log("❌ Composer tidak ditemukan, scan elements:");
       await scanAllElementsVerbose(page, "Composer");
     }
 
-    // ===== 2️⃣ Isi caption
-    const textboxSelectors = [
-      'div[role="textbox"][contenteditable="true"]',
-      'textarea[name="xs"]',
-      '[aria-label*="write something"]'
-    ];
-
-    let typed = false;
-    for (const sel of textboxSelectors) {
-      const handle = await page.$(sel);
-      if (handle) {
-        console.log("✅ Textbox ditemukan:", sel);
-        await handle.focus();
-        await page.keyboard.type(caption, { delay: 50 });
-        typed = true;
-        await page.waitForTimeout(1000);
-        break;
-      }
-    }
-
-    if (!typed) {
-      console.log("❌ Textbox / Caption tidak ditemukan, scan semua elemen");
+    // =========================
+    // Isi caption
+    let textboxHandle = await page.$('div[role="textbox"][contenteditable="true"], div[contenteditable="true"], textarea[name="xs"]');
+    if (textboxHandle) {
+      console.log("✅ Textbox / Caption ditemukan, isi caption...");
+      await textboxHandle.focus();
+      await page.keyboard.type(caption, { delay: 50 });
+      await page.waitForTimeout(1000);
+    } else {
+      console.log("❌ Textbox tidak ditemukan, scan elements:");
       await scanAllElementsVerbose(page, "Textbox / Caption");
     }
 
-    // ===== 3️⃣ Klik tombol post
+    // =========================
+    // Klik tombol post (fallback klik semua jika kata kunci tidak ketemu)
     const postCandidates = await page.$$('button, div[role="button"], input[type="submit"], a');
     let postClicked = false;
-
     for (const el of postCandidates) {
       const name = await page.evaluate(e => (e.innerText || e.getAttribute("aria-label") || "").trim(), el);
-      console.log("🔹 Tombol ditemukan:", name);
-
-      // jika ada kata post/kirim/bagikan klik
       if (["post", "kirim", "bagikan"].some(t => name.toLowerCase().includes(t))) {
         console.log("✅ Klik tombol:", name);
         await safeClick(el);
@@ -135,9 +110,8 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       }
     }
 
-    // fallback: klik semua tombol yang terlihat
     if (!postClicked) {
-      console.log("⚠️ Tombol post kata kunci tidak ditemukan, coba klik semua tombol");
+      console.log("⚠️ Kata kunci tombol post tidak ditemukan, coba klik semua tombol/div...");
       for (const el of postCandidates) {
         await safeClick(el);
       }
