@@ -1,7 +1,13 @@
-const puppeteer = require("puppeteer");
-const fs = require("fs");
+"use strict";
 
-// Fungsi klik aman
+const fs = require("fs");
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+
+// Aktifkan plugin stealth
+puppeteer.use(StealthPlugin());
+
+// ===== Fungsi klik aman
 async function safeClick(el) {
   if (!el) return false;
   try {
@@ -17,7 +23,7 @@ async function safeClick(el) {
   }
 }
 
-// Fungsi scan elemen verbose
+// ===== Fungsi scan elemen verbose
 async function scanAllElementsVerbose(page, label = "Scan") {
   console.log(`\n🔎 ${label} (50 elemen pertama)`);
   const elements = await page.evaluate(() => {
@@ -39,33 +45,53 @@ async function scanAllElementsVerbose(page, label = "Scan") {
   return elements;
 }
 
+// ===== Main Puppeteer
 (async () => {
   try {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://m.facebook.com/groups/5763845890292336/"; // versi mobile
+    const groupUrl = "https://m.facebook.com/groups/5763845890292336/";
     const caption = "Halo 👋 ini posting otomatis Puppeteer versi mobile!";
 
     const browser = await puppeteer.launch({
-      headless: true,
-      defaultViewport: { width: 412, height: 915, isMobile: true, hasTouch: true },
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
+      headless: new,
+      defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-blink-features=AutomationControlled"
+      ],
     });
 
     const page = await browser.newPage();
-    page.on("console", msg => console.log("BROWSER LOG:", msg.text()));
-    await page.evaluateOnNewDocument(() => {
-  Object.defineProperty(navigator, "webdriver", { get: () => false });
-});
-    
+
+    // ===== Anti-detect: spoof user-agent & browser properties
     await page.setUserAgent(
-      "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
+      "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 " +
+      "(KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36"
     );
 
+    await page.setViewport({ width: 390, height: 844, isMobile: true });
+
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, "webdriver", { get: () => false });
+    });
+    await page.evaluateOnNewDocument(() => {
+      window.navigator.chrome = { runtime: {} };
+    });
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, "languages", { get: () => ["id-ID", "id"] });
+    });
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
+    });
+
+    // ===== Pasang cookies
     await page.setCookie(...cookies);
     console.log("✅ Cookies set");
 
+    // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(3000);
 
@@ -105,17 +131,17 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       await page.waitForTimeout(1500);
     } else {
       console.log("❌ Launcherbox tombol tidak ditemukan");
-      // 🔥 fallback untuk m.facebook.com
-  launcherbox = await page.$('a[href*="composer"]');
-  if (launcherbox) {
-    console.log("✅ Launcherbox (m.facebook) ditemukan");
-    await safeClick(launcherbox);
-    await page.waitForTimeout(1500);
-  } else {
-    console.log("❌ Launcherbox (m.facebook) juga tidak ditemukan");
-  }
+      // fallback untuk m.facebook.com
+      launcherbox = await page.$('a[href*="composer"]');
+      if (launcherbox) {
+        console.log("✅ Launcherbox (m.facebook) ditemukan");
+        await safeClick(launcherbox);
+        await page.waitForTimeout(1500);
+      } else {
+        console.log("❌ Launcherbox (m.facebook) juga tidak ditemukan");
+      }
     }
-    
+
     // ===== 3️⃣ Isi caption di textbox
     const textbox = await page.$('div[contenteditable="true"]');
     if (textbox) {
@@ -138,6 +164,10 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       console.log("❌ Tombol POST tidak ditemukan");
       await scanAllElementsVerbose(page, "Tombol POST");
     }
+
+    // ===== Debug: cek webdriver
+    const webdriver = await page.evaluate(() => navigator.webdriver);
+    console.log("navigator.webdriver:", webdriver);
 
     await browser.close();
   } catch (err) {
