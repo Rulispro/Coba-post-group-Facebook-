@@ -83,7 +83,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
         console.log("✅ Composer ditemukan:", sel);
         await safeClick(handle);
         composerClicked = true;
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(2000); // tunggu launcherbox muncul
         break;
       }
     }
@@ -92,60 +92,42 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       await scanAllElementsVerbose(page, "Composer");
     }
 
-    // ===== 2️⃣ Isi caption (versi mobile, parent div[role="button"][tabindex="0"])
-    const parentSelector = 'div[role="button"][tabindex="0"]';
-    await page.waitForSelector(parentSelector);
-    const parent = await page.$(parentSelector);
-
-    const allChildren = await parent.$$('*');
-    let textbox = null;
-
-    for (const el of allChildren) {
-      const isEditable = await el.evaluate(node => node.getAttribute('contenteditable') === 'true');
-      const placeholder = await el.evaluate(node => node.getAttribute('placeholder') || '');
-      const role = await el.evaluate(node => node.getAttribute('role') || '');
-      const aria = await el.evaluate(node => node.getAttribute('aria-label') || '');
-
-      if (
-        isEditable ||
-        placeholder.includes("Write something") ||
-        (role === "button" && aria.toLowerCase().includes("write something")) ||
-        (role === "button" && aria.toLowerCase().includes("create a public post"))
-      ) {
-        textbox = el;
-        break;
-      }
+    // ===== 2️⃣ Klik launcherbox (biar fokus input)
+    const launcherboxSelector = 'div[role="button"][tabindex="0"][aria-label*="create a post"]';
+    const launcherbox = await page.$(launcherboxSelector);
+    if (launcherbox) {
+      console.log("✅ Launcherbox tombol ditemukan");
+      await safeClick(launcherbox);
+      await page.waitForTimeout(1500);
+    } else {
+      console.log("❌ Launcherbox tombol tidak ditemukan");
     }
 
-    if (!textbox) {
-      console.log('❌ Textbox / Caption tidak ditemukan, scan semua elemen');
-      await scanAllElementsVerbose(page, "Textbox / Caption");
-    } else {
-      console.log('✅ Textbox ditemukan, klik dan isi teks');
-      await textbox.click({ clickCount: 2 });
+    // ===== 3️⃣ Isi caption di textbox
+    const textbox = await page.$('div[contenteditable="true"]');
+    if (textbox) {
+      console.log("✅ Textbox aktif ditemukan");
       await textbox.focus();
       await page.keyboard.type(caption, { delay: 50 });
-      await page.waitForTimeout(1000);
-
-      // ===== Klik tombol Post versi mobile
-      const postButton = await page.$x(
-        "//div[@role='button' and contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'kirim')]"
-      );
-      if (postButton.length > 0) {
-        await safeClick(postButton[0]);
-        console.log('✅ Post berhasil dikirim');
-      } else {
-        console.log('⚠️ Tombol Post tidak ditemukan, coba scan semua tombol');
-        const postCandidates = await page.$$('button, div[role="button"], input[type="submit"], a');
-        for (const el of postCandidates) await safeClick(el);
-      }
+      await page.waitForTimeout(2000);
+    } else {
+      console.log("❌ Textbox aktif tidak ditemukan, scan elemen");
+      await scanAllElementsVerbose(page, "Textbox setelah klik launcherbox");
     }
 
-    await page.waitForTimeout(5000);
+    // ===== 4️⃣ Klik tombol POST
+    try {
+      await page.waitForSelector('div[role="button"] span.f2', { timeout: 5000 });
+      console.log("✅ Tombol POST ditemukan");
+      await page.click('div[role="button"]:has(span.f2)');
+      console.log("🎉 Post berhasil dikirim");
+    } catch (e) {
+      console.log("❌ Tombol POST tidak ditemukan");
+      await scanAllElementsVerbose(page, "Tombol POST");
+    }
+
     await browser.close();
-    console.log("🎉 Selesai posting!");
   } catch (err) {
-    console.error("❌ Gagal posting:", err);
-    process.exit(1);
+    console.error("❌ Error utama:", err);
   }
 })();
