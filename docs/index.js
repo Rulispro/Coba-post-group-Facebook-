@@ -55,12 +55,14 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     const caption = "Halo 👋 ini posting otomatis Puppeteer versi mobile!";
 
     const browser = await puppeteer.launch({
-      headless: new,
+      headless: "new",
       defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
-        "--disable-blink-features=AutomationControlled"
+        "--disable-blink-features=AutomationControlled",
+        "--disable-dev-shm-usage",
+        "--disable-gpu"
       ],
     });
 
