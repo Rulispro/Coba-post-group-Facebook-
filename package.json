@@ -1,11 +1,12 @@
 {
+  "name": "facebook-bot",
   "version": "1.0.0",
-  "main": "docs/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node docs/index.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "puppeteer": "^21.11.0",
+    "puppeteer": "^19.11.1",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1",
     "puppeteer-screen-recorder": "^3.0.0"
