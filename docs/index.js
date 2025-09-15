@@ -133,19 +133,21 @@ try {
     return target || null;
   });
 
-  if (fallback) {
-    await fallback.click();
+ if (fallback) {
+  const real = await fallback.jsonValue();
+  if (real) {
+    await fallback.asElement().click();
     console.log("🟦 Klik elemen biru berhasil (fallback)");
     await page.waitForTimeout(2000); // jeda biar box kebuka
   } else {
     console.log("❌ Composer tidak ditemukan sama sekali");
     await scanAllElementsVerbose(page, "Composer");
   }
-}
-
-
-    // ===== 2️⃣ Klik launcherbox
-    const launcherbox = await page.$('div[role="button"][tabindex="0"][aria-label*="create a post"], a[href*="composer"]');
+    }
+      
+   // ===== 2️⃣ Klik launcherbox
+    await page.waitForSelector('div[contenteditable="true"]', { visible: true })
+  const launcherbox = await page.$('div[role="button"][tabindex="0"][aria-label*="create a post"]);
     if (launcherbox) {
       console.log("✅ Launcherbox ditemukan");
       await safeClick(launcherbox);
@@ -176,7 +178,21 @@ try {
       console.log("❌ Tombol POST tidak ditemukan");
       await scanAllElementsVerbose(page, "Tombol POST");
     }
+   
+  // 3. Klik tombol Post
+  const posted = await safeClick(
+    page,
+    "//span[text()='Post' or text()='Kirim']",
+    "Tombol Post"
+  );
 
+  if (posted) {
+    console.log("🎉 Status berhasil dikirim!");
+  } else {
+    console.log("⚠️ Status gagal diposting");
+  }
+
+  await page.waitForTimeout(5000);
     // ===== Debug: cek webdriver
     const webdriver = await page.evaluate(() => navigator.webdriver);
     console.log("navigator.webdriver:", webdriver);
