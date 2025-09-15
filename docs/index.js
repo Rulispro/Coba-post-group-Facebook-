@@ -143,39 +143,85 @@ async function scanAllElementsVerbose(page, label = "Scan") {
       console.log("ℹ️ Launcherbox tidak ada (mungkin langsung textbox)");
     }
 
-    // ===== 3️⃣ Isi caption
+     // ===== 3️⃣ Isi caption
     //const textbox = await page.$('div[contenteditable="true"]');
     //if (textbox) {
-   //   console.log("✅ Textbox aktif ditemukan");
-     // await textbox.focus();
-     // await page.keyboard.type(caption, { delay: 50 });
-     // await page.waitForTimeout(2000);
-   // } else {
+    //  console.log("✅ Textbox aktif ditemukan");
+    //  await textbox.focus();
+   //   await page.keyboard.type(caption, { delay: 50 });
+   //   await page.waitForTimeout(2000);
+  //  } else {
     //  console.log("❌ Textbox aktif tidak ditemukan, scan elemen");
-    //  await scanAllElementsVerbose(page, "Textbox setelah klik launcherbox");
-   // }
-    // ===== 3️⃣ Isi caption dengan cara aman
-await page.waitForSelector('div[contenteditable="true"]', { visible: true });
+     //   await scanAllElementsVerbose(page, "Textbox setelah klik launcherbox");
+  //  }
+     
+     
+      // ===== 3️⃣ Isi caption dengan cara aman
+let filled = false;
 
-await page.evaluate((text) => {
-  const box = document.querySelector('div[contenteditable="true"]');
-  if (box) {
-    box.focus();
+// 1️⃣ Coba pakai textarea lama
+let textbox = await page.$('textarea[name="xc_message"]');
+if (textbox) {
+  console.log("✅ Textarea klasik ditemukan");
+  await textbox.type(caption, { delay: 50 });
+  filled = true;
+}
 
-    // Kosongkan dulu
-    box.innerHTML = "";
+// 2️⃣ Kalau gagal, coba contenteditable role=“textbox”
+if (!filled) {
+  textbox = await page.$('div[contenteditable="true"][role="textbox"]');
+  if (textbox) {
+    console.log("✅ Contenteditable textbox ditemukan");
 
-    // Masukkan teks
-    box.innerHTML = text;
+    await page.evaluate((text) => {
+      const box =
+        document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+        document.querySelector('div[contenteditable="true"]');
+      if (box) {
+        box.focus();
+        box.innerHTML = ""; // reset
+        box.innerHTML = text;
 
-    // Trigger event biar Facebook anggap input valid
-    const ev = new InputEvent("input", { bubbles: true });
-    box.dispatchEvent(ev);
+        // biar dianggap mengetik
+        const ev = new InputEvent("input", { bubbles: true });
+        box.dispatchEvent(ev);
+      }
+    }, caption);
+
+    filled = true;
   }
-}, caption);
+}
 
-console.log("✍️ Caption berhasil diisi via DOM API");
-  
+// 3️⃣ Kalau masih gagal, coba berdasarkan aria-label
+if (!filled) {
+  textbox = await page.$('div[contenteditable="true"][aria-label*="Write"], div[contenteditable="true"][aria-label*="mind"]');
+  if (textbox) {
+    console.log("✅ Contenteditable dengan aria-label ditemukan");
+    await page.evaluate((text) => {
+      const box = document.querySelector('div[contenteditable="true"][aria-label*="Write"]') ||
+                  document.querySelector('div[contenteditable="true"][aria-label*="mind"]');
+      if (box) {
+        box.focus();
+        box.innerHTML = "";
+        box.innerHTML = text;
+        const ev = new InputEvent("input", { bubbles: true });
+        box.dispatchEvent(ev);
+      }
+    }, caption);
+
+    filled = true;
+  }
+}
+
+// 4️⃣ Kalau tetap tidak ketemu
+if (!filled) {
+  console.log("❌ Tidak ada textbox yang cocok, scan untuk debug");
+  await scanAllElementsVerbose(page, "Textbox composer");
+} else {
+  console.log("✍️ Caption berhasil diisi via DOM API");
+  await page.waitForTimeout(2000);
+}
+    
 
     // ===== 4️⃣ Klik tombol POST
     let posted = false;
