@@ -62,7 +62,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
     const groupUrl = "https://m.facebook.com/groups/5763845890292336/";
-    const caption = "Halo 👋 ini posting otomatis Puppeteer versi mobile!";
+    const caption = "🚀 Caption otomatis masuk dari Puppeteer!";
 
     const browser = await puppeteer.launch({
       headless: "new",
@@ -131,56 +131,63 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     }
     await page.waitForTimeout(2000);
 
-    // ===== 2️⃣ Klik launcherbox (opsional, kadang langsung muncul textbox)
-    const launcherbox = await page.$(
-      'div[role="button"][tabindex="0"][aria-label*="create a post"]'
-    );
-    if (launcherbox) {
-      console.log("✅ Launcherbox ditemukan");
-      await safeClickEl(launcherbox);
-      await page.waitForTimeout(1500);
-    } else {
-      console.log("ℹ️ Launcherbox tidak ada (mungkin langsung textbox)");
-    }
+    // ===== 2️⃣ Isi caption (klik placeholder + isi textbox)
+    const clickResult = await page.evaluate(() => {
+      const btn = [...document.querySelectorAll("div[role='button']")]
+        .find(el => {
+          const t = (el.innerText || "").toLowerCase();
+          return t.includes("write something") || t.includes("buat postingan") || t.includes("tulis sesuatu");
+        });
 
-     // ===== 3️⃣ Isi caption
-    //const textbox = await page.$('div[contenteditable="true"]');
-    //if (textbox) {
-    //  console.log("✅ Textbox aktif ditemukan");
-    //  await textbox.focus();
-   //   await page.keyboard.type(caption, { delay: 50 });
-   //   await page.waitForTimeout(2000);
-  //  } else {
-    //  console.log("❌ Textbox aktif tidak ditemukan, scan elemen");
-     //   await scanAllElementsVerbose(page, "Textbox setelah klik launcherbox");
-  //  }
-     
-     
-      // ===== 3️⃣ Isi caption dengan cara aman
-await page.waitForSelector('div[contenteditable="true"]', { visible: true });
+      if (!btn) return { ok: false, msg: "Placeholder 'Write something' tidak ditemukan" };
 
-await page.evaluate((text) => {
-  const box = document.querySelector('div[contenteditable="true"]');
-  if (box) {
-    box.focus();
+      ["mousedown", "mouseup", "click"].forEach(type => {
+        btn.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
+      });
 
-    // Kosongkan dulu
-    box.innerHTML = "";
+      return { ok: true, msg: "Klik placeholder berhasil" };
+    });
 
-    // Masukkan teks
-    box.innerHTML = text;
+    console.log("CLICK:", clickResult);
 
-    // Trigger event biar Facebook anggap input valid
-    const ev = new InputEvent("input", { bubbles: true });
-    box.dispatchEvent(ev);
-  }
-}, caption);
+    await page.waitForTimeout(1000);
 
-console.log("✍️ Caption berhasil diisi via DOM API");
-                              
-    
+    const fillResult = await page.evaluate((text) => {
+      const selectors = [
+        "textarea[name='xc_message']",
+        "textarea",
+        "div[role='textbox'][contenteditable='true']",
+        "div[contenteditable='true']"
+      ];
 
-    // ===== 4️⃣ Klik tombol POST
+      let tb = null;
+      for (const s of selectors) {
+        tb = document.querySelector(s);
+        if (tb) {
+          try {
+            if ("value" in tb) {
+              tb.focus();
+              tb.value = text;
+              tb.dispatchEvent(new Event("input", { bubbles: true }));
+              tb.dispatchEvent(new Event("change", { bubbles: true }));
+            } else {
+              tb.focus();
+              tb.innerText = text;
+              tb.dispatchEvent(new InputEvent("input", { bubbles: true }));
+              tb.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            return { ok: true, selector: s, msg: "Terisi" };
+          } catch (err) {
+            return { ok: false, selector: s, msg: "Error: " + err.message };
+          }
+        }
+      }
+      return { ok: false, msg: "Textbox tidak ditemukan" };
+    }, caption);
+
+    console.log("FILL:", fillResult);
+
+    // ===== 3️⃣ Klik tombol POST
     let posted = false;
 
     const postButton = await page.$x("//span[text()='Post' or text()='Kirim']");
