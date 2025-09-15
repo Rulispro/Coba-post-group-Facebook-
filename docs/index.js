@@ -188,23 +188,19 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     console.log("FILL:", fillResult);
 
     // ===== 3️⃣ Klik tombol POST
-    let posted = false;
+    // Tunggu tombol POST muncul
+await page.waitForXPath("//div[@role='button']//span[contains(text(), 'POST')]", { timeout: 5000 });
 
-    const postButton = await page.$x("//span[text()='Post' or text()='Kirim']");
-    if (postButton.length) {
-      posted = await safeClickEl(postButton[0]);
-    } else {
-      console.log("❌ Tombol POST tidak ditemukan, coba scan");
-      await scanAllElementsVerbose(page, "Tombol POST");
-    }
+// Cari elemen tombol POST
+const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
 
-    if (posted) {
-      console.log("🎉 Status berhasil dikirim!");
-    } else {
-      console.log("⚠️ Status gagal diposting");
-    }
-
-    await page.waitForTimeout(5000);
+if (postBtn) {
+  await postBtn.click();
+  console.log("✅ Tombol POST berhasil diklik!");
+} else {
+  console.log("❌ Tombol POST tidak ditemukan");
+}
+    
 
     // ===== Debug: cek webdriver
     const webdriver = await page.evaluate(() => navigator.webdriver);
