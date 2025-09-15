@@ -43,7 +43,7 @@ jobs:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
       - name: Upload recording
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: recording-video
           path: recording.mp4
