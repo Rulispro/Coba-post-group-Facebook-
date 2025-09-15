@@ -45,6 +45,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
   return elements;
 }
 
+const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
 // ===== Main Puppeteer
 (async () => {
   try {
@@ -170,7 +171,10 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     // ===== Debug: cek webdriver
     const webdriver = await page.evaluate(() => navigator.webdriver);
     console.log("navigator.webdriver:", webdriver);
-
+    // ===== Stop recorder setelah semua selesai
+    await recorder.stop();
+    console.log("🎬 Rekaman selesai: recording.mp4");
+    
     await browser.close();
   } catch (err) {
     console.error("❌ Error utama:", err);
