@@ -37,7 +37,7 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Run Puppeteer bot
-        run: npm start
+        run:  node docs/index.js
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
