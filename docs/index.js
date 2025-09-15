@@ -157,70 +157,27 @@ async function scanAllElementsVerbose(page, label = "Scan") {
      
      
       // ===== 3️⃣ Isi caption dengan cara aman
-let filled = false;
+await page.waitForSelector('div[contenteditable="true"]', { visible: true });
 
-// 1️⃣ Coba pakai textarea lama
-let textbox = await page.$('textarea[name="xc_message"]');
-if (textbox) {
-  console.log("✅ Textarea klasik ditemukan");
-  await textbox.type(caption, { delay: 50 });
-  filled = true;
-}
+await page.evaluate((text) => {
+  const box = document.querySelector('div[contenteditable="true"]');
+  if (box) {
+    box.focus();
 
-// 2️⃣ Kalau gagal, coba contenteditable role=“textbox”
-if (!filled) {
-  textbox = await page.$('div[contenteditable="true"][role="textbox"]');
-  if (textbox) {
-    console.log("✅ Contenteditable textbox ditemukan");
+    // Kosongkan dulu
+    box.innerHTML = "";
 
-    await page.evaluate((text) => {
-      const box =
-        document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-        document.querySelector('div[contenteditable="true"]');
-      if (box) {
-        box.focus();
-        box.innerHTML = ""; // reset
-        box.innerHTML = text;
+    // Masukkan teks
+    box.innerHTML = text;
 
-        // biar dianggap mengetik
-        const ev = new InputEvent("input", { bubbles: true });
-        box.dispatchEvent(ev);
-      }
-    }, caption);
-
-    filled = true;
+    // Trigger event biar Facebook anggap input valid
+    const ev = new InputEvent("input", { bubbles: true });
+    box.dispatchEvent(ev);
   }
-}
+}, caption);
 
-// 3️⃣ Kalau masih gagal, coba berdasarkan aria-label
-if (!filled) {
-  textbox = await page.$('div[contenteditable="true"][aria-label*="Write"], div[contenteditable="true"][aria-label*="mind"]');
-  if (textbox) {
-    console.log("✅ Contenteditable dengan aria-label ditemukan");
-    await page.evaluate((text) => {
-      const box = document.querySelector('div[contenteditable="true"][aria-label*="Write"]') ||
-                  document.querySelector('div[contenteditable="true"][aria-label*="mind"]');
-      if (box) {
-        box.focus();
-        box.innerHTML = "";
-        box.innerHTML = text;
-        const ev = new InputEvent("input", { bubbles: true });
-        box.dispatchEvent(ev);
-      }
-    }, caption);
-
-    filled = true;
-  }
-}
-
-// 4️⃣ Kalau tetap tidak ketemu
-if (!filled) {
-  console.log("❌ Tidak ada textbox yang cocok, scan untuk debug");
-  await scanAllElementsVerbose(page, "Textbox composer");
-} else {
-  console.log("✍️ Caption berhasil diisi via DOM API");
-  await page.waitForTimeout(2000);
-}
+console.log("✍️ Caption berhasil diisi via DOM API");
+                              
     
 
     // ===== 4️⃣ Klik tombol POST
