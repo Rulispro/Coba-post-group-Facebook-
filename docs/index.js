@@ -96,31 +96,53 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     await page.waitForTimeout(3000);
 
     // ===== 1️⃣ Klik composer / write something
-    const composerSelectors = [
-      'a[href*="composer"]',
-      'div[role="button"]',
-      'span[dir="auto"]',
-      'div[placeholder*="write something"]',
-      'div[aria-label*="write something"]',
-      'div[aria-label*="what\'s on your mind"]',
-      'div[aria-label*="create a post"]'
-    ];
+    // ===== 1️⃣ Klik composer / write something
+let writeBtn;
 
-    let composerClicked = false;
-    for (const sel of composerSelectors) {
-      const handle = await page.$(sel);
-      if (handle) {
-        console.log("✅ Composer ditemukan:", sel);
-        await safeClick(handle);
-        composerClicked = true;
-        await page.waitForTimeout(2000); // tunggu launcherbox muncul
-        break;
-      }
+try {
+  // Cara 1: pakai XPath (lebih stabil kalau ketemu teks langsung)
+  writeBtn = await page.waitForXPath(
+    "//*[contains(text(),'Write something')]",
+    { visible: true, timeout: 5000 }
+  );
+  await writeBtn.click();
+  console.log("✅ Sudah klik elemen biru (Write something)");
+  await page.waitForTimeout(2000); // jeda biar box kebuka
+} catch (e) {
+  console.log("⚠️ XPath gagal, coba fallback evaluateHandle");
+
+  // Cara 2: fallback pakai evaluateHandle (cari LEAF element)
+  const fallback = await page.evaluateHandle(() => {
+    const els = Array.from(document.querySelectorAll("div, span, p"));
+    const target = els.find(el => {
+      if (!el.innerText) return false;
+      if (!el.innerText.includes("Write something")) return false;
+
+      // cek kalau child masih punya teks sama → skip (biar LEAF)
+      const childHas = Array.from(el.children)
+        .some(c => c.innerText && c.innerText.includes("Write something"));
+      return !childHas;
+    });
+
+    if (target) {
+      // highlight biru buat debug
+      target.style.outline = "3px solid blue";
+      target.style.backgroundColor = "rgba(0,0,255,0.2)";
     }
-    if (!composerClicked) {
-      console.log("❌ Composer tidak ditemukan, scan semua elemen");
-      await scanAllElementsVerbose(page, "Composer");
-    }
+
+    return target || null;
+  });
+
+  if (fallback) {
+    await fallback.click();
+    console.log("🟦 Klik elemen biru berhasil (fallback)");
+    await page.waitForTimeout(2000); // jeda biar box kebuka
+  } else {
+    console.log("❌ Composer tidak ditemukan sama sekali");
+    await scanAllElementsVerbose(page, "Composer");
+  }
+}
+
 
     // ===== 2️⃣ Klik launcherbox
     const launcherbox = await page.$('div[role="button"][tabindex="0"][aria-label*="create a post"], a[href*="composer"]');
