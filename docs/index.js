@@ -3,6 +3,7 @@
 const fs = require("fs");
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
 
 // Aktifkan plugin stealth
 puppeteer.use(StealthPlugin());
@@ -45,7 +46,6 @@ async function scanAllElementsVerbose(page, label = "Scan") {
   return elements;
 }
 
-const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
 // ===== Main Puppeteer
 (async () => {
   try {
@@ -69,24 +69,21 @@ const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
 
     const page = await browser.newPage();
 
+    // ===== Mulai rekaman
+    const recorder = new PuppeteerScreenRecorder(page);
+    await recorder.start('recording.mp4');
+
     // ===== Anti-detect: spoof user-agent & browser properties
     await page.setUserAgent(
       "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 " +
       "(KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36"
     );
-
     await page.setViewport({ width: 390, height: 844, isMobile: true });
 
     await page.evaluateOnNewDocument(() => {
       Object.defineProperty(navigator, "webdriver", { get: () => false });
-    });
-    await page.evaluateOnNewDocument(() => {
       window.navigator.chrome = { runtime: {} };
-    });
-    await page.evaluateOnNewDocument(() => {
       Object.defineProperty(navigator, "languages", { get: () => ["id-ID", "id"] });
-    });
-    await page.evaluateOnNewDocument(() => {
       Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
     });
 
@@ -125,27 +122,17 @@ const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
       await scanAllElementsVerbose(page, "Composer");
     }
 
-    // ===== 2️⃣ Klik launcherbox (biar fokus input)
-    const launcherboxSelector = 'div[role="button"][tabindex="0"][aria-label*="create a post"]';
-    let launcherbox = await page.$(launcherboxSelector);
+    // ===== 2️⃣ Klik launcherbox
+    const launcherbox = await page.$('div[role="button"][tabindex="0"][aria-label*="create a post"], a[href*="composer"]');
     if (launcherbox) {
-      console.log("✅ Launcherbox tombol ditemukan");
+      console.log("✅ Launcherbox ditemukan");
       await safeClick(launcherbox);
       await page.waitForTimeout(1500);
     } else {
-      console.log("❌ Launcherbox tombol tidak ditemukan");
-      // fallback untuk m.facebook.com
-      launcherbox = await page.$('a[href*="composer"]');
-      if (launcherbox) {
-        console.log("✅ Launcherbox (m.facebook) ditemukan");
-        await safeClick(launcherbox);
-        await page.waitForTimeout(1500);
-      } else {
-        console.log("❌ Launcherbox (m.facebook) juga tidak ditemukan");
-      }
+      console.log("❌ Launcherbox tidak ditemukan");
     }
 
-    // ===== 3️⃣ Isi caption di textbox
+    // ===== 3️⃣ Isi caption
     const textbox = await page.$('div[contenteditable="true"]');
     if (textbox) {
       console.log("✅ Textbox aktif ditemukan");
@@ -158,12 +145,12 @@ const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
     }
 
     // ===== 4️⃣ Klik tombol POST
-    try {
-      await page.waitForSelector('div[role="button"] span.f2', { timeout: 5000 });
+    const postButton = await page.$('div[role="button"] span.f2');
+    if (postButton) {
       console.log("✅ Tombol POST ditemukan");
-      await page.click('div[role="button"]:has(span.f2)');
+      await postButton.click();
       console.log("🎉 Post berhasil dikirim");
-    } catch (e) {
+    } else {
       console.log("❌ Tombol POST tidak ditemukan");
       await scanAllElementsVerbose(page, "Tombol POST");
     }
@@ -171,10 +158,11 @@ const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
     // ===== Debug: cek webdriver
     const webdriver = await page.evaluate(() => navigator.webdriver);
     console.log("navigator.webdriver:", webdriver);
-    // ===== Stop recorder setelah semua selesai
+
+    // ===== Stop recorder
     await recorder.stop();
     console.log("🎬 Rekaman selesai: recording.mp4");
-    
+
     await browser.close();
   } catch (err) {
     console.error("❌ Error utama:", err);
