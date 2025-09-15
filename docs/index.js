@@ -144,16 +144,38 @@ async function scanAllElementsVerbose(page, label = "Scan") {
     }
 
     // ===== 3️⃣ Isi caption
-    const textbox = await page.$('div[contenteditable="true"]');
-    if (textbox) {
-      console.log("✅ Textbox aktif ditemukan");
-      await textbox.focus();
-      await page.keyboard.type(caption, { delay: 50 });
-      await page.waitForTimeout(2000);
-    } else {
-      console.log("❌ Textbox aktif tidak ditemukan, scan elemen");
-      await scanAllElementsVerbose(page, "Textbox setelah klik launcherbox");
-    }
+    //const textbox = await page.$('div[contenteditable="true"]');
+    //if (textbox) {
+   //   console.log("✅ Textbox aktif ditemukan");
+     // await textbox.focus();
+     // await page.keyboard.type(caption, { delay: 50 });
+     // await page.waitForTimeout(2000);
+   // } else {
+    //  console.log("❌ Textbox aktif tidak ditemukan, scan elemen");
+    //  await scanAllElementsVerbose(page, "Textbox setelah klik launcherbox");
+   // }
+    // ===== 3️⃣ Isi caption dengan cara aman
+await page.waitForSelector('div[contenteditable="true"]', { visible: true });
+
+await page.evaluate((text) => {
+  const box = document.querySelector('div[contenteditable="true"]');
+  if (box) {
+    box.focus();
+
+    // Kosongkan dulu
+    box.innerHTML = "";
+
+    // Masukkan teks
+    box.innerHTML = text;
+
+    // Trigger event biar Facebook anggap input valid
+    const ev = new InputEvent("input", { bubbles: true });
+    box.dispatchEvent(ev);
+  }
+}, caption);
+
+console.log("✍️ Caption berhasil diisi via DOM API");
+  
 
     // ===== 4️⃣ Klik tombol POST
     let posted = false;
