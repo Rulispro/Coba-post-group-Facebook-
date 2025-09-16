@@ -372,9 +372,12 @@ function getTodayString() {
     console.log(`✅ Media ${fileName} berhasil di-download.`);
 
     const [fileChooser] = await Promise.all([
-      page.waitForFileChooser(),
-      page.click('div[aria-label="Photo/Video"]')
-    ]);
+  page.waitForEvent("filechooser"),
+  page.click('div[aria-label="Photo/Video"]')
+]);
+
+await fileChooser.accept([path.join(mediaFolder, fileName)]);
+
 
     await fileChooser.accept([path.join(mediaFolder, fileName)]);
     await page.waitForTimeout(2000);
