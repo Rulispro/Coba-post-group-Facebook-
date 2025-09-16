@@ -366,7 +366,7 @@ function getTodayString() {
     // ===== 3️⃣ Download + upload media
     const today = getTodayString();
     const fileName = `akun1_${today}.jpg`; // bisa ganti .mp4 kalau video
-    const mediaUrl = `https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/${fileName}`;
+    const mediaUrl = `https://github.com/Rulispro/Coba-post-group-Facebook-/commits/2025-09-16${fileName}`;
 
     await downloadMedia(mediaUrl, fileName);
     console.log(`✅ Media ${fileName} berhasil di-download.`);
