@@ -311,63 +311,52 @@ function delay(ms) {
       await scanAllElementsVerbose(page, "Composer");
     }
     await page.waitForTimeout(2000);
-   
-   // ===== 2️⃣ Isi caption (klik placeholder + isi textbox)
-    const clickResult = await page.evaluate(() => {
-      const btn = [...document.querySelectorAll("div[role='button']")]
-        .find(el => {
-          const t = (el.innerText || "").toLowerCase();
-          return t.includes("write something") || t.includes("buat postingan") || t.includes("tulis sesuatu");
-        });
-      if (!btn) return { ok: false, msg: "Placeholder 'Write something' tidak ditemukan" };
-      ["mousedown", "mouseup", "click"].forEach(type => {
-       btn.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
-      });
-      return { ok: true, msg: "Klik placeholder berhasil" };
+   // 1️⃣ Klik placeholder composer
+const clickResult = await page.evaluate(() => {
+  const btn = [...document.querySelectorAll("div[role='button']")]
+    .find(el => {
+      const t = (el.innerText || "").toLowerCase();
+      return t.includes("write something") || t.includes("buat postingan") || t.includes("tulis sesuatu");
     });
-    console.log("CLICK:", clickResult);
-    await page.waitForTimeout(1000);
-    // ===== 2️⃣ Isi caption
-    const fillResult = await page.evaluate((text) => {
-      const selectors = [
-        "textarea[name='xc_message']",
-        "textarea",
-        "div[role='textbox'][contenteditable='true']",
-        "div[contenteditable='true']"
-      ];
-      let tb = null;
-      for (const s of selectors) {
-        tb = document.querySelector(s);
-        if (tb) {
-          try {
-            if ("value" in tb) {
-              tb.focus();
-              tb.value = text;
-              tb.dispatchEvent(new Event("input", { bubbles: true }));
-              tb.dispatchEvent(new Event("change", { bubbles: true }));
-            } else {
-              tb.focus();
-              tb.innerText = text;
-              tb.dispatchEvent(new InputEvent("input", { bubbles: true }));
-              tb.dispatchEvent(new Event("change", { bubbles: true }));
-            }
-            return { ok: true, selector: s, msg: "Terisi" };
-          } catch (err) {
-            return { ok: false, selector: s, msg: "Error: " + err.message };
-          }
-        }
-      const tb = document.querySelector("div[contenteditable='true']");
-      if (tb) {
-        tb.focus();
+  if (!btn) return { ok: false, msg: "Placeholder tidak ditemukan" };
+  ["mousedown", "mouseup", "click"].forEach(type => {
+    btn.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
+  });
+  return { ok: true, msg: "Klik placeholder berhasil" };
+});
+console.log("CLICK:", clickResult);
+await page.waitForTimeout(1000);
+
+// 2️⃣ Isi caption
+const fillResult = await page.evaluate((text) => {
+  const selectors = [
+    "textarea[name='xc_message']",
+    "textarea",
+    "div[role='textbox'][contenteditable='true']",
+    "div[contenteditable='true']"
+  ];
+
+  for (const s of selectors) {
+    const tb = document.querySelector(s);
+    if (tb) {
+      tb.focus();
+      if ("value" in tb) {
+        tb.value = text;
+        tb.dispatchEvent(new Event("input", { bubbles: true }));
+        tb.dispatchEvent(new Event("change", { bubbles: true }));
+      } else {
         tb.innerText = text;
         tb.dispatchEvent(new InputEvent("input", { bubbles: true }));
-        return { ok: true };
+        tb.dispatchEvent(new Event("change", { bubbles: true }));
       }
-      return { ok: false, msg: "Textbox tidak ditemukan" };
-      return { ok: false };
-    }, caption);
-    console.log("FILL:", fillResult);
-   
+      return { ok: true, selector: s, msg: "Caption berhasil diisi" };
+    }
+  }
+  return { ok: false, msg: "Textbox tidak ditemukan" };
+}, caption);
+
+console.log("FILL:", fillResult);
+
     // ===== 3️⃣ Download + upload media
     const today = getTodayString();
     const fileName = `akun1_${today}.jpg`; // bisa ganti .mp4 kalau video
