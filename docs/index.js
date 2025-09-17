@@ -236,11 +236,12 @@ async function downloadMedia(url, filename) {
     https.get(url, (res) => {
       res.pipe(file);
       file.on("finish", () => {
-        file.close(resolve);
+        file.close(() => resolve(filePath)); // ✅ sekarang return path
       });
     }).on("error", (err) => reject(err));
   });
 }
+
 
 // ===== Ambil tanggal hari ini
 function getTodayString() {
@@ -365,9 +366,9 @@ console.log("FILL:", fillResult);
     await downloadMedia(mediaUrl, fileName);
     console.log(`✅ Media ${fileName} berhasil di-download.`);
    // 2️⃣ Upload ke Facebook
-await uploadMedia(page, filePath);
+   await uploadMedia(page, filePath);
     // ===== Fungsi upload ke Facebook
-async function uploadMedia(page, filePath) {
+  async function uploadMedia(page, filePath) {
   const fileName = path.basename(filePath);
 
   // Klik tombol Foto/Video
