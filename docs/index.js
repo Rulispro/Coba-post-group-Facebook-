@@ -352,25 +352,38 @@ console.log("FILL:", fillResult);
     await downloadMedia(mediaUrl, fileName);
     console.log(`✅ Media ${fileName} berhasil di-download.`);
 
-    const [fileChooser] = await Promise.all([
-  page.waitForEvent("filechooser"),
-  page.click('div[aria-label="Photos/Video"]')
-]);
+    async function chooseMediaButton(page, fileName, mediaFolder) {
+  let buttonSelector = "";
 
-await fileChooser.accept([path.join(mediaFolder, fileName)]);
+  // Tentukan tombol berdasarkan ekstensi
+  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
+    buttonSelector = 'div[role="button"][aria-label="Video"]';
+  } else {
+    buttonSelector = 'div[role="button"][aria-label="Photos"]';
+  }
 
-console.log(`✅ ${fileName} berhasil dipilih.`);
+  // Tunggu file chooser terbuka
+  const [fileChooser] = await Promise.all([
+    page.waitForFileChooser(),
+    page.click(buttonSelector)
+  ]);
 
-// Deteksi apakah file foto atau video
-if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
-  console.log("⏳ Tunggu minimal 10 detik untuk video processing...");
-  await delay(10000); // 10 detik
-} else {
-  console.log("⏳ Tunggu 2 detik untuk foto processing...");
-  await delay(2000); // 2 detik
-}
+  // Pilih file dari folder media
+  await fileChooser.accept([path.join(mediaFolder, fileName)]);
+  console.log(`✅ ${fileName} berhasil dipilih.`);
 
-console.log("✅ Media berhasil diproses dan siap diposting.");
+  // Delay berdasarkan jenis media
+  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
+    console.log("⏳ Tunggu minimal 10 detik untuk video processing...");
+    await delay(10000); // 10 detik
+  } else {
+    console.log("⏳ Tunggu 5 detik untuk foto processing...");
+    await delay(5000); // 5 detik
+  }
+
+  console.log("✅ Media berhasil diproses dan siap diposting.");
+   }
+   await chooseMediaButton(page, fileName, mediaFolder);
    
     // ===== 4️⃣ Klik tombol POST
     const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
