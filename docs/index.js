@@ -354,13 +354,11 @@ console.log("FILL:", fillResult);
 
     const [fileChooser] = await Promise.all([
   page.waitForEvent("filechooser"),
-  page.click('div[aria-label="Photo/Video"]')
+  page.click('div[aria-label="Photos/Video"]')
 ]);
 
 await fileChooser.accept([path.join(mediaFolder, fileName)]);
 
-
-    await fileChooser.accept([path.join(mediaFolder, fileName)]);
 console.log(`✅ ${fileName} berhasil dipilih.`);
 
 // Deteksi apakah file foto atau video
