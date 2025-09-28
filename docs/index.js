@@ -242,44 +242,45 @@ async function downloadMedia(url, filename) {
   });
 }
 
-// ===== 2️⃣ Upload ke Facebook
+// ===== Fungsi upload ke Facebook
 async function uploadMedia(page, filePath) {
   const fileName = path.basename(filePath);
 
-  // Klik tombol Foto/Video
-  let buttonSelector = "";
-  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
-    buttonSelector = 'div[role="button"][aria-label="Video"]';
-  } else {
-    buttonSelector = 'div[role="button"][aria-label="Photos"]';
-  }
-
-  await page.click(buttonSelector);
+  // Klik tombol Foto/Video (Composer)
+  await page.click('div[role="button"][aria-label="Foto/Video"]');
   console.log("✅ Tombol media diklik.");
 
-  // Cari input file
-  const fileInput = await page.waitForSelector(
-    'input[type="file"][accept*="image"], input[type="file"][accept*="video"]',
-    { visible: true, timeout: 10000 }
-  );
+  let fileInput;
 
-  // Upload file
+  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
+    // Input untuk foto
+    fileInput = await page.waitForSelector(
+      'input[type="file"][accept="image/*"]',
+      { timeout: 10000 }
+    );
+  } else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
+    // Input untuk video
+    fileInput = await page.waitForSelector(
+      'input[type="file"][accept="video/*"]',
+      { timeout: 10000 }
+    );
+  } else {
+    throw new Error("❌ Format file tidak didukung: " + fileName);
+  }
+
+  // Upload file (meskipun hidden, Puppeteer bisa)
   await fileInput.uploadFile(filePath);
   console.log(`✅ ${fileName} berhasil di-upload.`);
 
   // Tunggu preview
-  await page.waitForSelector(
-    'img[src*="scontent"], video[src*="fbcdn"]',
-    { visible: true, timeout: 20000 }
-  );
-
-  // Delay
-  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
-    console.log("⏳ Tunggu minimal 10 detik untuk video processing...");
-    await delay(10000);
+  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
+    await page.waitForSelector('img[src*="scontent"]', { timeout: 20000 });
+    console.log("✅ Foto preview muncul.");
+    await page.waitForTimeout(5000);
   } else {
-    console.log("⏳ Tunggu 5 detik untuk foto processing...");
-    await delay(5000);
+    await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
+    console.log("✅ Video preview muncul.");
+    await page.waitForTimeout(10000);
   }
 
   console.log("✅ Media siap diposting.");
