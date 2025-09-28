@@ -246,8 +246,16 @@ async function downloadMedia(url, filename) {
 async function uploadMedia(page, filePath) {
   const fileName = path.basename(filePath);
 
-  // Klik tombol Foto/Video (Composer)
-  await page.click('div[role="button"][aria-label="Photos/Video"]');
+ 
+    // Klik tombol Foto/Video
+  let buttonSelector = "";
+  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
+    buttonSelector = 'div[role="button"][aria-label="Video"]';
+  } else {
+    buttonSelector = 'div[role="button"][aria-label="Photos"]';
+  }
+
+  await page.click(buttonSelector);
   console.log("✅ Tombol media diklik.");
 
   let fileInput;
