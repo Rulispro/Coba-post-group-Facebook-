@@ -323,9 +323,11 @@ async function uploadMedia(page, filePath) {
   if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
     await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
     console.log("✅ Foto preview muncul.");
+   await delay(2000); 
   } else {
     await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
     console.log("✅ Video preview muncul.");
+   await delay(3000); // kasih jeda lebih lama untuk video
   }
 
   console.log("✅ Media siap diposting.");
