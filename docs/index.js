@@ -242,7 +242,7 @@ async function downloadMedia(url, filename) {
   });
 }
 
- // ===== Fungsi upload ke Facebook (foto/video)
+  // ===== Fungsi upload ke Facebook (foto/video)
 async function uploadMedia(page, filePath) {
   const fileName = path.basename(filePath);
 
@@ -271,47 +271,28 @@ async function uploadMedia(page, filePath) {
     throw new Error("❌ Format file tidak didukung: " + fileName);
   }
 
-  // Upload file (Chrome)
+  // Upload file
   await fileInput.uploadFile(filePath);
   console.log(`✅ ${fileName} berhasil di-upload ke input.`);
 
+  // 🔔 Trigger event React biar preview muncul
+  const reactOk = await page.evaluate((selector) => {
+    const input = document.querySelector(selector);
+    if (!input) return false;
 
- // 🔔 Trigger event React biar preview muncul
-await page.evaluate((selector) => {
-  const input = document.querySelector(selector);
-  if (!input) return false;
-
-  ["input", "change"].forEach(type => {
-    const evt = new Event(type, { bubbles: true });
-    input.dispatchEvent(evt);
-  });
-  return true;
-}, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
-   ? 'input[type="file"][accept*="image"]'
-   : 'input[type="file"][accept*="video"]');
-
-console.log("⏳ Tunggu preview render...");
-
-// Tunggu preview (foto/video)
-if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-  await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
-  console.log("✅ Foto preview muncul.");
-} else {
-  await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
-  console.log("✅ Video preview muncul.");
-}
- 
-    fileName.match(/\.(jpg|jpeg|png|gif)$/i)
-      ? 'input[type="file"][accept*="image"]'
-      : 'input[type="file"][accept*="video"]',
-    fileName
-  );
+    ["input", "change"].forEach(type => {
+      const evt = new Event(type, { bubbles: true });
+      input.dispatchEvent(evt);
+    });
+    return true;
+  }, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
+        ? 'input[type="file"][accept*="image"]'
+        : 'input[type="file"][accept*="video"]');
 
   if (reactOk) {
     console.log("✅ Event React berhasil dipicu.");
   } else {
     console.log("⚠️ Event React gagal, coba drag-drop fallback...");
-    // ==== Fallback drag-drop ke composer ====
     await page.evaluate((fileName) => {
       const dropZone =
         document.querySelector('[aria-label*="Tambah foto"]') ||
@@ -335,7 +316,8 @@ if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
     }, fileName);
   }
 
-  // ==== Tunggu preview muncul ====
+  // Tunggu preview muncul
+  console.log("⏳ Tunggu preview render...");
   if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
     await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
     console.log("✅ Foto preview muncul.");
@@ -345,8 +327,8 @@ if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
   }
 
   console.log("✅ Media siap diposting.");
-}
-
+     }
+   
 
 // ===== Ambil tanggal hari ini
 function getTodayString() {
