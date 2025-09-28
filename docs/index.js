@@ -289,8 +289,8 @@ async function uploadMedia(page, filePath) {
     });
     return true;
   }, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
-        ? 'input[type="file"][accept*="image"]'
-        : 'input[type="file"][accept*="video"]');
+        ? 'input[type="file"][accept="image/*"]'
+        : 'input[type="file"][accept="video/*"]');
 
   if (reactOk) {
     console.log("✅ Event React berhasil dipicu.");
