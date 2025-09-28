@@ -251,7 +251,7 @@ async function uploadMedia(page, filePath) {
   if (fileName.match(/\.(mp4|mov|avi)$/i)) {
     buttonSelector = 'div[role="button"][aria-label*="Video"]';
   } else {
-    buttonSelector = 'div[role="button"][aria-label*="Foto"]';
+    buttonSelector = 'div[role="button"][aria-label*="Photos"]';
   }
 
   try {
@@ -264,9 +264,9 @@ async function uploadMedia(page, filePath) {
   // Cari input file
   let fileInput;
   if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-    fileInput = await page.waitForSelector('input[type="file"][accept*="image"]', { timeout: 10000 });
+    fileInput = await page.waitForSelector('input[type="file"][accept="image/*"]', { timeout: 10000 });
   } else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
-    fileInput = await page.waitForSelector('input[type="file"][accept*="video"]', { timeout: 10000 });
+    fileInput = await page.waitForSelector('input[type="file"][accept="video/*"]', { timeout: 10000 });
   } else {
     throw new Error("❌ Format file tidak didukung: " + fileName);
   }
