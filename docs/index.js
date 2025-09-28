@@ -256,7 +256,7 @@ async function uploadMedia(page, filePath) {
 
   try {
     await page.click(buttonSelector);
-    await delay(2000); // kasih waktu 3 detik minimal
+    await delay(3000); // kasih waktu 3 detik minimal
 
     console.log("✅ Tombol media diklik.");
   } catch {
@@ -276,6 +276,7 @@ async function uploadMedia(page, filePath) {
   // Upload file
   await fileInput.uploadFile(filePath);
   console.log(`✅ ${fileName} berhasil di-upload ke input.`);
+  await delay(5000);
 
   // 🔔 Trigger event React biar preview muncul
   const reactOk = await page.evaluate((selector) => {
@@ -323,11 +324,11 @@ async function uploadMedia(page, filePath) {
   if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
     await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
     console.log("✅ Foto preview muncul.");
-   await delay(2000); 
+   await delay(5000); 
   } else {
     await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
     console.log("✅ Video preview muncul.");
-   await delay(3000); // kasih jeda lebih lama untuk video
+   await delay(5000); // kasih jeda lebih lama untuk video
   }
 
   console.log("✅ Media siap diposting.");
