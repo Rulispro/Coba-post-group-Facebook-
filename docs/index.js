@@ -275,26 +275,32 @@ async function uploadMedia(page, filePath) {
   await fileInput.uploadFile(filePath);
   console.log(`✅ ${fileName} berhasil di-upload ke input.`);
 
-  // ==== Trigger React biar preview muncul ====
-  let reactOk = await page.evaluate((selector, fileName) => {
-    const input = document.querySelector(selector);
-    if (!input) return false;
 
-    try {
-      const dt = new DataTransfer();
-      dt.items.add(new File(["dummy"], fileName)); // dummy content cukup
-      input.files = dt.files;
+ // 🔔 Trigger event React biar preview muncul
+await page.evaluate((selector) => {
+  const input = document.querySelector(selector);
+  if (!input) return false;
 
-      ["input", "change"].forEach(type => {
-        const evt = new Event(type, { bubbles: true });
-        input.dispatchEvent(evt);
-      });
+  ["input", "change"].forEach(type => {
+    const evt = new Event(type, { bubbles: true });
+    input.dispatchEvent(evt);
+  });
+  return true;
+}, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
+   ? 'input[type="file"][accept*="image"]'
+   : 'input[type="file"][accept*="video"]');
 
-      return true;
-    } catch (e) {
-      return false;
-    }
-  },
+console.log("⏳ Tunggu preview render...");
+
+// Tunggu preview (foto/video)
+if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
+  await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
+  console.log("✅ Foto preview muncul.");
+} else {
+  await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
+  console.log("✅ Video preview muncul.");
+}
+ 
     fileName.match(/\.(jpg|jpeg|png|gif)$/i)
       ? 'input[type="file"][accept*="image"]'
       : 'input[type="file"][accept*="video"]',
