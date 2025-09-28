@@ -260,40 +260,52 @@ async function uploadMedia(page, filePath) {
 
   let fileInput;
 
-  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-    // Input untuk foto
-    fileInput = await page.waitForSelector(
-      'input[type="file"][accept="image/*"]',
-      { timeout: 10000 }
-    );
-  } else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
-    // Input untuk video
-    fileInput = await page.waitForSelector(
-      'input[type="file"][accept="video/*"]',
-      { timeout: 10000 }
-    );
-  } else {
-    throw new Error("❌ Format file tidak didukung: " + fileName);
-  }
-
-  // Upload file (meskipun hidden, Puppeteer bisa)
-  await fileInput.uploadFile(filePath);
-  console.log(`✅ ${fileName} berhasil di-upload.`);
-
-  // Tunggu preview
-  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-    await page.waitForSelector('img[src*="scontent"]', { timeout: 20000 });
-    console.log("✅ Foto preview muncul.");
-    await page.waitForTimeout(5000);
-  } else {
-    await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
-    console.log("✅ Video preview muncul.");
-    await page.waitForTimeout(10000);
-  }
-
-  console.log("✅ Media siap diposting.");
+if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
+  fileInput = await page.waitForSelector(
+    'input[type="file"][accept="image/*"]',
+    { timeout: 10000 }
+  );
+} else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
+  fileInput = await page.waitForSelector(
+    'input[type="file"][accept="video/*"]',
+    { timeout: 10000 }
+  );
+} else {
+  throw new Error("❌ Format file tidak didukung: " + fileName);
 }
 
+// Upload file ke <input>
+await fileInput.uploadFile(filePath);
+
+// ✅ Trigger React synthetic events
+await page.evaluate((selector) => {
+  const input = document.querySelector(selector);
+  if (input) {
+    // Simulasi klik mouse React
+    ["mousedown", "mouseup", "click", "input", "change"].forEach(type => {
+      const evt = new Event(type, { bubbles: true });
+      input.dispatchEvent(evt);
+    });
+  }
+}, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
+    ? 'input[type="file"][accept="image/*"]'
+    : 'input[type="file"][accept="video/*"]'
+);
+
+console.log(`✅ ${fileName} berhasil di-upload & event React dipicu.`);
+
+// Tunggu preview muncul
+if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
+  await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
+  console.log("✅ Foto preview muncul.");
+  await page.waitForTimeout(5000);
+} else {
+  await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
+  console.log("✅ Video preview muncul.");
+  await page.waitForTimeout(10000);
+}
+
+console.log("✅ Media siap diposting.");
 
 // ===== Ambil tanggal hari ini
 function getTodayString() {
