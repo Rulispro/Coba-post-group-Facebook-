@@ -256,6 +256,8 @@ async function uploadMedia(page, filePath) {
 
   try {
     await page.click(buttonSelector);
+    await delay(2000); // kasih waktu 3 detik minimal
+
     console.log("✅ Tombol media diklik.");
   } catch {
     console.log("⚠️ Tombol media tidak ketemu, lanjut pakai input file langsung.");
@@ -327,6 +329,8 @@ async function uploadMedia(page, filePath) {
   }
 
   console.log("✅ Media siap diposting.");
+ await delay(3000); // kasih waktu 3 detik minimal
+
      }
    
 
@@ -444,6 +448,8 @@ const fillResult = await page.evaluate((text) => {
 }, caption);
 
 console.log("FILL:", fillResult);
+   await delay(3000); // kasih waktu 3 detik minimal
+
 
   // ===== 3️⃣ Download + upload media
 const today = getTodayString();
