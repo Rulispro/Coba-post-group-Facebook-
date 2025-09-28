@@ -306,6 +306,7 @@ if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
 }
 
 console.log("✅ Media siap diposting.");
+}
 
 // ===== Ambil tanggal hari ini
 function getTodayString() {
