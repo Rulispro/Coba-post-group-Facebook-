@@ -242,6 +242,49 @@ async function downloadMedia(url, filename) {
   });
 }
 
+// ===== 2️⃣ Upload ke Facebook
+async function uploadMedia(page, filePath) {
+  const fileName = path.basename(filePath);
+
+  // Klik tombol Foto/Video
+  let buttonSelector = "";
+  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
+    buttonSelector = 'div[role="button"][aria-label="Video"]';
+  } else {
+    buttonSelector = 'div[role="button"][aria-label="Photos"]';
+  }
+
+  await page.click(buttonSelector);
+  console.log("✅ Tombol media diklik.");
+
+  // Cari input file
+  const fileInput = await page.waitForSelector(
+    'input[type="file"][accept*="image"], input[type="file"][accept*="video"]',
+    { visible: true, timeout: 10000 }
+  );
+
+  // Upload file
+  await fileInput.uploadFile(filePath);
+  console.log(`✅ ${fileName} berhasil di-upload.`);
+
+  // Tunggu preview
+  await page.waitForSelector(
+    'img[src*="scontent"], video[src*="fbcdn"]',
+    { visible: true, timeout: 20000 }
+  );
+
+  // Delay
+  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
+    console.log("⏳ Tunggu minimal 10 detik untuk video processing...");
+    await delay(10000);
+  } else {
+    console.log("⏳ Tunggu 5 detik untuk foto processing...");
+    await delay(5000);
+  }
+
+  console.log("✅ Media siap diposting.");
+}
+
 
 // ===== Ambil tanggal hari ini
 function getTodayString() {
@@ -358,57 +401,69 @@ const fillResult = await page.evaluate((text) => {
 
 console.log("FILL:", fillResult);
 
+  // ===== 3️⃣ Download + upload media
+const today = getTodayString();
+const fileName = `akun1_${today}.jpg`; // bisa .mp4
+const mediaUrl = "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/akun1_2025-09-16.jpg";
+
+// download media → simpan return value ke filePath
+const filePath = await downloadMedia(mediaUrl, fileName);
+console.log(`✅ Media ${fileName} berhasil di-download.`);
+
+// upload ke Facebook
+await uploadMedia(page, filePath);
+ 
     // ===== 3️⃣ Download + upload media
-    const today = getTodayString();
-    const fileName = `akun1_${today}.jpg`; // bisa ganti .mp4 kalau video
-    const mediaUrl = "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/akun1_2025-09-16.jpg";
+ //   const today = getTodayString();
+//    const fileName = `akun1_${today}.jpg`; // bisa ganti .mp4 kalau video
+ //   const mediaUrl = "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/akun1_2025-09-16.jpg";
    //download media
-    await downloadMedia(mediaUrl, fileName);
-    console.log(`✅ Media ${fileName} berhasil di-download.`);
-   // 2️⃣ Upload ke Facebook
-   await uploadMedia(page, filePath);
+  //  await downloadMedia(mediaUrl, fileName);
+ //   console.log(`✅ Media ${fileName} berhasil di-download.`);
+//   // 2️⃣ Upload ke Facebook
+//   await uploadMedia(page, filePath);
     // ===== Fungsi upload ke Facebook
-  async function uploadMedia(page, filePath) {
-  const fileName = path.basename(filePath);
+//  async function uploadMedia(page, filePath) {
+//  const fileName = path.basename(filePath);
 
   // Klik tombol Foto/Video
-  let buttonSelector = "";
-  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
-    buttonSelector = 'div[role="button"][aria-label="Video"]';
-  } else {
-    buttonSelector = 'div[role="button"][aria-label="Photos"]';
-  }
+//  let buttonSelector = "";
+//  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
+//    buttonSelector = 'div[role="button"][aria-label="Video"]';
+//  } else {
+//    buttonSelector = 'div[role="button"][aria-label="Photos"]';
+//  }
 
-  await page.click(buttonSelector);
-  console.log("✅ Tombol media diklik.");
+//  await page.click(buttonSelector);
+//  console.log("✅ Tombol media diklik.");
 
   // Cari input file
-  const fileInput = await page.waitForSelector(
-    'input[type="file"][accept*="image"], input[type="file"][accept*="video"]',
-    { visible: true, timeout: 10000 }
-  );
+//  const fileInput = await page.waitForSelector(
+//    'input[type="file"][accept*="image"], input[type="file"][accept*="video"]',
+//    { visible: true, timeout: 10000 }
+//  );
 
   // Upload file
-  await fileInput.uploadFile(filePath);
-  console.log(`✅ ${fileName} berhasil di-upload.`);
+ // await fileInput.uploadFile(filePath);
+ // console.log(`✅ ${fileName} berhasil di-upload.`);
 
   // Tunggu preview muncul → tanda sukses upload
-  await page.waitForSelector(
-    'img[src*="scontent"], video[src*="fbcdn"]',
-    { visible: true, timeout: 20000 }
-  );
+//  await page.waitForSelector(
+//    'img[src*="scontent"], video[src*="fbcdn"]',
+ //   { visible: true, timeout: 20000 }
+//  );
 
   // Delay berdasarkan jenis
-  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
-    console.log("⏳ Tunggu minimal 10 detik untuk video processing...");
-    await new Promise(r => setTimeout(r, 10000));
-  } else {
-    console.log("⏳ Tunggu 5 detik untuk foto processing...");
-    await new Promise(r => setTimeout(r, 5000));
-  }
+//  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
+ //   console.log("⏳ Tunggu minimal 10 detik untuk video processing...");
+  //  await new Promise(r => setTimeout(r, 10000));
+//  } else {
+ //   console.log("⏳ Tunggu 5 detik untuk foto processing...");
+ //   await new Promise(r => setTimeout(r, 5000));
+//  }
 
-  console.log("✅ Media siap diposting.");
-}
+ // console.log("✅ Media siap diposting.");
+//}
    
     // ===== 4️⃣ Klik tombol POST
     const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
