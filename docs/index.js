@@ -247,7 +247,7 @@ async function uploadMedia(page, filePath) {
   const fileName = path.basename(filePath);
 
   // Klik tombol Foto/Video (Composer)
-  await page.click('div[role="button"][aria-label="Foto/Video"]');
+  await page.click('div[role="button"][aria-label="Photos/Video"]');
   console.log("✅ Tombol media diklik.");
 
   let fileInput;
