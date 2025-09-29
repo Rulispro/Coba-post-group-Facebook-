@@ -247,22 +247,53 @@ async function uploadMedia(page, filePath) {
   const fileName = path.basename(filePath);
 
   // Klik tombol "Foto/Video"
-  let buttonSelector = "";
-  if (fileName.match(/\.(mp4|mov|avi)$/i)) {
-    buttonSelector = 'div[role="button"][aria-label*="Video"]';
-  } else {
-    buttonSelector = 'div[role="button"][aria-label*="Photos"]';
-  }
+  //let buttonSelector = "";
+ // if (fileName.match(/\.(mp4|mov|avi)$/i)) {
+  //  buttonSelector = 'div[role="button"][aria-label*="Video"]';
+ // } else {
+  //  buttonSelector = 'div[role="button"][aria-label*="Photos"]';
+//  }
+//
+//  try {
+ //   await page.click(buttonSelector);
+  //  await delay(3000); // kasih waktu 3 detik minimal
 
-  try {
-    await page.click(buttonSelector);
-    await delay(3000); // kasih waktu 3 detik minimal
+//    console.log("✅ Tombol media diklik.");
+//  } catch {
+//    console.log("⚠️ Tombol media tidak ketemu, lanjut pakai input file langsung.");
+//}
+let buttonSelector = "";
+if (fileName.match(/\.(mp4|mov|avi)$/i)) {
+  buttonSelector = 'div[role="button"][aria-label*="Video"]';
+} else {
+  buttonSelector = 'div[role="button"][aria-label*="Photos"]';
+}
 
-    console.log("✅ Tombol media diklik.");
-  } catch {
-    console.log("⚠️ Tombol media tidak ketemu, lanjut pakai input file langsung.");
-  }
+try {
+  // Coba klik biasa dulu
+  await page.click(buttonSelector, { delay: 100 });
+  await delay(3000);
+  console.log("✅ Tombol media diklik (click biasa).");
+} catch (e) {
+  console.log("⚠️ Click biasa gagal, coba dispatchEvent manual...");
 
+  await page.evaluate((sel) => {
+    const btn = document.querySelector(sel);
+    if (btn) {
+      ["mousedown", "mouseup", "click"].forEach(evt => {
+        btn.dispatchEvent(new MouseEvent(evt, { 
+          bubbles: true, 
+          cancelable: true, 
+          view: window 
+        }));
+      });
+    }
+  }, buttonSelector);
+
+  await delay(3000);
+  console.log("✅ Tombol media diklik (pakai dispatchEvent).");
+}
+ 
   // Cari input file
   let fileInput;
   if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
