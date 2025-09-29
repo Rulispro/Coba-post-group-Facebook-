@@ -338,12 +338,9 @@ async function downloadMedia(url, filename) {
     await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
     console.log("✅ Video preview muncul.");
   }
-// 🔎 Debug: pastikan preview benar-benar ada di DOM
-await page.waitForSelector("[data-testid='media-attachment-preview']", { timeout: 15000 });
-console.log("✅ Preview benar-benar muncul di DOM");
 
 // 📸 Debug screenshot
-await page.screenshot({ path: "after_upload.png", fullPage: true });
+  await page.screenshot({ path: "after_upload.png", fullPage: true });
 
   console.log("✅ Media siap diposting.");
   await delay(3000);
