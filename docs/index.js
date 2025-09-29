@@ -385,8 +385,8 @@ function delay(ms) {
     const page = await browser.newPage();
 
     // ===== Mulai rekaman
-    const recorder = new PuppeteerScreenRecorder(page);
-    await recorder.start("recording.mp4");
+   // const recorder = new PuppeteerScreenRecorder(page);
+   // await recorder.start("recording.mp4");
 
     // ===== Anti-detect
     await page.setUserAgent(
@@ -531,29 +531,38 @@ await uploadMedia(page, filePath);
    
     
     // ===== 3️⃣ Klik tombol POST
-    // Tunggu tombol muncul
-  await page.evaluate(() => {
-  const btn = [...document.querySelectorAll('div[role="button"]')]
-    .find(div => div.querySelector('span.f2')?.innerText === 'POST');
-  if (!btn) return console.log("❌ Tombol POST tidak ditemukan");
+const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
+if (postBtn) {
+  try {
+    await postBtn.click({ delay: 100 });
+    console.log("✅ Tombol POST diklik biasa");
+  } catch (e) {
+    console.log("⚠️ Click biasa gagal, coba dispatchEvent...");
+    await page.evaluate(() => {
+      const btn = document.evaluate(
+        "//div[@role='button']//span[contains(text(), 'POST')]",
+        document,
+        null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+        null
+      ).singleNodeValue;
 
-  const dispatchTouch = (el, type) => {
-    el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, view: window }));
-  };
+      if (btn) {
+        ["mousedown", "mouseup", "click"].forEach(evt =>
+          btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }))
+        );
+      }
+    });
+    console.log("✅ Fallback dispatchEvent berhasil");
+  }
+} else {
+  console.log("❌ Tombol POST tidak ditemukan");
+}
 
-  // Dispatch semua event yang mungkin ditangkap React
-  ["mousedown", "mouseup", "click", "touchstart", "touchend", "pointerdown", "pointerup"].forEach(evt => {
-    if (evt.startsWith("touch")) {
-      dispatchTouch(btn, evt);
-    } else {
-      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
-    }
-  });
-});
 
     // ===== Stop recorder
-    await recorder.stop();
-    console.log("🎬 Rekaman selesai: recording.mp4");
+  //  await recorder.stop();
+   // console.log("🎬 Rekaman selesai: recording.mp4");
 
     await browser.close();
   } catch (err) {
