@@ -286,8 +286,10 @@ async function downloadMedia(url, filename) {
 //  console.log(`✅ ${fileName} berhasil di-upload ke input.`);
 //  await delay(5000);
   // ===== Ambil input file dan upload langsung
-  const fileInput = await page.$('input[type="file"][accept="image/*"], input[type="file"][accept="video/*"]');
-                 || await page.$('input[type="file"]');                
+  const fileInput =
+  (await page.$('input[type="file"][accept="image/*"], input[type="file"][accept="video/*"]')) ||
+  (await page.$('input[type="file"]'));
+  
   if (fileInput) {
     await fileInput.uploadFile(filePath);
     console.log("✅ File sudah diattach (React terinformasi)");
