@@ -244,9 +244,9 @@ async function downloadMedia(url, filename) {
 
   // ===== Fungsi upload ke Facebook (foto/video)
       
- async function uploadMedia(page, filePath) {
-  const fileName = path.basename(filePath);
-  const absolutePath = path.resolve(__dirname, "media", fileName);
+// async function uploadMedia(page, filePath) {
+  //const fileName = path.basename(filePath);
+ // const absolutePath = path.resolve(__dirname, "media", fileName);
 
   // Tentukan tombol media
 //  let buttonSelector = fileName.match(/\.(mp4|mov|avi)$/i)
