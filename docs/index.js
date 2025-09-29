@@ -271,7 +271,7 @@ async function downloadMedia(url, filename) {
     await delay(3000);
   }
 
-   Cari input file
+   //Cari input file
   let fileInput;
   if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
     fileInput = await page.waitForSelector('input[type="file"][accept="image/*"]', { timeout: 10000 });
@@ -445,10 +445,11 @@ console.log("FILL:", fillResult);
 
   // ===== 3️⃣ Download + upload media
  const today = getTodayString();
- const fileName = `akun1_${today}.png`; // bisa .mp4
+ const fileName = `akun1_2025-09-16${today}.png`; // bisa .mp4
 const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.3.png";
 
- download media → simpan return value ke filePatconst filePath = await downloadMedia(mediaUrl, fileName);
+// download media → simpan return value ke filePat
+  const filePath = await downloadMedia(mediaUrl, fileName);
 console.log(`✅ Media ${fileName} berhasil di-download.`);
 
 // upload ke Facebook
