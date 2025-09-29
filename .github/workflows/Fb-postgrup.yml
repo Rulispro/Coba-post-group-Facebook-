@@ -36,15 +36,14 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-        - name: Download media from GitHub Release
+      - name: Download media from GitHub Release
         run: |
-    mkdir -p media
-    curl -L -o media/foto.jpg https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/foto.jpg
-    curl -L -o media/video.mp4 https://github.com/Rulispro/Coba-post-grouo-Facebook-/releases/download/v1.0/video.mp4
-
+          mkdir -p media
+          curl -L -o media/foto.jpg https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/foto.jpg
+          curl -L -o media/video.mp4 https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/video.mp4
 
       - name: Run Puppeteer bot
-        run:  node docs/index.js
+        run: node docs/index.js
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
@@ -54,6 +53,5 @@ jobs:
           name: recording-video
           path: recording.mp4
 
-          - name: Clean media folder
-            run: rm -rf media/*
-
+      - name: Clean media folder
+        run: rm -rf media/*
