@@ -249,66 +249,82 @@ async function downloadMedia(url, filename) {
   const absolutePath = path.resolve(__dirname, "media", fileName);
 
   // Tentukan tombol media
-  let buttonSelector = fileName.match(/\.(mp4|mov|avi)$/i)
-    ? 'div[role="button"][aria-label="Video"]'
-    : 'div[role="button"][aria-label="Photos"]';
+//  let buttonSelector = fileName.match(/\.(mp4|mov|avi)$/i)
+//    ? 'div[role="button"][aria-label="Video"]'
+  //  : 'div[role="button"][aria-label="Photos"]';
 
   // Klik tombol media
-  try {
-    await page.click(buttonSelector, { delay: 100 });
-    await delay(3000);
-    console.log("✅ Tombol media diklik (click biasa).");
-  } catch {
-    console.log("⚠️ Click biasa gagal, coba dispatchEvent manual...");
-    await page.evaluate((sel) => {
-      const btn = document.querySelector(sel);
-      if (btn) {
-        ["mousedown", "mouseup", "click"].forEach(evt => {
-         btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
-        });
-      }
-    }, buttonSelector);
-    await delay(3000);
-  }
+//  try {
+ //   await page.click(buttonSelector, { delay: 100 });
+  //  await delay(3000);
+   // console.log("✅ Tombol media diklik (click biasa).");
+//  } catch {
+  //  console.log("⚠️ Click biasa gagal, coba dispatchEvent manual...");
+   // await page.evaluate((sel) => {
+ //     const btn = document.querySelector(sel);
+ //     if (btn) {
+ //       ["mousedown", "mouseup", "click"].forEach(evt => {
+ //        btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+ //       });
+ //     }
+ //   }, buttonSelector);
+  //  await delay(3000);
+//  }
 
    //Cari input file
-  let fileInput;
-  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-    fileInput = await page.waitForSelector('input[type="file"][accept="image/*"]', { timeout: 10000 });
-  } else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
-    fileInput = await page.waitForSelector('input[type="file"][accept="video/*"]', { timeout: 10000 });
-  } else {
-    throw new Error("❌ Format file tidak didukung: " + fileName);
-  }
+//  let fileInput;
+ // if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
+   // fileInput = await page.waitForSelector('input[type="file"][accept="image/*"]', { timeout: 10000 });
+//  } else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
+   // fileInput = await page.waitForSelector('input[type="file"][accept="video/*"]', { timeout: 10000 });
+ // } else {
+  //  throw new Error("❌ Format file tidak didukung: " + fileName);
+ // }
 
   // Upload file
-  await fileInput.uploadFile(absolutePath);
-  console.log(`✅ ${fileName} berhasil di-upload ke input.`);
-  await delay(5000);
+  //await fileInput.uploadFile(absolutePath);
+//  console.log(`✅ ${fileName} berhasil di-upload ke input.`);
+//  await delay(5000);
+  // ===== Ambil input file dan upload langsung
+  const fileInput = await page.$('input[type="file"][accept="image/*"], input[type="file"][accept="video/*"]');
+  if (fileInput) {
+    await fileInput.uploadFile(filePath);
+    console.log("✅ File sudah diattach (React terinformasi)");
+   // Trigger event React supaya input terdeteksi
+    await page.evaluate((selector) => {
+      const input = document.querySelector(selector);
+      if (!input) return;
+      ["input", "change"].forEach(evt => input.dispatchEvent(new Event(evt, { bubbles: true })));
+    }, 'input[type="file"][accept="image/*"]');
 
-   //Trigger event React
-  const reactOk = await page.evaluate((selector) => {
-    const input = document.querySelector(selector);
-    if (!input) return false;
-    ["input", "change"].forEach(type => input.dispatchEvent(new Event(type, { bubbles: true })));
-    return true;
-  }, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
-        ? 'input[type="file"][accept="image/*"]'
-        : 'input[type="file"][accept="video/*"]');
-
-  if (!reactOk) {
-    console.log("⚠️ Event React gagal, coba drag-drop fallback...");
-    await page.evaluate((fileName) => {
-     const dropZone =
-        document.querySelector('[aria-label*="Tambah foto"]') ||
-        document.querySelector('[aria-label*="Tambah Video"]');
-      if (!dropZone) return false;
-      const dt = new DataTransfer();
-      dt.items.add(new File(["dummy"], fileName));
-      dropZone.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt }));
-      return true;
-    }, fileName);
+    await page.waitForTimeout(3000); // tunggu React sinkron
+  } else {
+    console.log("❌ Input file tidak ditemukan, upload gagal");
   }
+
+ //  //Trigger event React
+//  const reactOk = await page.evaluate((selector) => {
+   // const input = document.querySelector(selector);
+  //  if (!input) return false;
+    //["input", "change"].forEach(type => input.dispatchEvent(new Event(type, { bubbles: true })));
+   // return true;
+ // }, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
+      //  ? 'input[type="file"][accept="image/*"]'
+      //  : 'input[type="file"][accept="video/*"]');
+
+ // if (!reactOk) {
+  //  console.log("⚠️ Event React gagal, coba drag-drop fallback...");
+    //await page.evaluate((fileName) => {
+     //const dropZone =
+     //   document.querySelector('[aria-label*="Tambah foto"]') ||
+      //  document.querySelector('[aria-label*="Tambah Video"]');
+     // if (!dropZone) return false;
+    //  const dt = new DataTransfer();
+      //dt.items.add(new File(["dummy"], fileName));
+     // dropZone.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt }));
+    //  return true;
+ //   }, fileName);
+ // }
 
   // Tunggu preview muncul
   console.log("⏳ Tunggu preview render...");
@@ -510,6 +526,13 @@ await uploadMedia(page, filePath);
     
     // ===== 3️⃣ Klik tombol POST
     // Tunggu tombol muncul
+   await page.evaluate(() => {
+  const btn = [...document.querySelectorAll('div[role="button"]')]
+    .find(div => div.querySelector('span.f2')?.innerText === 'POST');
+  if (!btn) return console.log("❌ Tombol POST tidak ditemukan");
+  ["mousedown","mouseup","click","touchstart","touchend"].forEach(evt => btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true })));
+});
+   
 
 await page.evaluate(() => {
   const btn = [...document.querySelectorAll('div[role="button"]')]
