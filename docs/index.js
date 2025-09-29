@@ -338,6 +338,12 @@ async function downloadMedia(url, filename) {
     await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
     console.log("✅ Video preview muncul.");
   }
+// 🔎 Debug: pastikan preview benar-benar ada di DOM
+await page.waitForSelector("[data-testid='media-attachment-preview']", { timeout: 15000 });
+console.log("✅ Preview benar-benar muncul di DOM");
+
+// 📸 Debug screenshot
+await page.screenshot({ path: "after_upload.png", fullPage: true });
 
   console.log("✅ Media siap diposting.");
   await delay(3000);
@@ -529,15 +535,7 @@ await uploadMedia(page, filePath);
     
     // ===== 3️⃣ Klik tombol POST
     // Tunggu tombol muncul
-   await page.evaluate(() => {
-  const btn = [...document.querySelectorAll('div[role="button"]')]
-    .find(div => div.querySelector('span.f2')?.innerText === 'POST');
-  if (!btn) return console.log("❌ Tombol POST tidak ditemukan");
-  ["mousedown","mouseup","click","touchstart","touchend"].forEach(evt => btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true })));
-});
-   
-
-await page.evaluate(() => {
+  await page.evaluate(() => {
   const btn = [...document.querySelectorAll('div[role="button"]')]
     .find(div => div.querySelector('span.f2')?.innerText === 'POST');
   if (!btn) return console.log("❌ Tombol POST tidak ditemukan");
