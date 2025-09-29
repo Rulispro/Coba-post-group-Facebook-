@@ -226,118 +226,118 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 }
 
 // ===== Fungsi download media dari GitHub Release
-const mediaFolder = path.join(__dirname, "media");
-if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
+//const mediaFolder = path.join(__dirname, "media");
+//if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
 
-async function downloadMedia(url, filename) {
-  const filePath = path.join(mediaFolder, filename);
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(filePath);
-    https.get(url, (res) => {
-      res.pipe(file);
-      file.on("finish", () => {
-        file.close(() => resolve(filePath)); // ✅ sekarang return path
-      });
-    }).on("error", (err) => reject(err));
-  });
-}
+//async function downloadMedia(url, filename) {
+ // const filePath = path.join(mediaFolder, filename);
+ // return new Promise((resolve, reject) => {
+//    const file = fs.createWriteStream(filePath);
+   // https.get(url, (res) => {
+     // res.pipe(file);
+     // file.on("finish", () => {
+        //file.close(() => resolve(filePath)); // ✅ sekarang return path
+      //});
+ //   }).on("error", (err) => reject(err));
+  //});
+//}
 
   // ===== Fungsi upload ke Facebook (foto/video)
       
- async function uploadMedia(page, filePath) {
-  const fileName = path.basename(filePath);
-  const absolutePath = path.resolve(__dirname, "media", fileName);
+// async function uploadMedia(page, filePath) {
+  //const fileName = path.basename(filePath);
+//  const absolutePath = path.resolve(__dirname, "media", fileName);
 
   // Tentukan tombol media
-  let buttonSelector = fileName.match(/\.(mp4|mov|avi)$/i)
-    ? 'div[role="button"][aria-label="Video"]'
-    : 'div[role="button"][aria-label="Photos"]';
+  //let buttonSelector = fileName.match(/\.(mp4|mov|avi)$/i)
+    //? 'div[role="button"][aria-label="Video"]'
+   // : 'div[role="button"][aria-label="Photos"]';
 
   // Klik tombol media
-  try {
-    await page.click(buttonSelector, { delay: 100 });
-    await delay(3000);
-    console.log("✅ Tombol media diklik (click biasa).");
-  } catch {
-    console.log("⚠️ Click biasa gagal, coba dispatchEvent manual...");
-    await page.evaluate((sel) => {
-      const btn = document.querySelector(sel);
-      if (btn) {
-        ["mousedown", "mouseup", "click"].forEach(evt => {
-          btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
-        });
-      }
-    }, buttonSelector);
-    await delay(3000);
-  }
+//  try {
+  //  await page.click(buttonSelector, { delay: 100 });
+   // await delay(3000);
+   // console.log("✅ Tombol media diklik (click biasa).");
+//  } catch {
+   // console.log("⚠️ Click biasa gagal, coba dispatchEvent manual...");
+  //  await page.evaluate((sel) => {
+      //const btn = document.querySelector(sel);
+     // if (btn) {
+      //  ["mousedown", "mouseup", "click"].forEach(evt => {
+    //      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+     //   });
+     // }
+    //}, buttonSelector);
+  //  await delay(3000);
+ // }
 
   // Cari input file
-  let fileInput;
-  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-    fileInput = await page.waitForSelector('input[type="file"][accept="image/*"]', { timeout: 10000 });
-  } else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
-    fileInput = await page.waitForSelector('input[type="file"][accept="video/*"]', { timeout: 10000 });
-  } else {
-    throw new Error("❌ Format file tidak didukung: " + fileName);
-  }
-
+ // let fileInput;
+//  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
+   // fileInput = await page.waitForSelector('input[type="file"][accept="image/*"]', { timeout: 10000 });
+ // } else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
+  //  fileInput = await page.waitForSelector('input[type="file"][accept="video/*"]', { timeout: 10000 });
+//  } else {
+//    throw new Error("❌ Format file tidak didukung: " + fileName);
+//  }
+//
   // Upload file
-  await fileInput.uploadFile(absolutePath);
-  console.log(`✅ ${fileName} berhasil di-upload ke input.`);
-  await delay(5000);
+//  await fileInput.uploadFile(absolutePath);
+ // console.log(`✅ ${fileName} berhasil di-upload ke input.`);
+//  await delay(5000);
 
   // Trigger event React
-  const reactOk = await page.evaluate((selector) => {
-    const input = document.querySelector(selector);
-    if (!input) return false;
-    ["input", "change"].forEach(type => input.dispatchEvent(new Event(type, { bubbles: true })));
-    return true;
-  }, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
-        ? 'input[type="file"][accept="image/*"]'
-        : 'input[type="file"][accept="video/*"]');
+//  const reactOk = await page.evaluate((selector) => {
+ //   const input = document.querySelector(selector);
+  //  if (!input) return false;
+  //  ["input", "change"].forEach(type => input.dispatchEvent(new Event(type, { bubbles: true })));
+  //  return true;
+  //}, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
+    //    ? 'input[type="file"][accept="image/*"]'
+  //      : 'input[type="file"][accept="video/*"]');
 
-  if (!reactOk) {
-    console.log("⚠️ Event React gagal, coba drag-drop fallback...");
-    await page.evaluate((fileName) => {
-      const dropZone =
-        document.querySelector('[aria-label*="Tambah foto"]') ||
-        document.querySelector('[aria-label*="Tambah Video"]');
-      if (!dropZone) return false;
-      const dt = new DataTransfer();
-      dt.items.add(new File(["dummy"], fileName));
-      dropZone.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt }));
-      return true;
-    }, fileName);
-  }
+ // if (!reactOk) {
+  //  console.log("⚠️ Event React gagal, coba drag-drop fallback...");
+  //  await page.evaluate((fileName) => {
+   //   const dropZone =
+   //     document.querySelector('[aria-label*="Tambah foto"]') ||
+    //    document.querySelector('[aria-label*="Tambah Video"]');
+   //   if (!dropZone) return false;
+   //   const dt = new DataTransfer();
+   //   dt.items.add(new File(["dummy"], fileName));
+   //   dropZone.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt }));
+  //    return true;
+ //   }, fileName);
+//  }
 
   // Tunggu preview muncul
-  console.log("⏳ Tunggu preview render...");
-  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-    await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
-    console.log("✅ Foto preview muncul.");
-  } else {
-    await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
-    console.log("✅ Video preview muncul.");
-  }
+//  console.log("⏳ Tunggu preview render...");
+//  if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
+//    await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
+ //   console.log("✅ Foto preview muncul.");
+//  } else {
+ //   await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
+//    console.log("✅ Video preview muncul.");
+//  }
 
-  console.log("✅ Media siap diposting.");
-  await delay(3000);
-   }
+//  console.log("✅ Media siap diposting.");
+//  await delay(3000);
+//   }
                                                                              
    
 
 // ===== Ambil tanggal hari ini
-function getTodayString() {
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-// 🕒 Fungsi delay
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+//function getTodayString() {
+//  const today = new Date();
+////  const yyyy = today.getFullYear();
+//  const mm = String(today.getMonth() + 1).padStart(2, "0");
+//  const dd = String(today.getDate()).padStart(2, "0");
+//  return `${yyyy}-${mm}-${dd}`;
+//}
+//// 🕒 Fungsi delay
+//function delay(ms) {
+//  return new Promise(resolve => setTimeout(resolve, ms));
+////}
 
 // ===== Main Puppeteer
 (async () => {
@@ -444,16 +444,15 @@ console.log("FILL:", fillResult);
 
 
   // ===== 3️⃣ Download + upload media
-const today = getTodayString();
-const fileName = `akun1_${today}.png`; // bisa .mp4
-const mediaUrl = "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/akun1_2025-09-16.png/Screenshot_20250909-071607.png";
+//const today = getTodayString();
+//const fileName = `akun1_${today}.png`; // bisa .mp4
+//const mediaUrl = "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/akun1_2025-09-16.png/Screenshot_20250909-071607.png";
 
-// download media → simpan return value ke filePath
-const filePath = await downloadMedia(mediaUrl, fileName);
-console.log(`✅ Media ${fileName} berhasil di-download.`);
+// download media → simpan return value ke filePatconst filePath = await downloadMedia(mediaUrl, fileName);
+//console.log(`✅ Media ${fileName} berhasil di-download.`);
 
 // upload ke Facebook
-await uploadMedia(page, filePath);
+//await uploadMedia(page, filePath);
  
     // ===== 3️⃣ Download + upload media
  //   const today = getTodayString();
