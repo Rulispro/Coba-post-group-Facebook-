@@ -286,7 +286,7 @@ async function downloadMedia(url, filename) {
   console.log(`✅ ${fileName} berhasil di-upload ke input.`);
   await delay(5000);
 
-   Trigger event React
+   //Trigger event React
   const reactOk = await page.evaluate((selector) => {
     const input = document.querySelector(selector);
     if (!input) return false;
@@ -459,7 +459,7 @@ await uploadMedia(page, filePath);
     const today = getTodayString();
     const fileName = `akun1_${today}.jpg`; // bisa ganti .mp4 kalau video
     const mediaUrl = "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/akun1_2025-09-16.jpg";
-   download media
+  // download media
     await downloadMedia(mediaUrl, fileName);
    console.log(`✅ Media ${fileName} berhasil di-download.`);
 //   // 2️⃣ Upload ke Facebook
