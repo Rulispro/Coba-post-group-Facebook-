@@ -52,6 +52,14 @@ jobs:
         with:
           name: recording-video
           path: recording.mp4
+    
+      - name: Upload screenshot
+         uses: actions/upload-artifact@v4
+         with:
+            name: screenshots
+            path: after_upload.png
+
+          
 
       - name: Clean media folder
         run: rm -rf media/*
