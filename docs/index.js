@@ -506,14 +506,10 @@ console.log("FILL:", fillResult);
  // console.log("✅ Media siap diposting.");
 //}
    
-    // ===== 4️⃣ Klik tombol POST
-    const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
-    if (postBtn) {
-      await postBtn.click();
-      console.log("✅ Tombol POST berhasil diklik!");
-    } else {
-      console.log("❌ Tombol POST tidak ditemukan");
-    }
+    
+    // ===== 3️⃣ Klik tombol POST
+    // Tunggu tombol POST muncul
+ await page.waitForXPath("//div[@role='button']//span[contains(text(), 'POST')]", { timeout: 5000 });
 
     // ===== Stop recorder
     await recorder.stop();
