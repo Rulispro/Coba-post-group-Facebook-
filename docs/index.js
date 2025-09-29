@@ -445,7 +445,7 @@ console.log("FILL:", fillResult);
 
   // ===== 3️⃣ Download + upload media
  const today = getTodayString();
- const fileName = `akun1_2025-09-16${today}.png`; // bisa .mp4
+ const fileName = `akun1_${today}.png`; // bisa .mp4
 const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.3.png";
 
 // download media → simpan return value ke filePat
@@ -456,12 +456,12 @@ console.log(`✅ Media ${fileName} berhasil di-download.`);
 await uploadMedia(page, filePath);
  
     // ===== 3️⃣ Download + upload media
-    const today = getTodayString();
-    const fileName = `akun1_${today}.jpg`; // bisa ganti .mp4 kalau video
-    const mediaUrl = "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/akun1_2025-09-16.jpg";
+ //   const today = getTodayString();
+   // const fileName = `akun1_${today}.jpg`; // bisa ganti .mp4 kalau video
+//    const mediaUrl = "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/akun1_2025-09-16.jpg";
   // download media
-    await downloadMedia(mediaUrl, fileName);
-   console.log(`✅ Media ${fileName} berhasil di-download.`);
+//    await downloadMedia(mediaUrl, fileName);
+//   console.log(`✅ Media ${fileName} berhasil di-download.`);
 //   // 2️⃣ Upload ke Facebook
 //   await uploadMedia(page, filePath);
     // ===== Fungsi upload ke Facebook
