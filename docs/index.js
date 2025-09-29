@@ -286,31 +286,8 @@ async function downloadMedia(url, filename) {
 //  console.log(`✅ ${fileName} berhasil di-upload ke input.`);
 //  await delay(5000);
   // ===== Ambil input file dan upload langsung
-  const fileInput =
-  (await page.$('input[type="file"][accept*="image"]')) ||
-  (await page.$('input[type="file"][accept*="video"]')) ||
-  (await page.$('input[type="file"]')); // fallback
-
-if (fileInput) {
-  await fileInput.uploadFile(filePath);
-  console.log("✅ File sudah diattach (React terinformasi)");
-
-  // kasih delay supaya Facebook proses file ke memory
-  await page.waitForTimeout(5000);
-
-  // Trigger event supaya React / DOM sadar ada file baru
-  await page.evaluate((selector) => {
-    const input = document.querySelector(selector);
-    if (!input) return;
-    ["input", "change"].forEach(evt =>
-      input.dispatchEvent(new Event(evt, { bubbles: true }))
-    );
-  }, 'input[type="file"]');
-
-  await page.waitForTimeout(3000); // tambahan sinkronisasi
-} else {
-  console.log("❌ Input file tidak ditemukan, upload gagal");
-}
+  
+  
   
  //  //Trigger event React
 //  const reactOk = await page.evaluate((selector) => {
@@ -338,24 +315,53 @@ if (fileInput) {
 
   // Tunggu preview muncul
   
+  // ✅ Upload dan tunggu preview
+async function uploadMedia(page, filePath, fileName) {
+  const fileInput =
+    (await page.$('input[type="file"][accept*="image"]')) ||
+    (await page.$('input[type="file"][accept*="video"]')) ||
+    (await page.$('input[type="file"]')); // fallback
+
+  if (fileInput) {
+    await fileInput.uploadFile(filePath);
+    console.log("✅ File sudah diattach (React terinformasi)");
+
+    // tunggu proses file
+    await page.waitForTimeout(5000);
+
+    // Trigger event supaya React sadar ada file baru
+    await page.evaluate((selector) => {
+      const input = document.querySelector(selector);
+      if (!input) return;
+      ["input", "change"].forEach(evt =>
+        input.dispatchEvent(new Event(evt, { bubbles: true }))
+      );
+    }, 'input[type="file"]');
+
+    await page.waitForTimeout(3000); // tambahan sinkronisasi
+  } else {
+    console.log("❌ Input file tidak ditemukan, upload gagal");
+    return;
+  }
+
+  // Tunggu preview muncul
   console.log("⏳ Tunggu preview render...");
-if (/\.(jpg|jpeg|png|gif)$/i.test(fileName)) {
-  await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
-  console.log("✅ Foto preview muncul.");
-  await page.waitForTimeout(5000);
-} else {
-  await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
-  console.log("✅ Video preview muncul.");
-  await page.waitForTimeout(5000);
+  if (/\.(jpg|jpeg|png|gif)$/i.test(fileName)) {
+    await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 20000 });
+    console.log("✅ Foto preview muncul.");
+    await page.waitForTimeout(5000);
+  } else {
+    await page.waitForSelector('video[src*="fbcdn"]', { timeout: 30000 });
+    console.log("✅ Video preview muncul.");
+    await page.waitForTimeout(5000);
+  }
+
+  // 📸 Debug screenshot
+  await page.screenshot({ path: "after_upload.png", fullPage: true });
+  console.log("✅ Media siap diposting.");
+  await page.waitForTimeout(3000);
 }
-
-// 📸 Debug screenshot
-await page.screenshot({ path: "after_upload.png", fullPage: true });
-console.log("✅ Media siap diposting.");
-await page.waitForTimeout(3000);
                                                                       
-   
-
 // ===== Ambil tanggal hari ini
 function getTodayString() {
   const today = new Date();
