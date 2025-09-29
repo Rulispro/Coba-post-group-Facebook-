@@ -508,8 +508,23 @@ console.log("FILL:", fillResult);
    
     
     // ===== 3️⃣ Klik tombol POST
-    // Tunggu tombol POST muncul
- await page.waitForXPath("//div[@role='button']//span[contains(text(), 'POST')]", { timeout: 5000 });
+    // Tunggu tombol muncul
+await page.waitForSelector('div[role="button"] span.f2', { visible: true, timeout: 10000 });
+
+// Klik tombol POST
+await page.evaluate(() => {
+  const btn = [...document.querySelectorAll('div[role="button"]')]
+    .find(div => div.querySelector('span.f2')?.innerText === 'POST');
+  if (btn) {
+    ["mousedown", "mouseup", "click"].forEach(evt => {
+      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+    });
+  } else {
+    console.log("❌ Tombol POST tidak ditemukan!");
+  }
+});
+console.log("✅ Tombol POST diklik!");
+
 
     // ===== Stop recorder
     await recorder.stop();
