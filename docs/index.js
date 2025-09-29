@@ -264,9 +264,9 @@ async function uploadMedia(page, filePath) {
 //}
 let buttonSelector = "";
 if (fileName.match(/\.(mp4|mov|avi)$/i)) {
-  buttonSelector = 'div[role="button"][aria-label*="Video"]';
+  buttonSelector = 'div[role="button"][aria-label="Video"]';
 } else {
-  buttonSelector = 'div[role="button"][aria-label*="Photos"]';
+  buttonSelector = 'div[role="button"][aria-label="Photos"]';
 }
 
 try {
@@ -303,7 +303,16 @@ try {
   } else {
     throw new Error("❌ Format file tidak didukung: " + fileName);
   }
+   // Path absolut file di folder media
+  const filePath = path.resolve(__dirname, "media", fileName);
 
+  // Tunggu input siap
+  const inputFile = await page.waitForSelector(inputSelector, { timeout: 10000 });
+
+  // Upload file
+  await inputFile.uploadFile(filePath);
+  console.log(`✅ ${fileName} berhasil di-upload ke input.`);
+   
   // Upload file
   await fileInput.uploadFile(filePath);
   console.log(`✅ ${fileName} berhasil di-upload ke input.`);
