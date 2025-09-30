@@ -36,16 +36,23 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Download media from GitHub Release
+      # ✅ Tambah step untuk bikin variabel tanggal
+      - name: Set DATE
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      # ✅ Download media dengan nama file pakai tanggal otomatis
+      - name: Download Media
         run: |
           mkdir -p media
-          curl -L -o media/foto.jpg https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/foto.jpg
-          curl -L -o media/video.mp4 https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/video.mp4
+          curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.png" -o media/akun1_${{ env.DATE }}.png
+          # kalau ada video juga
+          # curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.mp4" -o media/akun1_${{ env.DATE }}.mp4
 
       - name: Run Puppeteer bot
         run: node docs/index.js
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+          DATE: ${{ env.DATE }}   # 🔑 biar bisa dipakai di Node.js juga
 
       - name: Upload recording
         uses: actions/upload-artifact@v4
