@@ -421,11 +421,24 @@ async function uploadMediaAndPost(page, filePath, fileName) {
   } else {
     console.log("⚠️ Ekstensi file tidak dikenali:", ext);
   }
+const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+await page.screenshot({ path: screenshotPath, fullPage: true });
+console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
+
+// Debug: pastikan file ada
+const fs = require("fs");
+if (fs.existsSync(screenshotPath)) {
+  console.log("✅ Screenshot ada di folder media");
+} else {
+  console.log("❌ Screenshot TIDAK ADA di folder media");
+}
 
   // 4️⃣ Tambahkan buffer ekstra sebelum klik POST
   console.log(`⏳ Tunggu buffer ${bufferTime / 10000}s sebelum klik POST...`);
   await page.waitForTimeout(bufferTime);
-
+  // 4️⃣ Debug screenshot
+  await page.screenshot({ path: "after_upload.png", fullPage: true });
+  console.log("✅ Media siap diposting.");
   // 5️⃣ Klik tombol POST otomatis
 ///  const postBtn = await page.$('div[aria-label="Post"], button[type="submit"]');
  // if (postBtn) {
@@ -434,11 +447,7 @@ async function uploadMediaAndPost(page, filePath, fileName) {
  // } else {
  //console.log("❌ Tombol POST tidak ditemukan, posting gagal.");
 //  }
-const screenshotPath = path.join(__dirname, "media", "after_upload.png"); // fixed name
-await page.screenshot({ path: screenshotPath, fullPage: true });
-console.log(`📸 Screenshot terakhir disimpan: ${screenshotPath}`);
 
-  
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
   if (process.env.GITHUB_ACTIONS) {
     console.log(`📤 Screenshot siap di-upload ke artifact (gunakan actions/upload-artifact di workflow)`);
