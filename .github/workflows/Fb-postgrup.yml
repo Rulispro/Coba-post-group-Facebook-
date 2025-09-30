@@ -40,31 +40,45 @@ jobs:
       - name: Set DATE
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
+      # ✅ Buat folder media
+      - name: Create media folder
+        run: mkdir -p media
+
       # ✅ Download media dengan nama file pakai tanggal otomatis
       - name: Download Media
         run: |
-          mkdir -p media
           curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.png" -o media/akun1_${{ env.DATE }}.png
           # kalau ada video juga
           # curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.mp4" -o media/akun1_${{ env.DATE }}.mp4
 
+      # ✅ Jalankan bot Puppeteer
       - name: Run Puppeteer bot
         run: node docs/index.js
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
-          DATE: ${{ env.DATE }}   # 🔑 biar bisa dipakai di Node.js juga
+          DATE: ${{ env.DATE }}
 
+      # ✅ Upload recording
       - name: Upload recording
         uses: actions/upload-artifact@v4
         with:
           name: recording-video
           path: recording.mp4
 
-      - name: Upload screenshot
+      # ✅ Upload screenshot terakhir (fixed filename)
+      - name: Upload last screenshot
         uses: actions/upload-artifact@v4
         with:
-          name: screenshots
+          name: screenshot
           path: after_upload.png
 
+      # ✅ Upload semua screenshot di media folder (pattern)
+      - name: Upload all screenshots from media
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-screenshots
+          path: media/after_upload_*.png
+
+      # ✅ Bersihkan folder media
       - name: Clean media folder
         run: rm -rf media/*
