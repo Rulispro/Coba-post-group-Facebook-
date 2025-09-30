@@ -492,7 +492,7 @@ const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/
 console.log(`✅ Media ${fileName} berhasil di-download.`);
 
 // upload ke Facebook
-await uploadMedia(page, filePath);
+await uploadMedia(page, filePath, fileName);
  
     // ===== 3️⃣ Download + upload media
  //   const today = getTodayString();
