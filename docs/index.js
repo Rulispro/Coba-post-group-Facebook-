@@ -427,13 +427,13 @@ async function uploadMediaAndPost(page, filePath, fileName) {
   await page.waitForTimeout(bufferTime);
 
   // 5️⃣ Klik tombol POST otomatis
-  const postBtn = await page.$('div[aria-label="Post"], button[type="submit"]');
-  if (postBtn) {
-    await postBtn.click();
-    console.log("✅ Tombol POST diklik otomatis!");
-  } else {
-    console.log("❌ Tombol POST tidak ditemukan, posting gagal.");
-  }
+///  const postBtn = await page.$('div[aria-label="Post"], button[type="submit"]');
+ // if (postBtn) {
+ //   await postBtn.click();
+  //  console.log("✅ Tombol POST diklik otomatis!");
+ // } else {
+ //console.log("❌ Tombol POST tidak ditemukan, posting gagal.");
+//  }
 
   // 6️⃣ Screenshot terakhir saja untuk debugging
   const screenshotPath = `after_upload_${Date.now()}.png`;
