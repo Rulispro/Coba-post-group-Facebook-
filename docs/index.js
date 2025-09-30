@@ -348,22 +348,23 @@ async function uploadMedia(page, filePath, fileName) {
 
   console.log("⏳ Tunggu preview render...");
 
-if (/\.(jpg|jpeg|png|gif)$/i.test(fileName)) {
-  // FOTO
-  await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 30000 });
-  console.log("✅ Foto preview muncul.");
-} else if (/\.(mp4|mov|webm)$/i.test(fileName)) {
-  // VIDEO
-  await page.waitForSelector('video[src*="fbcdn"], video', { timeout: 60000 });
-  console.log("✅ Video preview muncul.");
-} else {
-  console.log("⚠️ Ekstensi file tidak dikenali, lanjut tanpa cek preview.");
-}
+ // ✅ Cek ekstensi pakai path.extname
+  const ext = path.extname(fileName).toLowerCase();
 
-// 📸 Debug screenshot
-await page.screenshot({ path: "after_upload.png", fullPage: true });
-console.log("✅ Media siap diposting.");
-}                                                          
+  if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
+    await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 30000 });
+    console.log("✅ Foto preview muncul.");
+  } else if ([".mp4", ".mov", ".webm"].includes(ext)) {
+    await page.waitForSelector('video[src*="fbcdn"], video', { timeout: 60000 });
+    console.log("✅ Video preview muncul.");
+  } else {
+    console.log("⚠️ Ekstensi file tidak dikenali:", ext);
+  }
+
+  // 📸 Debug screenshot
+  await page.screenshot({ path: "after_upload.png", fullPage: true });
+  console.log("✅ Media siap diposting.");
+}                                                    
 // ===== Ambil tanggal hari ini
 function getTodayString() {
   const today = new Date();
