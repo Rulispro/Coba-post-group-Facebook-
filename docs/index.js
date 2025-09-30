@@ -436,10 +436,9 @@ async function uploadMediaAndPost(page, filePath, fileName) {
 //  }
 
   // 6️⃣ Screenshot terakhir saja untuk debugging
-  const screenshotPath = `after_upload_${Date.now()}.png`;
-  await page.screenshot({ path: screenshotPath, fullPage: true });
-  console.log(`📸 Screenshot terakhir disimpan: ${screenshotPath}`);
-
+  const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+await page.screenshot({ path: screenshotPath, fullPage: true });
+console.log(`📸 Screenshot terakhir disimpan: ${screenshotPath}`);
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
   if (process.env.GITHUB_ACTIONS) {
     console.log(`📤 Screenshot siap di-upload ke artifact (gunakan actions/upload-artifact di workflow)`);
