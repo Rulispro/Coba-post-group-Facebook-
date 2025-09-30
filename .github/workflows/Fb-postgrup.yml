@@ -65,13 +65,6 @@ jobs:
           name: recording-video
           path: recording.mp4
 
-      # ✅ Upload screenshot terakhir (fixed filename)
-      - name: Upload last screenshot
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshot
-          path: after_upload.png
-
       # ✅ Upload semua screenshot di media folder (pattern)
       - name: Upload all screenshots from media
         uses: actions/upload-artifact@v4
