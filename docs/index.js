@@ -413,8 +413,8 @@ function delay(ms) {
     const page = await browser.newPage();
 
     // ===== Mulai rekaman
-   // const recorder = new PuppeteerScreenRecorder(page);
-   // await recorder.start("recording.mp4");
+    const recorder = new PuppeteerScreenRecorder(page);
+    await recorder.start("recording.mp4");
 
     // ===== Anti-detect
     await page.setUserAgent(
@@ -589,8 +589,8 @@ if (postBtn) {
 
 
     // ===== Stop recorder
-  //  await recorder.stop();
-   // console.log("🎬 Rekaman selesai: recording.mp4");
+    await recorder.stop();
+    console.log("🎬 Rekaman selesai: recording.mp4");
 
     await browser.close();
   } catch (err) {
