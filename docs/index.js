@@ -253,13 +253,15 @@ async function downloadMedia(url, filename) {
 //    ? 'div[role="button"][aria-label="Video"]'
   //  : 'div[role="button"][aria-label="Photos"]';
 
-  // Klik tombol media
+  /* Klik tombol media
 //  try {
  //   await page.click(buttonSelector, { delay: 100 });
   //  await delay(3000);
    // console.log("✅ Tombol media diklik (click biasa).");
 //  } catch {
-  //  console.log("⚠️ Click biasa gagal, coba dispatchEvent manual...");
+    console.log("⚠️ Click biasa gagal, coba dispatchEvent manual...");
+}
+*/
    // await page.evaluate((sel) => {
  //     const btn = document.querySelector(sel);
  //     if (btn) {
