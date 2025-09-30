@@ -658,8 +658,7 @@ if (postBtn) {
       }
     });
     console.log("✅ Fallback dispatchEvent berhasil");
-  }
-/ else {
+  } else {
    console.log("❌ Tombol POST tidak ditemukan");
 }
 
