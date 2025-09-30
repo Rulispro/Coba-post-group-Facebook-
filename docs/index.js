@@ -314,57 +314,69 @@ async function downloadMedia(url, filename) {
     //  return true;
  //   }, fileName);
  // }
+const path = require("path");
 
-  // Tunggu preview muncul
-  
-  // ✅ Upload dan tunggu preview
+// ✅ Upload dan tunggu preview
 async function uploadMedia(page, filePath, fileName) {
+  // 1️⃣ Klik tombol "Photo/Video"
+  const addMediaBtn = await page.$('div[aria-label="Photo/Video"], div[aria-label="Photos"], div[aria-label="Video"]');
+  if (addMediaBtn) {
+    await addMediaBtn.click();
+    console.log("📸 Tombol Photo/Video diklik.");
+    await page.waitForTimeout(2000);
+  }
+
+  // 2️⃣ Cari input file
   const fileInput =
     (await page.$('input[type="file"][accept*="image"]')) ||
     (await page.$('input[type="file"][accept*="video"]')) ||
-    (await page.$('input[type="file"]')); // fallback
+    (await page.$('input[type="file"]'));
 
-  if (fileInput) {
-    await fileInput.uploadFile(filePath);
-    console.log("✅ File sudah diattach (React terinformasi)");
-
-    // tunggu proses file
-    await page.waitForTimeout(5000);
-
-    // Trigger event supaya React sadar ada file baru
-    await page.evaluate((selector) => {
-      const input = document.querySelector(selector);
-      if (!input) return;
-      ["input", "change"].forEach(evt =>
-        input.dispatchEvent(new Event(evt, { bubbles: true }))
-      );
-    }, 'input[type="file"]');
-
-    await page.waitForTimeout(3000); // tambahan sinkronisasi
-  } else {
+  if (!fileInput) {
     console.log("❌ Input file tidak ditemukan, upload gagal");
     return;
   }
 
-  console.log("⏳ Tunggu preview render...");
+  // Upload file
+  await fileInput.uploadFile(filePath);
+  console.log("✅ File sudah diattach");
 
- // ✅ Cek ekstensi pakai path.extname
+  // Trigger event supaya React sadar
+  await page.evaluate((selector) => {
+    const input = document.querySelector(selector);
+    if (!input) return;
+    ["input", "change"].forEach(evt =>
+      input.dispatchEvent(new Event(evt, { bubbles: true }))
+    );
+  }, 'input[type="file"]');
+
+  // 3️⃣ Tunggu preview sesuai tipe file
   const ext = path.extname(fileName).toLowerCase();
 
   if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
-    await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 30000 });
+    console.log("⏳ Tunggu foto upload sampai preview muncul...");
+    await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 60000 });
     console.log("✅ Foto preview muncul.");
+    await page.waitForTimeout(7000); // buffer tambahan setelah preview
   } else if ([".mp4", ".mov", ".webm"].includes(ext)) {
-    await page.waitForSelector('video[src*="fbcdn"], video', { timeout: 60000 });
+    console.log("⏳ Tunggu video upload sampai preview muncul...");
+    await page.waitForSelector('video[src*="fbcdn"], video', { timeout: 120000 });
     console.log("✅ Video preview muncul.");
+    await page.waitForTimeout(15000); // buffer tambahan setelah preview
   } else {
     console.log("⚠️ Ekstensi file tidak dikenali:", ext);
   }
 
-  // 📸 Debug screenshot
+  // 4️⃣ Debug screenshot
   await page.screenshot({ path: "after_upload.png", fullPage: true });
   console.log("✅ Media siap diposting.");
-}                                                    
+
+  // 5️⃣ Klik tombol posting (bisa tambahkan setelah ini)
+  // const postBtn = await page.$('div[aria-label="Post"], button[type="submit"]');
+  // if (postBtn) await postBtn.click();
+}
+
+                                                    
 // ===== Ambil tanggal hari ini
 function getTodayString() {
   const today = new Date();
