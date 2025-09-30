@@ -635,33 +635,33 @@ await uploadMediaAndPost(page, filePath, fileName);
    
     
     // ===== 3️⃣ Klik tombol POST
-//const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
-//if (postBtn) {
- // try {
-  //  await postBtn.click({ delay: 100 });
-//  console.log("✅ Tombol POST diklik biasa");
- // } catch (e) {
-   //console.log("⚠️ Click biasa gagal, coba dispatchEvent...");
-   // await page.evaluate(() => {
-    //  const btn = document.evaluate(
-     //   "//div[@role='button']//span[contains(text(), 'POST')]",
-    //  document,
-    //    null,
-  //    XPathResult.FIRST_ORDERED_NODE_TYPE,
-     //   null
-     // ).singleNodeValue;
-//
-     // if (btn) {
-      //  ["mousedown", "mouseup", "click"].forEach(evt =>
-   //     btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }))
-     //   );
-     // }
- //   });
-   // console.log("✅ Fallback dispatchEvent berhasil");
-//  }
-//}/ else {
-//  console.log("❌ Tombol POST tidak ditemukan");
-//}
+const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
+if (postBtn) {
+  try {
+    await postBtn.click({ delay: 100 });
+  console.log("✅ Tombol POST diklik biasa");
+  } catch (e) {
+   console.log("⚠️ Click biasa gagal, coba dispatchEvent...");
+    await page.evaluate(() => {
+      const btn = document.evaluate(
+        "//div[@role='button']//span[contains(text(), 'POST')]",
+      document,
+        null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+        null
+      ).singleNodeValue;
+
+      if (btn) {
+        ["mousedown", "mouseup", "click"].forEach(evt =>
+        btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }))
+        );
+      }
+    });
+    console.log("✅ Fallback dispatchEvent berhasil");
+  }
+/ else {
+   console.log("❌ Tombol POST tidak ditemukan");
+}
 
 
     // ===== Stop recorder
