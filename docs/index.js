@@ -407,7 +407,7 @@ async function uploadMediaAndPost(page, filePath, fileName) {
 
   // 3️⃣ Tunggu preview
   const ext = path.extname(fileName).toLowerCase();
-  let bufferTime = 7000; // default buffer foto
+  let bufferTime = 10000; // default buffer foto
 
   if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
     console.log("⏳ Tunggu foto upload sampai preview muncul...");
@@ -423,7 +423,7 @@ async function uploadMediaAndPost(page, filePath, fileName) {
   }
 
   // 4️⃣ Tambahkan buffer ekstra sebelum klik POST
-  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
+  console.log(`⏳ Tunggu buffer ${bufferTime / 10000}s sebelum klik POST...`);
   await page.waitForTimeout(bufferTime);
 
   // 5️⃣ Klik tombol POST otomatis
@@ -578,7 +578,7 @@ console.log(`✅ Media ${fileName} berhasil di-download.`);
 
 // upload ke Facebook
 //await uploadMedia(page, filePath, fileName);
- const { uploadMediaAndPost } = require("./uploadMedia"); // import baru
+  
 await uploadMediaAndPost(page, filePath, fileName);
    
     // ===== 3️⃣ Download + upload media
