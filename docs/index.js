@@ -434,11 +434,11 @@ async function uploadMediaAndPost(page, filePath, fileName) {
  // } else {
  //console.log("❌ Tombol POST tidak ditemukan, posting gagal.");
 //  }
-
-  // 6️⃣ Screenshot terakhir saja untuk debugging
-  const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+const screenshotPath = path.join(__dirname, "media", "after_upload.png"); // fixed name
 await page.screenshot({ path: screenshotPath, fullPage: true });
 console.log(`📸 Screenshot terakhir disimpan: ${screenshotPath}`);
+
+  
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
   if (process.env.GITHUB_ACTIONS) {
     console.log(`📤 Screenshot siap di-upload ke artifact (gunakan actions/upload-artifact di workflow)`);
