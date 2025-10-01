@@ -71,9 +71,9 @@ jobs:
         with:
           name: screenshots
           path: |
-            after_upload*.png
-            media/after_upload_*.png
-
+            docs/media/after_upload.png
+            docs/media/after_upload_*.png
+            
       # ✅ Bersihkan folder media
       - name: Clean media folder
         run: rm -rf media/*
