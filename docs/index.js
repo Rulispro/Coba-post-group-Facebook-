@@ -78,9 +78,82 @@ async function downloadMedia(url, filename) {
 //  await page.screenshot({ path: "after_upload.png", fullPage: true });
 //  console.log("✅ Media siap diposting.");
 
+async function uploadMedia(page, filePath, fileName, type = "Photos") {
+  console.log(`🚀 Mulai upload ${type}: ${fileName}`);
 
-         
+  // 1️⃣ Klik tombol Photos/Video pakai event React
+  await page.evaluate((label) => {
+    const btn = [...document.querySelectorAll('div[role="button"]')]
+      .find(div =>
+        div.getAttribute("aria-label") === label ||
+        (div.innerText || "").includes(label)
+      );
 
+    if (!btn) {
+      console.log(`❌ Tombol ${label} tidak ditemukan`);
+      return;
+    }
+
+    const dispatchTouch = (el, type) => {
+      el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, view: window }));
+    };
+
+    ["pointerdown","mousedown","touchstart","mouseup","pointerup","touchend","click"].forEach(evt => {
+      if (evt.startsWith("touch")) {
+        dispatchTouch(btn, evt);
+      } else {
+        btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+      }
+    });
+
+    console.log(`✅ Tombol ${label} berhasil diklik`);
+  }, type);
+
+  // 2️⃣ Cari input file
+  const fileInput =
+    (await page.$('input[type="file"][accept="image/*"]')) ||
+    (await page.$('input[type="file"][accept*="video/*"]')) ||
+    (await page.$('input[type="file"]'));
+
+  if (!fileInput) {
+    console.log("❌ Input file tidak ditemukan, upload gagal");
+    return false;
+  }
+
+  // Upload file
+  await fileInput.uploadFile(filePath);
+  console.log("✅ File sudah diattach:", filePath);
+
+  // Trigger event biar React detect
+  await page.evaluate(() => {
+    const input = document.querySelector('input[type="file"]');
+    if (input) {
+      ["input", "change"].forEach(evt =>
+        input.dispatchEvent(new Event(evt, { bubbles: true }))
+      );
+    }
+  });
+
+  // 3️⃣ Tunggu preview (foto/video)
+  const ext = path.extname(fileName).toLowerCase();
+  let bufferTime = 10000; // default 10s foto
+
+  if ([".jpg", ".jpeg", ".png"].includes(ext)) {
+    console.log("⏳ Tunggu foto preview...");
+    await page.waitForSelector('img[src*="scontent"], div[data-mcomponent="ImageArea"] img', { timeout: 60000 });
+    console.log("✅ Foto preview ready");
+  } else if ([".mp4", ".mov"].includes(ext)) {
+    console.log("⏳ Tunggu video preview...");
+    await page.waitForSelector('div[data-mcomponent="VideoArea"], video', { timeout: 120000 });
+    console.log("✅ Video preview ready");
+    bufferTime = 15000;
+  }
+
+  await page.waitForTimeout(bufferTime);
+  console.log("✅ Upload selesai");
+  return true;
+                                               }
+                            
 
 
 const screenshotPath = path.join(__dirname, "media", "after_upload.png");
@@ -242,7 +315,7 @@ console.log(`✅ Media ${fileName} berhasil di-download.`);
 // upload ke Facebook
 
   
-await uploadMediaAndPost(page, filePath, fileName);
+await uploadMedia(page, filePath, fileName, "Photos");
    
 
 
