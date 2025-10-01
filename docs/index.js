@@ -173,14 +173,14 @@ module.exports = { uploadMedia };
 
 
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
-  if (process.env.GITHUB_ACTIONS) {
-    console.log(`📤 Screenshot siap di-upload ke artifact (gunakan actions/upload-artifact di workflow)`);
-  }
+ // if (process.env.GITHUB_ACTIONS) {
+   // console.log(`📤 Screenshot siap di-upload ke artifact (gunakan actions/upload-artifact di workflow)`);
+ // }
 
-  return true;
-}
+//  return true;
+//}
 
-module.exports = { uploadMediaAndPost };
+//module.exports = { uploadMediaAndPost };
                                           
 // ===== Ambil tanggal hari ini
 function getTodayString() {
