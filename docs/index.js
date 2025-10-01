@@ -161,24 +161,24 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 //  console.log("⚠️ Ekstensi file tidak dikenali:", ext);
 //}
 
-const screenshotPath = path.join(__dirname, "media", "after_upload.png");
-await page.screenshot({ path: screenshotPath, fullPage: true });
-console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
+//const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+//await page.screenshot({ path: screenshotPath, fullPage: true });
+//console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
 
 // Debug: pastikan file ada
 
-if (fs.existsSync(screenshotPath)) {
-  console.log("✅ Screenshot ada di folder media");
-} else {
-  console.log("❌ Screenshot TIDAK ADA di folder media");
-}
+//if (fs.existsSync(screenshotPath)) {
+  //console.log("✅ Screenshot ada di folder media");
+//} else {
+ // console.log("❌ Screenshot TIDAK ADA di folder media");
+//}
 
   // 4️⃣ Tambahkan buffer ekstra sebelum klik POST
-  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
-  await page.waitForTimeout(bufferTime);
+//  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
+//  await page.waitForTimeout(bufferTime);
   // 4️⃣ Debug screenshot
-  await page.screenshot({ path: "after_upload.png", fullPage: true });
-  console.log("✅ Media siap diposting.");
+  //await page.screenshot({ path: "after_upload.png", fullPage: true });
+  //console.log("✅ Media siap diposting.");
 
 
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
