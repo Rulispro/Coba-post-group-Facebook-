@@ -57,26 +57,26 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 }
 
 // ===== Fungsi download media dari GitHub Release
-//const mediaFolder = path.join(__dirname, "media");
-//if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
+const mediaFolder = path.join(__dirname, "media");
+if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
 
-//async function downloadMedia(url, filename) {
-//  const filePath = path.join(mediaFolder, filename);
-//  return new Promise((resolve, reject) => {
-//    const file = fs.createWriteStream(filePath);
-//    https.get(url, (res) => {
- //     res.pipe(file);
-//      file.on("finish", () => {
-//        file.close(() => resolve(filePath)); // ✅ sekarang return path
-//      });
-//    }).on("error", (err) => reject(err));
-//  });
-//}
+async function downloadMedia(url, filename) {
+  const filePath = path.join(mediaFolder, filename);
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(filePath);
+   https.get(url, (res) => {
+      res.pipe(file);
+      file.on("finish", () => {
+        file.close(() => resolve(filePath)); // ✅ sekarang return path
+      });
+    }).on("error", (err) => reject(err));
+  });
+}
 
 
   // 4️⃣ Debug screenshot
-//  await page.screenshot({ path: "after_upload.png", fullPage: true });
-//  console.log("✅ Media siap diposting.");
+  await page.screenshot({ path: "after_upload.png", fullPage: true });
+  console.log("✅ Media siap diposting.");
 
 
          
@@ -91,94 +91,94 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 //  }
 
   // 2️⃣ Cari input file
-//  const fileInput =
-//    (await page.$('input[type="file"][accept="image/*"]')) ||
-//    (await page.$('input[type="file"][accept*="video/*"]')) ||
-//    (await page.$('input[type="file"]'));
+  const fileInput =
+    (await page.$('input[type="file"][accept="image/*"]')) ||
+    (await page.$('input[type="file"][accept*="video/*"]')) ||
+    (await page.$('input[type="file"]'));
 
-//  if (!fileInput) {
-//    console.log("❌ Input file tidak ditemukan, upload gagal");
-//    return false;
-//  }
+  if (!fileInput) {
+    console.log("❌ Input file tidak ditemukan, upload gagal");
+    return false;
+  }
 
   // Upload file
-//  await fileInput.uploadFile(filePath);
-//  console.log("✅ File sudah diattach");
+  await fileInput.uploadFile(filePath);
+  console.log("✅ File sudah diattach");
 
   // Trigger event supaya React sadar
-//  await page.evaluate((selector) => {
-//    const input = document.querySelector(selector);
-//    if (!input) return;
-//    ["input", "change"].forEach(evt =>
- //     input.dispatchEvent(new Event(evt, { bubbles: true }))
-//    );
-//  }, 'input[type="file"]');
+  await page.evaluate((selector) => {
+    const input = document.querySelector(selector);
+   if (!input) return;
+    ["input", "change"].forEach(evt =>
+     input.dispatchEvent(new Event(evt, { bubbles: true }))
+    );
+  }, 'input[type="file"]');
 
   // 3️⃣ Tunggu preview
-//  const ext = path.extname(fileName).toLowerCase();
-//  let bufferTime = 10000; // default buffer foto
+  const ext = path.extname(fileName).toLowerCase();
+  let bufferTime = 10000; // default buffer foto
 
 
 
-// if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
-//  console.log("⏳ Tunggu foto upload sampai preview muncul...");
-//  try {
-//    await page.waitForSelector(
-//      'img[src*="scontent"],img[src*="safe_image"], div[data-mcomponent="ImageArea"] img',
-//      { timeout: 60000 }
- //   );
-//    console.log("✅ Foto preview muncul.");
-//  } catch (e) {
-//    console.log("❌ Gagal deteksi foto, fallback cek ImageArea...");
- //   const previewImg = await page.$('div[data-mcomponent="ImageArea"] img');
-//    if (previewImg) {
- //     console.log("✅ Foto preview ditemukan lewat fallback.");
-//    } else {
- //     throw new Error("Foto tidak muncul sama sekali!");
-//    }
-//  }
+if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
+ console.log("⏳ Tunggu foto upload sampai preview muncul...");
+ try {
+    await page.waitForSelector(
+     'img[src*="scontent"],img[src*="safe_image"], div[data-mcomponent="ImageArea"] img',
+     { timeout: 60000 }
+   );
+    console.log("✅ Foto preview muncul.");
+  } catch (e) {
+    console.log("❌ Gagal deteksi foto, fallback cek ImageArea...");
+    const previewImg = await page.$('div[data-mcomponent="ImageArea"] img');
+    if (previewImg) {
+      console.log("✅ Foto preview ditemukan lewat fallback.");
+    } else {
+      throw new Error("Foto tidak muncul sama sekali!");
+    }
+  }
 
-//} else if ([".mp4", ".mov", ".webm"].includes(ext)) {
-//  console.log("⏳ Tunggu video upload sampai preview muncul...");
-//  try {
-//    await page.waitForSelector(
-  //    'div[data-mcomponent="VideoArea"], div[data-mcomponent="ImageArea"] img',
-   //   { timeout: 120000 }
- //   );
-//    console.log("✅ Video preview muncul.");
- //   bufferTime = 15000; // kasih jeda lebih lama
-//  } catch (e) {
- //   console.log("❌ Gagal deteksi video, fallback cek VideoArea + ikon X...");
-//    const previewVid = await page.$('div[data-mcomponent="VideoArea"]');
- //   if (previewVid) 
-    //  console.log("✅ Video preview ditemukan lewat fallback.");
-//    } else {
-//      throw new Error("Video tidak muncul sama sekali!");
-//    }
-//  }
+} else if ([".mp4", ".mov", ".webm"].includes(ext)) {
+  console.log("⏳ Tunggu video upload sampai preview muncul...");
+  try {
+    await page.waitForSelector(
+     'div[data-mcomponent="VideoArea"], div[data-mcomponent="ImageArea"] img',
+      { timeout: 120000 }
+    );
+    console.log("✅ Video preview muncul.");
+    bufferTime = 15000; // kasih jeda lebih lama
+  } catch (e) {
+    console.log("❌ Gagal deteksi video, fallback cek VideoArea + ikon X...");
+    const previewVid = await page.$('div[data-mcomponent="VideoArea"]');
+    if (previewVid) 
+      console.log("✅ Video preview ditemukan lewat fallback.");
+   } else {
+     throw new Error("Video tidak muncul sama sekali!");
+   }
+ }
 
-//} else {
-//  console.log("⚠️ Ekstensi file tidak dikenali:", ext);
-//}
+} else {
+ console.log("⚠️ Ekstensi file tidak dikenali:", ext);
+}
 
-//const screenshotPath = path.join(__dirname, "media", "after_upload.png");
-//await page.screenshot({ path: screenshotPath, fullPage: true });
-//console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
+const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+await page.screenshot({ path: screenshotPath, fullPage: true });
+console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
 
 // Debug: pastikan file ada
 
-//if (fs.existsSync(screenshotPath)) {
-  //console.log("✅ Screenshot ada di folder media");
-//} else {
- // console.log("❌ Screenshot TIDAK ADA di folder media");
-//}
+if (fs.existsSync(screenshotPath)) {
+  console.log("✅ Screenshot ada di folder media");
+} else {
+  console.log("❌ Screenshot TIDAK ADA di folder media");
+}
 
   // 4️⃣ Tambahkan buffer ekstra sebelum klik POST
-//  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
-//  await page.waitForTimeout(bufferTime);
+  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
+  await page.waitForTimeout(bufferTime);
   // 4️⃣ Debug screenshot
-  //await page.screenshot({ path: "after_upload.png", fullPage: true });
-  //console.log("✅ Media siap diposting.");
+  await page.screenshot({ path: "after_upload.png", fullPage: true });
+  console.log("✅ Media siap diposting.");
 
 
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
@@ -309,18 +309,18 @@ console.log("FILL:", fillResult);
 
 
   // ===== 3️⃣ Download + upload media
-// const today = process.env.DATE;
-// const fileName = `akun1_${today}.png`; // bisa .mp4
-//const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.png";
+ const today = process.env.DATE;
+ const fileName = `akun1_${today}.png`; // bisa .mp4
+const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.png";
 
 // download media → simpan return value ke filePat
-//  const filePath = await downloadMedia(mediaUrl, fileName);
-//console.log(`✅ Media ${fileName} berhasil di-download.`);
+  const filePath = await downloadMedia(mediaUrl, fileName);
+console.log(`✅ Media ${fileName} berhasil di-download.`);
 
 // upload ke Facebook
 
   
-//await uploadMediaAndPost(page, filePath, fileName);
+await uploadMediaAndPost(page, filePath, fileName);
    
 
 
@@ -336,35 +336,35 @@ console.log("FILL:", fillResult);
  // console.log("✅ Media siap diposting.");
 //}
    
-const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
-if (postBtn) {
-  try {
-    await postBtn.click();
-    await page.waitForTimeout(2000);
-    console.log("✅ Tombol POST diklik biasa");
-  } catch (e) {
-    console.log("⚠️ Click biasa gagal, coba dispatchEvent...");
-    await page.evaluate(() => {
-      const btn = document.evaluate(
-        "//div[@role='button']//span[contains(text(), 'POST')]",
-        document,
-        null,
-        XPathResult.FIRST_ORDERED_NODE_TYPE,
-        null
-      ).singleNodeValue;
 
-      if (btn) {
-        ["mousedown", "mouseup", "click"].forEach(evt =>
-          btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }))
-        );
-      }
-    });
-    console.log("✅ Fallback dispatchEvent berhasil");
-  }
-} else {
-  console.log("❌ Tombol POST tidak ditemukan");
-}
+    // ===== 3️⃣ Klik tombol POST
+    // Tunggu tombol muncul
+   await page.evaluate(() => {
+  const btn = [...document.querySelectorAll('div[role="button"]')]
+    .find(div => div.querySelector('span.f2')?.innerText === 'POST');
+  if (!btn) return console.log("❌ Tombol POST tidak ditemukan");
+  ["mousedown","mouseup","click","touchstart","touchend"].forEach(evt => btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true })));
+});
+   
 
+await page.evaluate(() => {
+  const btn = [...document.querySelectorAll('div[role="button"]')]
+    .find(div => div.querySelector('span.f2')?.innerText === 'POST');
+  if (!btn) return console.log("❌ Tombol POST tidak ditemukan");
+
+  const dispatchTouch = (el, type) => {
+    el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, view: window }));
+  };
+
+  // Dispatch semua event yang mungkin ditangkap React
+  ["mousedown", "mouseup", "click", "touchstart", "touchend", "pointerdown", "pointerup"].forEach(evt => {
+    if (evt.startsWith("touch")) {
+      dispatchTouch(btn, evt);
+    } else {
+      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+    }
+  });
+});
 
     // ===== Stop recorder
     await recorder.stop();
