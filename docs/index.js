@@ -78,6 +78,7 @@ async function downloadMedia(url, filename) {
 //  await page.screenshot({ path: "after_upload.png", fullPage: true });
 //  console.log("✅ Media siap diposting.");
 
+  
 async function uploadMedia(page, filePath, fileName, type = "Photos") {
   console.log(`🚀 Mulai upload ${type}: ${fileName}`);
 
@@ -120,11 +121,10 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
     return false;
   }
 
-  // Upload file
   await fileInput.uploadFile(filePath);
   console.log("✅ File sudah diattach:", filePath);
 
-  // Trigger event biar React detect
+  // Trigger React
   await page.evaluate(() => {
     const input = document.querySelector('input[type="file"]');
     if (input) {
@@ -134,9 +134,9 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
     }
   });
 
-  // 3️⃣ Tunggu preview (foto/video)
+  // 3️⃣ Tunggu preview
   const ext = path.extname(fileName).toLowerCase();
-  let bufferTime = 10000; // default 10s foto
+  let bufferTime = 10000;
 
   if ([".jpg", ".jpeg", ".png"].includes(ext)) {
     console.log("⏳ Tunggu foto preview...");
@@ -149,31 +149,27 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
     bufferTime = 15000;
   }
 
-  await page.waitForTimeout(bufferTime);
-  console.log("✅ Upload selesai");
-  return true;
-                                               }
-                            
+  // 4️⃣ Screenshot
+  const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+  console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
 
+  if (fs.existsSync(screenshotPath)) {
+    console.log("✅ Screenshot ada di folder media");
+  } else {
+    console.log("❌ Screenshot TIDAK ADA di folder media");
+  }
 
-const screenshotPath = path.join(__dirname, "media", "after_upload.png");
-await page.screenshot({ path: screenshotPath, fullPage: true });
-console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
-
-// Debug: pastikan file ada
-
-if (fs.existsSync(screenshotPath)) {
-  console.log("✅ Screenshot ada di folder media");
-} else {
-  console.log("❌ Screenshot TIDAK ADA di folder media");
-}
-
-  // 4️⃣ Tambahkan buffer ekstra sebelum klik POST
+  // Buffer ekstra
   console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
   await page.waitForTimeout(bufferTime);
-  // 4️⃣ Debug screenshot
-  await page.screenshot({ path: "after_upload.png", fullPage: true });
-  console.log("✅ Media siap diposting.");
+
+  console.log("✅ Upload selesai");
+  return true;
+}
+
+// ✅ Export fungsi yang benar
+module.exports = { uploadMedia };
 
 
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
