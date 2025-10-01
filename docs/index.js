@@ -161,9 +161,6 @@ if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
  console.log("⚠️ Ekstensi file tidak dikenali:", ext);
 }
 
-const screenshotPath = path.join(__dirname, "media", "after_upload.png");
-await page.screenshot({ path: screenshotPath, fullPage: true });
-console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
 
 // Debug: pastikan file ada
 
@@ -172,6 +169,10 @@ if (fs.existsSync(screenshotPath)) {
 } else {
   console.log("❌ Screenshot TIDAK ADA di folder media");
 }
+
+const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+await page.screenshot({ path: screenshotPath, fullPage: true });
+console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
 
   // 4️⃣ Tambahkan buffer ekstra sebelum klik POST
   console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
