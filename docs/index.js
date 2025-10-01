@@ -178,8 +178,8 @@ console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
   console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
   await page.waitForTimeout(bufferTime);
  // 4️⃣ Debug screenshot
-  await page.screenshot({ path: "after_upload.png", fullPage: true });
-  console.log("✅ Media siap diposting.");
+ // await page.screenshot({ path: "after_upload.png", fullPage: true });
+ // console.log("✅ Media siap diposting.");
 
 // Tunggu tombol muncul
    await page.evaluate(() => {
