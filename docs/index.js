@@ -135,7 +135,7 @@ async function uploadMediaAndPost(page, filePath, fileName) {
   console.log("⏳ Tunggu foto upload sampai preview muncul...");
   try {
     await page.waitForSelector(
-      'img[src*="scontent"], img[src*="safe_image"], div[data-mcomponent="ImageArea"] img',
+      'img[src*="scontent"],img[src*="safe_image"], div[data-mcomponent="ImageArea"] img',
       { timeout: 60000 }
     );
     console.log("✅ Foto preview muncul.");
@@ -177,7 +177,7 @@ await page.screenshot({ path: screenshotPath, fullPage: true });
 console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
 
 // Debug: pastikan file ada
-const fs = require("fs");
+
 if (fs.existsSync(screenshotPath)) {
   console.log("✅ Screenshot ada di folder media");
 } else {
@@ -185,7 +185,7 @@ if (fs.existsSync(screenshotPath)) {
 }
 
   // 4️⃣ Tambahkan buffer ekstra sebelum klik POST
-  console.log(`⏳ Tunggu buffer ${bufferTime / 10000}s sebelum klik POST...`);
+  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
   await page.waitForTimeout(bufferTime);
   // 4️⃣ Debug screenshot
   await page.screenshot({ path: "after_upload.png", fullPage: true });
@@ -392,10 +392,11 @@ await uploadMediaAndPost(page, filePath, fileName);
  // console.log("✅ Media siap diposting.");
 //}
    
-    const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
+const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
 if (postBtn) {
   try {
-    await postBtn.click({ delay: 2000 });
+    await postBtn.click();
+    await page.waitForTimeout(2000);
     console.log("✅ Tombol POST diklik biasa");
   } catch (e) {
     console.log("⚠️ Click biasa gagal, coba dispatchEvent...");
