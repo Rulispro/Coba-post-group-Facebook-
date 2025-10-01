@@ -1,6 +1,6 @@
 "use strict";
 
-
+const fs = require("fs");
 const path = require("path");
 const https = require("https");
 const puppeteer = require("puppeteer-extra");
@@ -196,7 +196,7 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
   });
 });
 // ✅ Export fungsi yang benar
-module.exports = { uploadMedia };
+//module.exports = { uploadMedia };
 
 
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
