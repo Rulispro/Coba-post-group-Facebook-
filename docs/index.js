@@ -1,172 +1,3 @@
-//"use strict";
-
-//const fs = require("fs");
-//const path = require("path");
-//const https = require("https");
-//const puppeteer = require("puppeteer-extra");
-//const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-//const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
-
-// Aktifkan plugin stealth
-//puppeteer.use(StealthPlugin());
-
-// ===== Fungsi klik aman (element langsung)
-// async function scanAllElementsVerbose(page, label = "Scan") {
- // return elements;
-//}
-
-// ===== Fungsi download media dari GitHub Release
-//const mediaFolder = path.join(__dirname, "media");
-//if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
-//async function downloadMedia(url, filename) {
-//  const filePath = path.join(mediaFolder, filename);
-//  return new Promise((resolve, reject) => {
-   // const file = fs.createWriteStream(filePath);
- //   https.get(url, (res) => {
-    //  res.pipe(file);
-  //    file.on("finish", () => {
-     //   file.close(resolve);
-   //   });
-  //  }).on("error", (err) => reject(err));
- // });
-//}
-// ===== Ambil tanggal hari ini
-//function getTodayString() {
- // const today = new Date();
- // const yyyy = today.getFullYear();
-//  const mm = String(today.getMonth() + 1).padStart(2, "0");
-//  const dd = String(today.getDate()).padStart(2, "0");
-  //return `${yyyy}-${mm}-${dd}`;
-//}
-// ===== Main Puppeteer
-//(async () => {
-//  try {
-// async function scanAllElementsVerbose(page, label = "Scan") {
-
-    // ===== 1️⃣ Klik composer / write something
-    //let writeClicked = await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer");
-   // if (!writeClicked) {
-    //  console.log("⚠️ XPath gagal, coba fallback evaluateHandle");
-     // const fallback = await page.evaluateHandle(() => {
-       // const els = Array.from(document.querySelectorAll("div, span, p"));
-       // return els.find(el => {
-       //   if (!el.innerText) return false;
-         // if (!el.innerText.includes("Write something")) return false;
-        //  const childHas = Array.from(el.children)
-          //  .some(c => c.innerText && c.innerText.includes("Write something"));
-         // return !childHas;
-       // }) || null;
-    //  });
-     // if (fallback) {
-       // await fallback.asElement().click();
-      //  console.log("🟦 Klik composer via fallback berhasil");
-   //   } else {
-      //  console.log("❌ Composer tidak ditemukan sama sekali");
-     //   await scanAllElementsVerbose(page, "Composer");
-     // }
-    //  console.log("⚠️ Composer tidak ditemukan, fallback scan");
-    //  await scanAllElementsVerbose(page, "Composer");
-   // }
-  //  await page.waitForTimeout(2000);
-
-    // ===== 2️⃣ Isi caption (klik placeholder + isi textbox)
-   // const clickResult = await page.evaluate(() => {
-    //  const btn = [...document.querySelectorAll("div[role='button']")]
-      //  .find(el => {
-       //   const t = (el.innerText || "").toLowerCase();
-       //   return t.includes("write something") || t.includes("buat postingan") || t.includes("tulis sesuatu");
-      //  });
-    //  if (!btn) return { ok: false, msg: "Placeholder 'Write something' tidak ditemukan" };
-    //  ["mousedown", "mouseup", "click"].forEach(type => {
-      //  btn.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
-      //});
-     // return { ok: true, msg: "Klik placeholder berhasil" };
-   // });
-   // console.log("CLICK:", clickResult);
-   // await page.waitForTimeout(1000);
-    // ===== 2️⃣ Isi caption
-   // const fillResult = await page.evaluate((text) => {
-  //    const selectors = [
-     //   "textarea[name='xc_message']",
-        //"textarea",
-       // "div[role='textbox'][contenteditable='true']",
-       // "div[contenteditable='true']"
-    //  ];
-     // let tb = null;
-     // for (const s of selectors) {
-       // tb = document.querySelector(s);
-       // if (tb) {
-      //    try {
-           // if ("value" in tb) {
-         //     tb.focus();
-           //   tb.value = text;
-            //  tb.dispatchEvent(new Event("input", { bubbles: true }));
-             // tb.dispatchEvent(new Event("change", { bubbles: true }));
-         //   } else {
-            //  tb.focus();
-            //  tb.innerText = text;
-            //  tb.dispatchEvent(new InputEvent("input", { bubbles: true }));
-            //  tb.dispatchEvent(new Event("change", { bubbles: true }));
-          //  }
-          //  return { ok: true, selector: s, msg: "Terisi" };
-        //  } catch (err) {
-         //   return { ok: false, selector: s, msg: "Error: " + err.message };
-        //  }
-      //  }
-      //const tb = document.querySelector("div[contenteditable='true']");
-     // if (tb) {
-       // tb.focus();
-      //  tb.innerText = text;
-       // tb.dispatchEvent(new InputEvent("input", { bubbles: true }));
-     //   return { ok: true };
-    //  }
-      //return { ok: false, msg: "Textbox tidak ditemukan" };
-    //  return { ok: false };
-  //  }, caption);
-  //  console.log("FILL:", fillResult);
-
-    // ===== 3️⃣ Klik tombol POST
-    // Tunggu tombol POST muncul
-//await page.waitForXPath("//div[@role='button']//span[contains(text(), 'POST')]", { timeout: 5000 });
-    // ===== 3️⃣ Download + upload media
-   // const today = getTodayString();
-    //const fileName = `akun1_${today}.jpg`; // bisa ganti .mp4 kalau video
-   // const mediaUrl = `https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/v1.0/${fileName}`;
-
-// Cari elemen tombol POST
-//const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
-  ///  await downloadMedia(mediaUrl, fileName);
-//    console.log(`✅ Media ${fileName} berhasil di-download.`);
-
-//if (postBtn) {
-  //await postBtn.click();
- // console.log("✅ Tombol POST berhasil diklik!");
-//} else {
- // console.log("❌ Tombol POST tidak ditemukan");
-//}
-    
-//    const [fileChooser] = await Promise.all([
-  //    page.waitForFileChooser(),
-    //  page.click('div[aria-label="Photo/Video"]')
-  //  ]);
-
-    // ===== Debug: cek webdriver
-  //  const webdriver = await page.evaluate(() => navigator.webdriver);
-  //  console.log("navigator.webdriver:", webdriver);
-   // await fileChooser.accept([path.join(mediaFolder, fileName)]);
-  //  await page.waitForTimeout(2000);
-  //  console.log("✅ Media berhasil diupload ke composer.");
-    // ===== 4️⃣ Klik tombol POST
-   // const [postBtn] = await page.$x("//div[@role='button']//span[contains(text(), 'POST')]");
-  //  if (postBtn) {
-    //  await postBtn.click();
-     // console.log("✅ Tombol POST berhasil diklik!");
-   // } else {
-     // console.log("❌ Tombol POST tidak ditemukan");
-  //  }
-
-    // ===== Stop recorder
-   // await recorder.stop();
 "use strict";
 
 const fs = require("fs");
@@ -242,133 +73,11 @@ async function downloadMedia(url, filename) {
   });
 }
 
-  // ===== Fungsi upload ke Facebook (foto/video)
-      
-// async function uploadMedia(page, filePath) {
-  //const fileName = path.basename(filePath);
- // const absolutePath = path.resolve(__dirname, "media", fileName);
-
-  // Tentukan tombol media
-//  let buttonSelector = fileName.match(/\.(mp4|mov|avi)$/i)
-//    ? 'div[role="button"][aria-label="Video"]'
-  //  : 'div[role="button"][aria-label="Photos"]';
-
-  // Klik tombol media
-//  try {
- //   await page.click(buttonSelector, { delay: 100 });
-  //  await delay(3000);
-   // console.log("✅ Tombol media diklik (click biasa).");
-//  } catch {
-   // console.log("⚠️ Click biasa gagal, coba dispatchEvent manual...");
-//}
-
-   // await page.evaluate((sel) => {
- //     const btn = document.querySelector(sel);
- //     if (btn) {
- //       ["mousedown", "mouseup", "click"].forEach(evt => {
- //        btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
- //       });
- //     }
- //   }, buttonSelector);
-  //  await delay(3000);
-//  }
-
-   //Cari input file
-//  let fileInput;
- // if (fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-   // fileInput = await page.waitForSelector('input[type="file"][accept="image/*"]', { timeout: 10000 });
-//  } else if (fileName.match(/\.(mp4|mov|avi)$/i)) {
-   // fileInput = await page.waitForSelector('input[type="file"][accept="video/*"]', { timeout: 10000 });
- // } else {
-  //  throw new Error("❌ Format file tidak didukung: " + fileName);
- // }
-
-  // Upload file
-  //await fileInput.uploadFile(absolutePath);
-//  console.log(`✅ ${fileName} berhasil di-upload ke input.`);
-//  await delay(5000);
-  // ===== Ambil input file dan upload langsung
-  
-  
-  
- //  //Trigger event React
-//  const reactOk = await page.evaluate((selector) => {
-   // const input = document.querySelector(selector);
-  //  if (!input) return false;
-    //["input", "change"].forEach(type => input.dispatchEvent(new Event(type, { bubbles: true })));
-   // return true;
- // }, fileName.match(/\.(jpg|jpeg|png|gif)$/i)
-      //  ? 'input[type="file"][accept="image/*"]'
-      //  : 'input[type="file"][accept="video/*"]');
-
- // if (!reactOk) {
-  //  console.log("⚠️ Event React gagal, coba drag-drop fallback...");
-    //await page.evaluate((fileName) => {
-     //const dropZone =
-     //   document.querySelector('[aria-label*="Tambah foto"]') ||
-      //  document.querySelector('[aria-label*="Tambah Video"]');
-     // if (!dropZone) return false;
-    //  const dt = new DataTransfer();
-      //dt.items.add(new File(["dummy"], fileName));
-     // dropZone.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt }));
-    //  return true;
- //   }, fileName);
- // }
-
-// ✅ Upload dan tunggu preview
-//async function uploadMedia(page, filePath, fileName) {
-  // 1️⃣ Klik tombol "Photo/Video"
-//  const addMediaBtn = await page.$('div[aria-label="Photo/Video"], div[aria-label="Photos"], div[aria-label="Video"]');
-//  if (addMediaBtn) {
- //   await addMediaBtn.click();   console.log("📸 Tombol Photo/Video diklik.");
-  //  await page.waitForTimeout(2000);
-//  }  // 2️⃣ Cari input file
-//  const fileInput =
- //   (await page.$('input[type="file"][accept*="image"]')) ||
-  //  (await page.$('input[type="file"][accept*="video"]')) ||
-  //  (await page.$('input[type="file"]'));
-
-//  if (!fileInput) {
- //   console.log("❌ Input file tidak ditemukan, upload gagal")    return;
-//  }
-
-  // Upload file
-//  await fileInput.uploadFile(filePath);
-//  console.log("✅ File sudah diattach");
-//
-  // Trigger event supaya React sadar
-//  await page.evaluate((selector) => {
- //   const input = document.querySelector(selector);
- //   if (!input) return;
- //   ["input", "change"].forEach(evt =>
- //     input.dispatchEvent(new Event(evt, { bubbles: true }))
-//    );
-//  }, 'input[type="file"]');
-
-  // 3️⃣ Tunggu preview sesuai tipe file
- // const ext = path.extname(fileName).toLowerCase();
-
-//  if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
- //   console.log("⏳ Tunggu foto upload sampai preview muncul...");
- //   await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 60000 });
-//  console.log("✅ Foto preview muncul.");
-  //  await page.waitForTimeout(7000); // buffer tambahan setelah preview
-//  } else if ([".mp4", ".mov", ".webm"].includes(ext)) {
-//    console.log("⏳ Tunggu video upload sampai preview muncul...");
- //   await page.waitForSelector('video[src*="fbcdn"], video', { timeout: 120000 });
- //   console.log("✅ Video preview muncul.");
-//    await page.waitForTimeout(15000); // buffer tambahan setelah preview  } else {
- //   console.log("⚠️ Ekstensi file tidak dikenali:", ext);
-//  }
 
   // 4️⃣ Debug screenshot
 //  await page.screenshot({ path: "after_upload.png", fullPage: true });
 //  console.log("✅ Media siap diposting.");
 
-  // 5️⃣ Klik tombol posting (bisa tambahkan setelah ini)
-  // const postBtn = await page.$('div[aria-label="Post"], button[type="submit"]');
-  // if (postBtn) await postBtn.click();
-//}
 
          
 // ✅ Upload dan tunggu preview + auto-post
@@ -383,8 +92,8 @@ async function uploadMediaAndPost(page, filePath, fileName) {
 
   // 2️⃣ Cari input file
   const fileInput =
-    (await page.$('input[type="file"][accept*="image"]')) ||
-    (await page.$('input[type="file"][accept*="video"]')) ||
+    (await page.$('input[type="file"][accept="image/*"]')) ||
+    (await page.$('input[type="file"][accept*="video/*"]')) ||
     (await page.$('input[type="file"]'));
 
   if (!fileInput) {
@@ -409,18 +118,60 @@ async function uploadMediaAndPost(page, filePath, fileName) {
   const ext = path.extname(fileName).toLowerCase();
   let bufferTime = 10000; // default buffer foto
 
-  if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
-    console.log("⏳ Tunggu foto upload sampai preview muncul...");
-    await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 60000 });
+//  if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
+  //  console.log("⏳ Tunggu foto upload sampai preview muncul...");
+  //  await page.waitForSelector('img[src*="scontent"], img[src*="safe_image"]', { timeout: 60000 });
+  //  console.log("✅ Foto preview muncul.")
+   //} else if ([".mp4", ".mov", ".webm"].includes(ext)) {
+    //console.log("⏳ Tunggu video upload sampai preview muncul...");
+    //await page.waitForSelector('video[src*="fbcdn"], video', { timeout: 120000 });
+   // console.log("✅ Video preview muncul.");
+  //  bufferTime = 15000; // buffer video lebih lama
+//  } else {
+  //  console.log("⚠️ Ekstensi file tidak dikenali:", ext);
+ // }
+
+ if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
+  console.log("⏳ Tunggu foto upload sampai preview muncul...");
+  try {
+    await page.waitForSelector(
+      'img[src*="scontent"], img[src*="safe_image"], div[data-mcomponent="ImageArea"] img',
+      { timeout: 60000 }
+    );
     console.log("✅ Foto preview muncul.");
-  } else if ([".mp4", ".mov", ".webm"].includes(ext)) {
-    console.log("⏳ Tunggu video upload sampai preview muncul...");
-    await page.waitForSelector('video[src*="fbcdn"], video', { timeout: 120000 });
-    console.log("✅ Video preview muncul.");
-    bufferTime = 15000; // buffer video lebih lama
-  } else {
-    console.log("⚠️ Ekstensi file tidak dikenali:", ext);
+  } catch (e) {
+    console.log("❌ Gagal deteksi foto, fallback cek ImageArea...");
+    const previewImg = await page.$('div[data-mcomponent="ImageArea"] img');
+    if (previewImg) {
+      console.log("✅ Foto preview ditemukan lewat fallback.");
+    } else {
+      throw new Error("Foto tidak muncul sama sekali!");
+    }
   }
+
+} else if ([".mp4", ".mov", ".webm"].includes(ext)) {
+  console.log("⏳ Tunggu video upload sampai preview muncul...");
+  try {
+    await page.waitForSelector(
+      'div[data-mcomponent="VideoArea"], div[data-mcomponent="ImageArea"] img',
+      { timeout: 120000 }
+    );
+    console.log("✅ Video preview muncul.");
+    bufferTime = 15000; // kasih jeda lebih lama
+  } catch (e) {
+    console.log("❌ Gagal deteksi video, fallback cek VideoArea + ikon X...");
+    const previewVid = await page.$('div[data-mcomponent="VideoArea"]');
+    if (previewVid) {
+      console.log("✅ Video preview ditemukan lewat fallback.");
+    } else {
+      throw new Error("Video tidak muncul sama sekali!");
+    }
+  }
+
+} else {
+  console.log("⚠️ Ekstensi file tidak dikenali:", ext);
+}
+
 const screenshotPath = path.join(__dirname, "media", "after_upload.png");
 await page.screenshot({ path: screenshotPath, fullPage: true });
 console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
