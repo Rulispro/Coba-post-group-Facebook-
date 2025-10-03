@@ -81,14 +81,14 @@ async function downloadMedia(url, filename) {
 
          
 // ✅ Upload dan tunggu preview + auto-post
-//async function uploadMediaAndPost(page, filePath, fileName) {
+async function uploadMediaAndPost(page, filePath, fileName) {
   // 1️⃣ Klik tombol Photo/Video
-//  const addMediaBtn = await page.$('div[aria-label="Photo/Video"], div[aria-label="Photos"], div[aria-label="Video"]');
-//  if (addMediaBtn) {
-//    await addMediaBtn.click();
-//    console.log("📸 Tombol Photo/Video diklik.");
-//    await page.waitForTimeout(2000);
-//  }
+  const addMediaBtn = await page.$('div[aria-label="Photo/Video"], div[aria-label="Photos"], div[aria-label="Video"]');
+  if (addMediaBtn) {
+    await addMediaBtn.click();
+    console.log("📸 Tombol Photo/Video diklik.");
+    await page.waitForTimeout(2000);
+  }
 
   // 2️⃣ Cari input file
   const fileInput =
