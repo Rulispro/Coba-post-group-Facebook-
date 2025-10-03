@@ -135,39 +135,49 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
     }
   });
 
-    // 3️⃣ Tunggu preview foto/video
-  let previewOk = false;
-  // 3️⃣ Tunggu preview media (foto/video)
+// 3️⃣ Tunggu preview media (foto/video)
+let previewOk = false;
+let bufferTime = 10000;
+
 try {
-  await page.waitForSelector(
-    [
-      'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // preview foto base64
-      'div[data-mcomponent="VideoArea"] video',                  // preview video
-      'img[src*="scontent"]',                                    // foto dari CDN fb
-      'video[src]'                                               // video dari CDN fb
-    ].join(", "),
-    { timeout: 60000 }
-  );
-  console.log("✅ Preview media muncul");
-} catch (e) {
-  console.log("⚠️ Preview tidak muncul dalam 60s, lanjut paksa");
-}
-  
-  
-  // 3️⃣ Tunggu preview
   const ext = path.extname(fileName).toLowerCase();
-  let bufferTime = 10000;
 
   if ([".jpg", ".jpeg", ".png"].includes(ext)) {
     console.log("⏳ Tunggu foto preview...");
-    await page.waitForSelector('div[data-mcomponent="ImageArea"] img', { timeout: 60000 });
+
+    await page.waitForSelector(
+      [
+        'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
+        'img[src*="scontent"]',                                    // foto dari CDN
+        'div[aria-label="Photo preview"] img',                     // fallback
+      ].join(", "),
+      { timeout: 60000 }
+    );
+
     console.log("✅ Foto preview ready");
+    previewOk = true;
+
   } else if ([".mp4", ".mov"].includes(ext)) {
     console.log("⏳ Tunggu video preview...");
-    await page.waitForSelector('div[data-mcomponent="VideoArea"], video', { timeout: 120000 });
+
+    await page.waitForSelector(
+      [
+        'div[data-mcomponent="VideoArea"] video',   // wrapper video
+        'video[src]',                               // video element
+        'div[aria-label="Video preview"]',          // fallback
+      ].join(", "),
+      { timeout: 120000 }
+    );
+
     console.log("✅ Video preview ready");
     bufferTime = 15000;
+    previewOk = true;
   }
+
+} catch (e) {
+  console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
+}
+
 
   // 4️⃣ Screenshot
   const screenshotPath = path.join(__dirname, "media", "after_upload.png");
