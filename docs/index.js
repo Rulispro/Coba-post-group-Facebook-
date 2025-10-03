@@ -170,9 +170,9 @@ if (fs.existsSync(screenshotPath)) {
   console.log("❌ Screenshot TIDAK ADA di folder media");
 }
 
-const screenshotPath = path.join(__dirname, "media", "after_upload.png");
-await page.screenshot({ path: screenshotPath, fullPage: true });
-console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
+//const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+//await page.screenshot({ path: screenshotPath, fullPage: true });
+//console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
 
   // 4️⃣ Tambahkan buffer ekstra sebelum klik POST
   console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
