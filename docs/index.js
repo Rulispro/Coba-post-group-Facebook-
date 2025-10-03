@@ -120,8 +120,9 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
     console.log("❌ Input file tidak ditemukan, upload gagal");
     return false;
   }
-
-  await fileInput.uploadFile(filePath);
+ 
+  //upload file 
+    await fileInput.uploadFile(filePath);
   console.log("✅ File sudah diattach:", filePath);
 
   // Trigger React
@@ -134,13 +135,33 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
     }
   });
 
+    // 3️⃣ Tunggu preview foto/video
+  let previewOk = false;
+  try {
+    await page.waitForSelector(
+      [
+        'div[data-mcomponent="ImageArea"] img',   // Foto preview baru
+        'div[data-mcomponent="VideoArea"] video', // Video preview baru
+        'div[aria-label="Photo preview"]',
+        'div[aria-label="Video preview"]',
+        'img[src*="scontent"]',
+        'video'
+      ].join(", "),
+      { timeout: 30000 }
+    );
+    console.log("✅ Preview media ready");
+    previewOk = true;
+  } catch (e) {
+    console.log("⚠️ Preview tidak muncul dalam 30s, lanjut paksa");
+  }
+  
   // 3️⃣ Tunggu preview
   const ext = path.extname(fileName).toLowerCase();
   let bufferTime = 10000;
 
   if ([".jpg", ".jpeg", ".png"].includes(ext)) {
     console.log("⏳ Tunggu foto preview...");
-    await page.waitForSelector('img[src*="scontent"], div[data-mcomponent="ImageArea"] img', { timeout: 60000 });
+    await page.waitForSelector('div[data-mcomponent="ImageArea"] img', { timeout: 60000 });
     console.log("✅ Foto preview ready");
   } else if ([".mp4", ".mov"].includes(ext)) {
     console.log("⏳ Tunggu video preview...");
