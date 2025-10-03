@@ -328,32 +328,16 @@ await uploadMedia(page, filePath, fileName, "Photos");
 
     // ===== 3️⃣ Klik tombol POST
     // Tunggu tombol muncul
-   await page.evaluate(() => {
-  const btn = [...document.querySelectorAll('div[role="button"]')]
-    .find(div => div.querySelector('span.f2')?.innerText === 'POST');
-  if (!btn) return console.log("❌ Tombol POST tidak ditemukan");
-  ["mousedown","mouseup","click","touchstart","touchend"].forEach(evt => btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true })));
-});
    
-
+// Cari tombol POST dengan innerText
 await page.evaluate(() => {
- const btn = [...document.querySelectorAll('div[role="button"]')]
-    .find(div => div.querySelector('span.f2')?.innerText === 'POST');
-  if (!btn) return console.log("❌ Tombol POST tidak ditemukan");
-
-  const dispatchTouch = (el, type) => {
-    el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, view: window }));
-  };
-
-  // Dispatch semua event yang mungkin ditangkap React
-  ["mousedown", "mouseup", "click", "touchstart", "touchend", "pointerdown", "pointerup"].forEach(evt => {
-    if (evt.startsWith("touch")) {
-      dispatchTouch(btn, evt);
-    } else {
-      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
-    }
-  });
+  const buttons = [...document.querySelectorAll('div[role="button"]')];
+  const postBtn = buttons.find(b => b.innerText.trim().toUpperCase() === "POST");
+  if (postBtn) {
+    postBtn.click();
+  }
 });
+console.log("✅ Klik POST berhasil (via innerText)");
 
     // ===== Stop recorder
     await recorder.stop();
