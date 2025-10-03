@@ -137,23 +137,22 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
 
     // 3️⃣ Tunggu preview foto/video
   let previewOk = false;
-  try {
-    await page.waitForSelector(
-      [
-        'div[data-mcomponent="ImageArea"] img',   // Foto preview baru
-        'div[data-mcomponent="VideoArea"] video', // Video preview baru
-        'div[aria-label="Photo preview"]',
-        'div[aria-label="Video preview"]',
-        'img[src*="scontent"]',
-        'video'
-      ].join(", "),
-      { timeout: 30000 }
-    );
-    console.log("✅ Preview media ready");
-    previewOk = true;
-  } catch (e) {
-    console.log("⚠️ Preview tidak muncul dalam 30s, lanjut paksa");
-  }
+  // 3️⃣ Tunggu preview media (foto/video)
+try {
+  await page.waitForSelector(
+    [
+      'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // preview foto base64
+      'div[data-mcomponent="VideoArea"] video',                  // preview video
+      'img[src*="scontent"]',                                    // foto dari CDN fb
+      'video[src]'                                               // video dari CDN fb
+    ].join(", "),
+    { timeout: 60000 }
+  );
+  console.log("✅ Preview media muncul");
+} catch (e) {
+  console.log("⚠️ Preview tidak muncul dalam 60s, lanjut paksa");
+}
+  
   
   // 3️⃣ Tunggu preview
   const ext = path.extname(fileName).toLowerCase();
