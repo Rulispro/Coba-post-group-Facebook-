@@ -179,11 +179,6 @@ module.exports = { uploadMedia };
   if (process.env.GITHUB_ACTIONS) {
     console.log(`📤 Screenshot siap di-upload ke artifact (gunakan actions/upload-artifact di workflow)`);
   }
-
-  return true;
-}
-
-//module.exports = { uploadMediaAndPost };
                                           
 // ===== Ambil tanggal hari ini
 function getTodayString() {
@@ -332,7 +327,7 @@ await uploadMedia(page, filePath, fileName, "Photos");
    
 
     // ===== 3️⃣ Klik tombol POST
-     Tunggu tombol muncul
+    // Tunggu tombol muncul
    await page.evaluate(() => {
   const btn = [...document.querySelectorAll('div[role="button"]')]
     .find(div => div.querySelector('span.f2')?.innerText === 'POST');
