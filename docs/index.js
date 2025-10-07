@@ -82,34 +82,25 @@ async function downloadMedia(url, filename) {
 async function uploadMedia(page, filePath, fileName, type = "Photos") {
   console.log(`🚀 Mulai upload ${type}: ${fileName}`);
 
-  // 1️⃣ Klik tombol Photos/Video pakai event React
-  await page.evaluate((label) => {
-    const btn = [...document.querySelectorAll('div[role="button"]')]
-      .find(div =>
-        div.getAttribute("aria-label") === label ||
-        (div.innerText || "").includes(label)
-      );
+// 1️⃣ Klik tombol Photo/Video di composer
+  const btn = await page.evaluateHandle(() => {
+    return [...document.querySelectorAll('div[role="button"]')]
+      .find(div => {
+        const txt = (div.innerText || "").toLowerCase();
+        const aria = (div.getAttribute("aria-label") || "").toLowerCase();
+        return txt.includes("photo") || txt.includes("video") || aria.includes("photo") || aria.includes("video") || txt.includes("foto");
+      });
+  });
 
-    if (!btn) {
-      console.log(`❌ Tombol ${label} tidak ditemukan`);
-      return;
-    }
+  if (btn) {
+    await btn.asElement().click();
+    console.log("✅ Tombol Photo/Video diklik");
+  } else {
+    console.log("❌ Tombol Photo/Video tidak ditemukan");
+    return false;
+  }
 
-    const dispatchTouch = (el, type) => {
-      el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, view: window }));
-    };
-
-    ["pointerdown","mousedown","touchstart","mouseup","pointerup","touchend","click"].forEach(evt => {
-      if (evt.startsWith("touch")) {
-        dispatchTouch(btn, evt);
-      } else {
-        btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
-      }
-    });
-
-    console.log(`✅ Tombol ${label} berhasil diklik`);
-  }, type);
-
+    
   // 2️⃣ Cari input file
   const fileInput =
     (await page.$('input[type="file"][accept="image/*"]')) ||
