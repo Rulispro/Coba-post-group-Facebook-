@@ -88,7 +88,7 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
       .find(div => {
         const txt = (div.innerText || "").toLowerCase();
         const aria = (div.getAttribute("aria-label") || "").toLowerCase();
-        return txt.includes("photo") || txt.includes("video") || aria.includes("photo") || aria.includes("video") || txt.includes("foto");
+        return txt.includes("Photos") || txt.includes("Video") || aria.includes("photo") || aria.includes("video") || txt.includes("foto");
       });
   });
 
