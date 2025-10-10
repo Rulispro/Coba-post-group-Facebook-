@@ -226,38 +226,49 @@ async function downloadMedia(url, filename) {
   });
   console.log("⚡ Event React input/change/keydown/keyup dikirim");
 
-  // 5️⃣ Debug preview image/video muncul
-  console.log("🔍 Tunggu preview muncul...");
-  await page.waitForTimeout(5000);
+    // 3️⃣ Tunggu preview media (foto/video)
+let previewOk = false;
+let bufferTime = 10000;
 
-  const debug = await page.evaluate(() => {
-    const area = document.querySelector('div[role="dialog"], form[method="POST"], div[aria-label*="postingan"], div[aria-label*="posting"]');
-    if (!area) return { found: false, msg: "❌ Area composer tidak ditemukan" };
+try {
+  const ext = path.extname(fileName).toLowerCase();
 
-    const imgs = [...area.querySelectorAll("img")].map(e => e.src);
-    const vids = [...area.querySelectorAll("video")].map(e => e.src);
+  if ([".jpg", ".jpeg", ".png"].includes(ext)) {
+    console.log("⏳ Tunggu foto preview...");
 
-    // beri border untuk visual debug
-    imgs.forEach(e => e.style.border = "3px solid red");
-    vids.forEach(e => e.style.border = "3px solid blue");
+    await page.waitForSelector(
+      [
+       'div[data-mcomponent="ImageArea"] img[src^="data:image"]' , // base64 inline
+       'img[src^="blob:"]',                                    // foto dari CDN
+        'div[aria-label="Photo preview"] img',                     // fallback
+      ].join(", "),
+      { timeout: 60000 }
+   );
 
-    return {
-      found: imgs.length > 0 || vids.length > 0,
-      imgCount: imgs.length,
-      vidCount: vids.length,
-      imgSrc: imgs,
-      vidSrc: vids
-    };
-  });
+    console.log("✅ Foto preview ready");
+    previewOk = true;
 
-  console.log("🖼️ Debug Preview:", debug);
+  } else if ([".mp4", ".mov"].includes(ext)) {
+    console.log("⏳ Tunggu video preview...");
 
-  if (!debug.found) {
-    console.log("⚠️ Preview belum muncul, ambil screenshot untuk analisis...");
-  } else {
-    console.log(`✅ Preview muncul (${debug.imgCount} gambar, ${debug.vidCount} video)`);
+    await page.waitForSelector(
+      [
+        'div[data-mcomponent="VideoArea"] video',   // wrapper video
+        'video[src]',                               // video element
+        'div[aria-label="Video preview"]',          // fallback
+     ].join(", "),
+      { timeout: 120000 }
+    );
+
+    console.log("✅ Video preview ready");
+    bufferTime = 15000;
+    previewOk = true;
   }
 
+} catch (e) {
+  console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
+}
+    
   // 6️⃣ Screenshot hasil preview
   const screenshotPath = path.join(__dirname, "media", "after_upload.png");
   await page.screenshot({ path: screenshotPath, fullPage: true });
