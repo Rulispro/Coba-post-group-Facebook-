@@ -169,71 +169,84 @@ async function downloadMedia(url, filename) {
 //  console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
 //}
 
-async function uploadMedia(page, filePath, fileName) {
-  const ext = path.extname(fileName).toLowerCase();
-  const isVideo = [".mp4", ".mov", ".avi"].includes(ext);
-  const type = isVideo ? "Video" : "Photos";
-  console.log(`🚀 Mulai upload ${type}: ${fileName}`);
+  // 5️⃣ Tunggu preview media muncul (foto/vi
 
-  // 1️⃣ Klik tombol Photos atau Video
-  const clicked = await page.evaluate((label) => {
-    const btn = [...document.querySelectorAll("div[role='button']")]
+
+"use strict";
+
+const path = require("path");
+
+async function uploadMedia(page, filePath, fileName) {
+  console.log(`🚀 Mulai upload media: ${fileName}`);
+
+  // 🔍 1️⃣ Cek ekstensi file untuk tentukan tombol yang akan diklik
+  const ext = path.extname(fileName).toLowerCase();
+  let label = "Photos";
+  if ([".mp4", ".mov"].includes(ext)) label = "Video";
+
+  console.log(`🧩 Deteksi ekstensi ${ext}, target tombol: ${label}`);
+
+  // 2️⃣ Klik tombol Photo/Video di composer
+  const btn = await page.evaluateHandle(() => {
+    return [...document.querySelectorAll('div[role="button"]')]
       .find(div => {
         const txt = (div.innerText || "").toLowerCase();
         const aria = (div.getAttribute("aria-label") || "").toLowerCase();
-        return txt.includes(label.toLowerCase()) || aria.includes(label.toLowerCase()) || txt.includes("foto");
+        return (
+          txt.includes("photos") ||
+          txt.includes("video") ||
+          aria.includes("photo") ||
+          aria.includes("video") ||
+          txt.includes("foto")
+        );
       });
+  });
 
-    if (!btn) return false;
-
-    // Simulasikan semua event React
-    ["pointerdown", "mousedown", "mouseup", "click"].forEach(evt => {
-      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
-    });
-
-    return true;
-  }, type);
-
-  if (!clicked) {
-    console.log(`❌ Tombol ${type} tidak ditemukan`);
+  if (btn) {
+    await btn.asElement().click();
+    console.log(`✅ Tombol ${label} diklik`);
+  } else {
+    console.log(`❌ Tombol ${label} tidak ditemukan`);
     return false;
   }
-  console.log(`✅ Tombol ${type} berhasil diklik`);
+
+  // Tunggu input file muncul
   await page.waitForTimeout(3000);
 
-  // 2️⃣ Cari input file yang sesuai
-  const selector = isVideo
-    ? 'input[type="file"][accept*="video"], input[type="file"][accept="video/*"]'
-    : 'input[type="file"][accept*="image"], input[type="file"][accept="image/*"]';
+  // 3️⃣ Cari input file
+  const fileInput =
+    (await page.$('input[type="file"][accept="image/*"]')) ||
+    (await page.$('input[type="file"][accept*="video/*"]')) ||
+    (await page.$('input[type="file"]'));
 
-  const fileInput = await page.$(selector);
   if (!fileInput) {
     console.log("❌ Input file tidak ditemukan, upload gagal");
     return false;
   }
 
-  // 3️⃣ Upload file ke input
+  // 4️⃣ Upload file
   await fileInput.uploadFile(filePath);
   console.log(`✅ File sudah diattach: ${filePath}`);
 
-  // 4️⃣ Trigger React agar Facebook tahu file sudah diinput
+  // 5️⃣ Trigger React agar Facebook tahu file sudah dipilih
   await page.evaluate(() => {
-    const inputs = document.querySelectorAll('input[type="file"]');
-    inputs.forEach(input => {
+    const input = document.querySelector('input[type="file"]');
+    if (input) {
       ["input", "change"].forEach(evt =>
         input.dispatchEvent(new Event(evt, { bubbles: true }))
       );
-    });
+    }
   });
   console.log("⚡ Event React 'input' & 'change' dikirim");
 
-  // 5️⃣ Tunggu preview media muncul (foto/video)
+  // 6️⃣ Tunggu preview media (foto/video)
   let previewOk = false;
   let bufferTime = 10000;
 
   try {
-    if (!isVideo) {
+    if ([".jpg", ".jpeg", ".png"].includes(ext)) {
       console.log("⏳ Tunggu foto preview...");
+
       await page.waitForSelector(
         [
           'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
@@ -242,11 +255,13 @@ async function uploadMedia(page, filePath, fileName) {
         ].join(", "),
         { timeout: 60000 }
       );
+
       console.log("✅ Foto preview ready");
       previewOk = true;
 
-    } else {
+    } else if ([".mp4", ".mov"].includes(ext)) {
       console.log("⏳ Tunggu video preview...");
+
       await page.waitForSelector(
         [
           'div[data-mcomponent="VideoArea"] video',   // wrapper video
@@ -255,26 +270,16 @@ async function uploadMedia(page, filePath, fileName) {
         ].join(", "),
         { timeout: 120000 }
       );
+
       console.log("✅ Video preview ready");
-      previewOk = true;
       bufferTime = 15000;
+      previewOk = true;
     }
+
   } catch (e) {
-    console.log("⚠️ Preview tidak muncul dalam batas waktu, lanjut paksa...");
+    console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
   }
-
-  // 6️⃣ Tambahkan buffer sebelum klik tombol POST
-  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
-  await page.waitForTimeout(bufferTime);
-
-  return previewOk;
-}
-
-//module.exports = { uploadMedia };
-
-
-  // 4️⃣ Screenshot
-  const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+const screenshotPath = path.join(__dirname, "media", "after_upload.png");
   await page.screenshot({ path: screenshotPath, fullPage: true });
   console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
 
@@ -283,6 +288,25 @@ async function uploadMedia(page, filePath, fileName) {
   } else {
     console.log("❌ Screenshot TIDAK ADA di folder media");
   }
+  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
+  await page.waitForTimeout(bufferTime);
+
+  return previewOk;
+}
+
+module.exports = { uploadMedia };
+
+
+  // 4️⃣ Screenshot
+ // const screenshotPath = path.join(__dirname, "media", "after_upload.png");
+ // await page.screenshot({ path: screenshotPath, fullPage: true });
+  //console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
+
+  //if (fs.existsSync(screenshotPath)) {
+  //  console.log("✅ Screenshot ada di folder media");
+//  } else {
+   // console.log("❌ Screenshot TIDAK ADA di folder media");
+//  }
 
   // Buffer ekstra
   //console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
@@ -296,7 +320,7 @@ async function uploadMedia(page, filePath, fileName) {
     
 
 // ✅ Export fungsi yang benar
-module.exports = { uploadMedia };
+//module.exports = { uploadMedia };
 
 
   // 7️⃣ Optional: upload screenshot ke artifact GitHub
