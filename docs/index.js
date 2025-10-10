@@ -171,11 +171,6 @@ async function downloadMedia(url, filename) {
 
   // 5️⃣ Tunggu preview media muncul (foto/vi
 
-
-"use strict";
-
-const path = require("path");
-
 async function uploadMedia(page, filePath, fileName) {
   console.log(`🚀 Mulai upload media: ${fileName}`);
 
