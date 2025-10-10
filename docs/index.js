@@ -57,22 +57,48 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 }
 
 // ===== Fungsi download media dari GitHub Release
-const mediaFolder = path.join(__dirname, "media");
+const mediaFolder = path.join(__dirname, "media",fileName);
 if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
 
-async function downloadMedia(url, filename) {
-  const filePath = path.join(mediaFolder, filename);
+//async function downloadMedia(url, filename) {
+ // const filePath = path.join(mediaFolder, filename);
+ // return new Promise((resolve, reject) => {
+  //  const file = fs.createWriteStream(filePath);
+//   https.get(url, (res) => {
+ //     res.pipe(file);
+ //     file.on("finish", () => {
+//file.close(() => resolve(filePath)); // ✅ sekarang return path
+ //     });
+//    }).on("error", (err) => reject(err));
+//  });
+//}
+
+async function downloadMediaFromGitHub(url, outputPath) {
+  console.log(`📥 Download media dari ${url}`);
+  const file = fs.createWriteStream(outputPath);
+
   return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(filePath);
-   https.get(url, (res) => {
+    https.get(url, (res) => {
+      if (res.statusCode !== 200) {
+        reject(new Error(`HTTP ${res.statusCode}`));
+        return;
+      }
+
       res.pipe(file);
       file.on("finish", () => {
-        file.close(() => resolve(filePath)); // ✅ sekarang return path
+        file.close(() => {
+          const stats = fs.statSync(outputPath);
+          if (stats.size === 0) {
+            reject(new Error("File kosong setelah download"));
+          } else {
+            console.log(`✅ Media tersimpan: ${outputPath} (${stats.size} bytes)`);
+            resolve();
+          }
+        });
       });
     }).on("error", (err) => reject(err));
   });
 }
-
 
   // 4️⃣ Debug screenshot
 //  await page.screenshot({ path: "after_upload.png", fullPage: true });
@@ -211,10 +237,14 @@ async function downloadMedia(url, filename) {
          if (!fileInput)
           { console.log("❌ Input file tidak ditemukan, upload gagal"); 
            return false; }
+
+   // Upload ke input file Facebook
+await page.setInputFiles('input[type="file"][accept*="image/*"]', mediaPath);
+console.log("✅ File sudah diattach:", mediaPath);
     
   // 3️⃣ Upload file ke input
-  await fileInput.uploadFile(filePath);
-  console.log(`✅ File sudah diattach: ${filePath}`);
+ // await fileInput.uploadFile(filePath);
+//  console.log(`✅ File sudah diattach: ${filePath}`);
 
   // 4️⃣ Trigger semua event agar React detect perubahan
   await page.evaluate(() => {
@@ -449,8 +479,13 @@ console.log("FILL:", fillResult);
 const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.png";
 
 // download media → simpan return value ke filePat
-  const filePath = await downloadMedia(mediaUrl, fileName);
+  const filePath = await downloadMedia(mediaUrl, mediaPath);//fileName);
 console.log(`✅ Media ${fileName} berhasil di-download.`);
+
+    // Pastikan file valid
+const stats = fs.statSync(mediaPath);
+console.log(`📏 Ukuran file: ${stats.size} bytes`);
+
 
 // upload ke Facebook
 
