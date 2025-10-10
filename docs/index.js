@@ -227,13 +227,48 @@ async function uploadMedia(page, filePath, fileName) {
   await page.evaluate(() => {
     const input = document.querySelector('input[type="file"]');
     if (input) {
-      ["input", "change"].forEach(evt =>
-        input.dispatchEvent(new Event(evt, { bubbles: true }))
+      const events = [
+        "focus", "pointerdown", "mousedown", "input", "change",
+        "blur", "mouseup", "pointerup", "keydown", "keyup"
+      ];
+      events.forEach(evt =>
+        input.dispatchEvent(new Event(evt, { bubbles: true, cancelable: true }))
       );
     }
   });
-  console.log("⚡ Event React 'input' & 'change' dikirim");
+  console.log("⚡ Event React 'focus, input, change, keydown, keyup' dikirim");
+  
+  // Tambah waktu buffer agar Facebook proses preview
+  await page.waitForTimeout(5000);
 
+  // 🔎 Debug preview blob/data src langsung dari DOM React
+  await page.evaluate(() => {
+    console.log("🧩 Debug preview mulai...");
+
+    const imgs = document.querySelectorAll('img[src^="blob:"], img[src^="data:"]');
+    const videos = document.querySelectorAll('video source[src^="blob:"], video[src^="data:"]');
+    
+    console.log(`🖼️ Ditemukan ${imgs.length} img preview`);
+    console.log(`🎥 Ditemukan ${videos.length} video preview`);
+
+    imgs.forEach((img, i) => console.log(`IMG[${i}] src=`, img.src));
+    videos.forEach((v, i) => console.log(`VIDEO[${i}] src=`, v.src));
+
+    imgs.forEach(img => img.style.border = "3px solid red");
+    document.querySelectorAll('video').forEach(v => v.style.border = "3px solid blue");
+  });
+  
+  // 🔎 Cek apakah React sudah render preview di composer
+  const hasPreview = await page.$eval(
+    'div[data-mcomponent="ImageArea"], img[src*="scontent"]',
+    el => !!el
+  ).catch(() => false);
+
+  if (hasPreview) {
+    console.log("✅ Facebook berhasil mendeteksi dan render preview!");
+  } else {
+    console.log("❌ Facebook belum render preview, kemungkinan React tidak update state.");
+      }      
   // 6️⃣ Tunggu preview media (foto/video)
   let previewOk = false;
   let bufferTime = 10000;
@@ -358,7 +393,13 @@ function delay(ms) {
     });
 
     const page = await browser.newPage();
-
+     // 🔊 Monitor semua console dari browser
+page.on("console", msg => console.log("📢 [Browser]", msg.text()));
+page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
+page.on("response", res => {
+  if (!res.ok()) console.log(`⚠️ [HTTP ${res.status()}] ${res.url()}`);
+});
+  
     // ===== Mulai rekaman
     const recorder = new PuppeteerScreenRecorder(page);
     await recorder.start("recording.mp4");
