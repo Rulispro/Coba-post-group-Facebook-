@@ -278,7 +278,7 @@ try {
   console.log(exists ? "✅ Screenshot tersimpan dengan baik" : "❌ Screenshot gagal disimpan");
 
   // 7️⃣ Tunggu buffer agar media siap dipost
-  const bufferTime = ext.match(/mp4|mov/) ? 15000 : 10000;
+  
   console.log(`⏳ Tunggu ${bufferTime / 1000}s agar preview stabil...`);
   await page.waitForTimeout(bufferTime);
 
