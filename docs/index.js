@@ -168,48 +168,55 @@ async function downloadMedia(url, filename) {
 //} catch (e) {
 //  console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
 //}
+
 async function uploadMedia(page, filePath, fileName) {
   const ext = path.extname(fileName).toLowerCase();
   const isVideo = [".mp4", ".mov", ".avi"].includes(ext);
   const type = isVideo ? "Video" : "Photos";
   console.log(`🚀 Mulai upload ${type}: ${fileName}`);
 
-  // 1️⃣ Klik tombol sesuai jenis media
-  const label = isVideo ? "Video" : "Photos";
+  // 1️⃣ Klik tombol Photos atau Video
   const clicked = await page.evaluate((label) => {
     const btn = [...document.querySelectorAll("div[role='button']")]
-      .find(div => (div.innerText || "").toLowerCase().includes(label.toLowerCase()));
+      .find(div => {
+        const txt = (div.innerText || "").toLowerCase();
+        const aria = (div.getAttribute("aria-label") || "").toLowerCase();
+        return txt.includes(label.toLowerCase()) || aria.includes(label.toLowerCase()) || txt.includes("foto");
+      });
+
     if (!btn) return false;
 
-    ["pointerdown","mousedown","mouseup","click"].forEach(evt =>
-      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }))
-    );
+    // Simulasikan semua event React
+    ["pointerdown", "mousedown", "mouseup", "click"].forEach(evt => {
+      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+    });
+
     return true;
-  }, label);
+  }, type);
 
   if (!clicked) {
-    console.log(`❌ Tombol ${label} tidak ditemukan`);
+    console.log(`❌ Tombol ${type} tidak ditemukan`);
     return false;
   }
-  console.log(`✅ Tombol ${label} berhasil diklik`);
-  await page.waitForTimeout(3000); // beri waktu picker muncul
+  console.log(`✅ Tombol ${type} berhasil diklik`);
+  await page.waitForTimeout(3000);
 
-  // 2️⃣ Cari input file
+  // 2️⃣ Cari input file yang sesuai
   const selector = isVideo
     ? 'input[type="file"][accept*="video"], input[type="file"][accept="video/*"]'
     : 'input[type="file"][accept*="image"], input[type="file"][accept="image/*"]';
 
   const fileInput = await page.$(selector);
   if (!fileInput) {
-    console.log("❌ Input file tidak ditemukan");
+    console.log("❌ Input file tidak ditemukan, upload gagal");
     return false;
   }
 
   // 3️⃣ Upload file ke input
   await fileInput.uploadFile(filePath);
-  console.log(`✅ File ${fileName} berhasil di-attach`);
+  console.log(`✅ File sudah diattach: ${filePath}`);
 
-  // 4️⃣ Trigger React agar Facebook tahu file sudah dipilih
+  // 4️⃣ Trigger React agar Facebook tahu file sudah diinput
   await page.evaluate(() => {
     const inputs = document.querySelectorAll('input[type="file"]');
     inputs.forEach(input => {
@@ -220,24 +227,50 @@ async function uploadMedia(page, filePath, fileName) {
   });
   console.log("⚡ Event React 'input' & 'change' dikirim");
 
-  // 5️⃣ Tunggu preview muncul
-  const previewSelector = isVideo
-    ? 'video[src], div[aria-label="Video preview"], div[data-mcomponent="VideoArea"] video'
-    : 'img[src*="scontent"], div[aria-label="Photo preview"], div[data-mcomponent="ImageArea"] img[src^="data:image"]';
+  // 5️⃣ Tunggu preview media muncul (foto/video)
+  let previewOk = false;
+  let bufferTime = 10000;
 
   try {
-    console.log("⏳ Tunggu preview muncul...");
-    await page.waitForSelector(previewSelector, { timeout: 15000 });
-    console.log("✅ Preview media muncul!");
+    if (!isVideo) {
+      console.log("⏳ Tunggu foto preview...");
+      await page.waitForSelector(
+        [
+          'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
+          'img[src*="scontent"]',                                    // foto dari CDN
+          'div[aria-label="Photo preview"] img'                      // fallback
+        ].join(", "),
+        { timeout: 60000 }
+      );
+      console.log("✅ Foto preview ready");
+      previewOk = true;
+
+    } else {
+      console.log("⏳ Tunggu video preview...");
+      await page.waitForSelector(
+        [
+          'div[data-mcomponent="VideoArea"] video',   // wrapper video
+          'video[src]',                               // direct video
+          'div[aria-label="Video preview"]'           // fallback
+        ].join(", "),
+        { timeout: 120000 }
+      );
+      console.log("✅ Video preview ready");
+      previewOk = true;
+      bufferTime = 15000;
+    }
   } catch (e) {
-    console.log("⚠️ Tidak terdeteksi preview, lanjut paksa...");
+    console.log("⚠️ Preview tidak muncul dalam batas waktu, lanjut paksa...");
   }
 
-  // 6️⃣ Tambahkan buffer tambahan agar POST aktif
-  await page.waitForTimeout(10000); // biar FB sempat render preview
-  console.log("✅ Upload selesai & preview dipastikan aktif");
-  return true;
+  // 6️⃣ Tambahkan buffer sebelum klik tombol POST
+  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
+  await page.waitForTimeout(bufferTime);
+
+  return previewOk;
 }
+
+//module.exports = { uploadMedia };
 
 
   // 4️⃣ Screenshot
