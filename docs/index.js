@@ -234,10 +234,10 @@ async function uploadMedia(page, filePath, fileName) {
   }
 
   // 6️⃣ Tambahkan buffer tambahan agar POST aktif
-//  await page.waitForTimeout(10000); // biar FB sempat render preview
-//  console.log("✅ Upload selesai & preview dipastikan aktif");
-//  return true;
-//}
+  await page.waitForTimeout(10000); // biar FB sempat render preview
+  console.log("✅ Upload selesai & preview dipastikan aktif");
+  return true;
+}
 
 
   // 4️⃣ Screenshot
@@ -252,12 +252,12 @@ async function uploadMedia(page, filePath, fileName) {
   }
 
   // Buffer ekstra
-  console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
-  await page.waitForTimeout(bufferTime);
+  //console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
+ // await page.waitForTimeout(bufferTime);
 
-  console.log("✅ Upload selesai");
-  return true;
-}
+ // console.log("✅ Upload selesai");
+ // return true;
+//}
 
 
     
