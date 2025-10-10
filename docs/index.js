@@ -79,95 +79,165 @@ async function downloadMedia(url, filename) {
 //  console.log("✅ Media siap diposting.");
 
   
-async function uploadMedia(page, filePath, fileName, type = "Photos") {
-  console.log(`🚀 Mulai upload ${type}: ${fileName}`);
+//async function uploadMedia(page, filePath, fileName, type = "Photos") {
+//  console.log(`🚀 Mulai upload ${type}: ${fileName}`);
 
 // 1️⃣ Klik tombol Photo/Video di composer
-  const btn = await page.evaluateHandle(() => {
-    return [...document.querySelectorAll('div[role="button"]')]
-      .find(div => {
-        const txt = (div.innerText || "").toLowerCase();
-        const aria = (div.getAttribute("aria-label") || "").toLowerCase();
-        return txt.includes("Photos") || txt.includes("Video") || aria.includes("photo") || aria.includes("video") || txt.includes("foto");
-      });
-  });
-
-  if (btn) {
-    await btn.asElement().click();
-    console.log("✅ Tombol Photo/Video diklik");
-  } else {
-    console.log("❌ Tombol Photo/Video tidak ditemukan");
-    return false;
-  }
-
+//  const btn = await page.evaluateHandle(() => {
+  //  return [...document.querySelectorAll('div[role="button"]')]
+      //.find(div => {
+       // const txt = (div.innerText || "").toLowerCase();
+     //   const aria = (div.getAttribute("aria-label") || "").toLowerCase();
+     //   return txt.includes("Photos") || txt.includes("Video") || aria.includes("photo") || aria.includes("video") || txt.includes("foto");
+    //  });
+//  });
+///
+ // if (btn) {
+  //  await btn.asElement().click();
+ //   console.log("✅ Tombol Photo/Video diklik");
+//  } else {
+  //  console.log("❌ Tombol Photo/Video tidak ditemukan");
+//    return false;
+//  }
+//
     
   // 2️⃣ Cari input file
-  const fileInput =
-    (await page.$('input[type="file"][accept="image/*"]')) ||
-    (await page.$('input[type="file"][accept*="video/*"]')) ||
-    (await page.$('input[type="file"]'));
+//  const fileInput =
+  //  (await page.$('input[type="file"][accept="image/*"]')) ||
+  //  (await page.$('input[type="file"][accept*="video/*"]')) ||
+ //   (await page.$('input[type="file"]'));
 
-  if (!fileInput) {
-    console.log("❌ Input file tidak ditemukan, upload gagal");
-    return false;
-  }
+ // if (!fileInput) {
+  //  console.log("❌ Input file tidak ditemukan, upload gagal");
+  //  return false;
+//  }
  
   //upload file 
-    await fileInput.uploadFile(filePath);
-  console.log("✅ File sudah diattach:", filePath);
+   // await fileInput.uploadFile(filePath);
+//  console.log("✅ File sudah diattach:", filePath);
 
   // Trigger React
+ // await page.evaluate(() => {
+ //   const input = document.querySelector('input[type="file"]');
+ //   if (input) {
+  //    ["input", "change"].forEach(evt =>
+  //      input.dispatchEvent(new Event(evt, { bubbles: true }))
+  //    );
+  //  }
+//  });
+
+// 3️⃣ Tunggu preview media (foto/video)
+//let previewOk = false;
+//let bufferTime = 10000;
+
+//try {
+ // const ext = path.extname(fileName).toLowerCase();
+
+ // if ([".jpg", ".jpeg", ".png"].includes(ext)) {
+   // console.log("⏳ Tunggu foto preview...");
+
+  //  await page.waitForSelector(
+   //   [
+    //    'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
+    //    'img[src*="scontent"]',                                    // foto dari CDN
+    //    'div[aria-label="Photo preview"] img',                     // fallback
+   //   ].join(", "),
+   //   { timeout: 60000 }
+ //   );
+
+  //  console.log("✅ Foto preview ready");
+ //   previewOk = true;
+
+//  } else if ([".mp4", ".mov"].includes(ext)) {
+  //  console.log("⏳ Tunggu video preview...");
+
+  //  await page.waitForSelector(
+   //   [
+    //    'div[data-mcomponent="VideoArea"] video',   // wrapper video
+    //    'video[src]',                               // video element
+    //    'div[aria-label="Video preview"]',          // fallback
+   //   ].join(", "),
+ //     { timeout: 120000 }
+ //   );
+
+  //  console.log("✅ Video preview ready");
+ //   bufferTime = 15000;
+//    previewOk = true;
+//  }
+
+//} catch (e) {
+//  console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
+//}
+async function uploadMedia(page, filePath, fileName) {
+  const ext = path.extname(fileName).toLowerCase();
+  const isVideo = [".mp4", ".mov", ".avi"].includes(ext);
+  const type = isVideo ? "Video" : "Photos";
+  console.log(`🚀 Mulai upload ${type}: ${fileName}`);
+
+  // 1️⃣ Klik tombol sesuai jenis media
+  const label = isVideo ? "Video" : "Photos";
+  const clicked = await page.evaluate((label) => {
+    const btn = [...document.querySelectorAll("div[role='button']")]
+      .find(div => (div.innerText || "").toLowerCase().includes(label.toLowerCase()));
+    if (!btn) return false;
+
+    ["pointerdown","mousedown","mouseup","click"].forEach(evt =>
+      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }))
+    );
+    return true;
+  }, label);
+
+  if (!clicked) {
+    console.log(`❌ Tombol ${label} tidak ditemukan`);
+    return false;
+  }
+  console.log(`✅ Tombol ${label} berhasil diklik`);
+  await page.waitForTimeout(3000); // beri waktu picker muncul
+
+  // 2️⃣ Cari input file
+  const selector = isVideo
+    ? 'input[type="file"][accept*="video"], input[type="file"][accept="video/*"]'
+    : 'input[type="file"][accept*="image"], input[type="file"][accept="image/*"]';
+
+  const fileInput = await page.$(selector);
+  if (!fileInput) {
+    console.log("❌ Input file tidak ditemukan");
+    return false;
+  }
+
+  // 3️⃣ Upload file ke input
+  await fileInput.uploadFile(filePath);
+  console.log(`✅ File ${fileName} berhasil di-attach`);
+
+  // 4️⃣ Trigger React agar Facebook tahu file sudah dipilih
   await page.evaluate(() => {
-    const input = document.querySelector('input[type="file"]');
-    if (input) {
+    const inputs = document.querySelectorAll('input[type="file"]');
+    inputs.forEach(input => {
       ["input", "change"].forEach(evt =>
         input.dispatchEvent(new Event(evt, { bubbles: true }))
       );
-    }
+    });
   });
+  console.log("⚡ Event React 'input' & 'change' dikirim");
 
-// 3️⃣ Tunggu preview media (foto/video)
-let previewOk = false;
-let bufferTime = 10000;
+  // 5️⃣ Tunggu preview muncul
+  const previewSelector = isVideo
+    ? 'video[src], div[aria-label="Video preview"], div[data-mcomponent="VideoArea"] video'
+    : 'img[src*="scontent"], div[aria-label="Photo preview"], div[data-mcomponent="ImageArea"] img[src^="data:image"]';
 
-try {
-  const ext = path.extname(fileName).toLowerCase();
-
-  if ([".jpg", ".jpeg", ".png"].includes(ext)) {
-    console.log("⏳ Tunggu foto preview...");
-
-    await page.waitForSelector(
-      [
-        'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
-        'img[src*="scontent"]',                                    // foto dari CDN
-        'div[aria-label="Photo preview"] img',                     // fallback
-      ].join(", "),
-      { timeout: 60000 }
-    );
-
-    console.log("✅ Foto preview ready");
-    previewOk = true;
-
-  } else if ([".mp4", ".mov"].includes(ext)) {
-    console.log("⏳ Tunggu video preview...");
-
-    await page.waitForSelector(
-      [
-        'div[data-mcomponent="VideoArea"] video',   // wrapper video
-        'video[src]',                               // video element
-        'div[aria-label="Video preview"]',          // fallback
-      ].join(", "),
-      { timeout: 120000 }
-    );
-
-    console.log("✅ Video preview ready");
-    bufferTime = 15000;
-    previewOk = true;
+  try {
+    console.log("⏳ Tunggu preview muncul...");
+    await page.waitForSelector(previewSelector, { timeout: 15000 });
+    console.log("✅ Preview media muncul!");
+  } catch (e) {
+    console.log("⚠️ Tidak terdeteksi preview, lanjut paksa...");
   }
 
-} catch (e) {
-  console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
-}
+  // 6️⃣ Tambahkan buffer tambahan agar POST aktif
+//  await page.waitForTimeout(10000); // biar FB sempat render preview
+//  console.log("✅ Upload selesai & preview dipastikan aktif");
+//  return true;
+//}
 
 
   // 4️⃣ Screenshot
