@@ -193,10 +193,10 @@ async function uploadMedia(page, filePath, fileName) {
         const txt = (div.innerText || "").toLowerCase();
         const aria = (div.getAttribute("aria-label") || "").toLowerCase();
         return (
-          txt.includes("photos") ||
+          txt.includes("Photos") ||
           txt.includes("video") ||
           aria.includes("photo") ||
-          aria.includes("video") ||
+          aria.includes("Video") ||
           txt.includes("foto")
         );
       });
