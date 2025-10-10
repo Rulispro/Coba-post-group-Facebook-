@@ -185,7 +185,7 @@ async function downloadMedia(url, filename) {
     const btn = [...document.querySelectorAll('div[role="button"]')].find(div => {
       const txt = (div.innerText || "").toLowerCase();
       const aria = (div.getAttribute("aria-label") || "").toLowerCase();
-      return txt.includes("photo") || txt.includes("video") || txt.includes("foto") || aria.includes("photo") || aria.includes("video");
+      return txt.includes("Photos") || txt.includes("Video") || txt.includes("foto") || aria.includes("photo") || aria.includes("video");
     });
 
     if (!btn) return false;
@@ -201,14 +201,17 @@ async function downloadMedia(url, filename) {
   } else {
     console.log(`✅ Tombol ${label} diklik`);
   }
-
-  // 2️⃣ Tunggu input file muncul
-  const fileInput = await page.waitForSelector('input[type="file"]', { visible: true, timeout: 10000 });
-  if (!fileInput) {
-    console.log("❌ Input file tidak ditemukan");
-    return false;
-  }
-
+ 
+ // Tunggu input file muncul
+    await page.waitForTimeout(3000);
+// 3️⃣ Cari input file 
+   const fileInput = (await page.$('input[type="file"][accept="image/*"]')) ||
+                      (await page.$('input[type="file"][accept*="video/*"]')) || 
+                      (await page.$('input[type="file"]'));
+         if (!fileInput)
+          { console.log("❌ Input file tidak ditemukan, upload gagal"); 
+           return false; }
+    
   // 3️⃣ Upload file ke input
   await fileInput.uploadFile(filePath);
   console.log(`✅ File sudah diattach: ${filePath}`);
