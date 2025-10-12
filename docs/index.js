@@ -475,7 +475,7 @@ console.log("FILL:", fillResult);
 
   // ===== 3️⃣ Download + upload media
  const today = process.env.DATE;
- const fileName = `akun1_${today}.png`; // bisa .mp4
+ const fileName = path.basename(mediaUrl); //ambil url nama media file 
 const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.png";
 
 // download media → simpan return value ke filePat
