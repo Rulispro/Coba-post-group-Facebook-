@@ -57,6 +57,8 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 }
 
 // ===== Fungsi download media dari GitHub Release
+
+const fileName = path.basename(mediaUrl); 
 const mediaFolder = path.join(__dirname, "media",fileName);
 if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
 
@@ -475,7 +477,7 @@ console.log("FILL:", fillResult);
 
   // ===== 3️⃣ Download + upload media
  const today = process.env.DATE;
- const fileName = path.basename(mediaUrl); //ambil url nama media file 
+ const fileName ='akun_1{today}.jpg'; //ambil url nama media file 
 const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.png";
 
 // download media → simpan return value ke filePat
