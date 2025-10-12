@@ -86,7 +86,7 @@ async function downloadMediaFromGitHub(url, outputPath) {
 
       res.pipe(file);
       file.on("finish", () => {
-       /file.close(() => {
+       file.close(() => {
           const stats = fs.statSync(outputPath);
           if (stats.size === 0) {
             reject(new Error("File kosong setelah download"));
