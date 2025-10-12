@@ -62,6 +62,9 @@ if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
 
 async function downloadMedia(url, filename) {
   const filePath = path.join(mediaFolder, filename);
+  const options = {
+    headers: { "User-Agent": "Mozilla/5.0 (PuppeteerBot)" }
+  };
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(filePath);
    https.get(url, (res) => {
@@ -451,6 +454,12 @@ const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/
 // download media → simpan return value ke filePat
   const filePath = await downloadMedia(mediaUrl, fileName);
 console.log(`✅ Media ${fileName} berhasil di-download.`);
+
+const stats = fs.statSync(filePath);
+if (stats.size === 0) {
+  throw new Error(`❌ File ${fileName} kosong! Download gagal.`);
+}
+
 
 // upload ke Facebook
 
