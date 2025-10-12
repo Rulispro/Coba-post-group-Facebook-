@@ -57,156 +57,128 @@ async function scanAllElementsVerbose(page, label = "Scan") {
 }
 
 // ===== Fungsi download media dari GitHub Release
-
-const fileName = path.basename(mediaUrl); 
-const mediaFolder = path.join(__dirname, "media",fileName);
+const mediaFolder = path.join(__dirname, "media");
 if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
 
-//async function downloadMedia(url, filename) {
- // const filePath = path.join(mediaFolder, filename);
- // return new Promise((resolve, reject) => {
-  //  const file = fs.createWriteStream(filePath);
-//   https.get(url, (res) => {
- //     res.pipe(file);
- //     file.on("finish", () => {
-//file.close(() => resolve(filePath)); // ✅ sekarang return path
- //     });
-//    }).on("error", (err) => reject(err));
-//  });
-//}
-
-async function downloadMediaFromGitHub(url, outputPath) {
-  console.log(`📥 Download media dari ${url}`);
- const file = fs.createWriteStream(outputPath);
-
+async function downloadMedia(url, filename) {
+  const filePath = path.join(mediaFolder, filename);
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      if (res.statusCode !== 200) {
-       reject(new Error(`HTTP ${res.statusCode}`));
-        return;
-      }
-
+    const file = fs.createWriteStream(filePath);
+   https.get(url, (res) => {
       res.pipe(file);
       file.on("finish", () => {
-       file.close(() => {
-          const stats = fs.statSync(outputPath);
-          if (stats.size === 0) {
-            reject(new Error("File kosong setelah download"));
-          } else {
-            console.log(`✅ Media tersimpan: ${outputPath} (${stats.size} bytes)`);
-            resolve();
-         }
-      });
+        file.close(() => resolve(filePath)); // ✅ sekarang return path
       });
     }).on("error", (err) => reject(err));
   });
- }
+}
+
 
   // 4️⃣ Debug screenshot
 //  await page.screenshot({ path: "after_upload.png", fullPage: true });
 //  console.log("✅ Media siap diposting.");
 
   
-async function uploadMedia(page, filePath, fileName, type = "Photos") {
- console.log(`🚀 Mulai upload ${type}: ${fileName}`);
+//async function uploadMedia(page, filePath, fileName, type = "Photos") {
+//  console.log(`🚀 Mulai upload ${type}: ${fileName}`);
 
 // 1️⃣ Klik tombol Photo/Video di composer
 //  const btn = await page.evaluateHandle(() => {
-//   return [...document.querySelectorAll('div[role="button"]')]
-  //    .find(div => {
-    //    const txt = (div.innerText || "").toLowerCase();
+  //  return [...document.querySelectorAll('div[role="button"]')]
+      //.find(div => {
+       // const txt = (div.innerText || "").toLowerCase();
      //   const aria = (div.getAttribute("aria-label") || "").toLowerCase();
-      //   return txt.includes("Photos") || txt.includes("Video") || aria.includes("photo") || aria.includes("video") || txt.includes("foto");
+     //   return txt.includes("Photos") || txt.includes("Video") || aria.includes("photo") || aria.includes("video") || txt.includes("foto");
     //  });
 //  });
-
+///
  // if (btn) {
-    //await btn.asElement().click();
-  //   console.log("✅ Tombol Photo/Video diklik");
-//   } else {
- //   console.log("❌ Tombol Photo/Video tidak ditemukan");
- //   return false;
+  //  await btn.asElement().click();
+ //   console.log("✅ Tombol Photo/Video diklik");
+//  } else {
+  //  console.log("❌ Tombol Photo/Video tidak ditemukan");
+//    return false;
 //  }
-
+//
     
   // 2️⃣ Cari input file
 //  const fileInput =
- //   (await page.$('input[type="file"][accept="image/*"]')) ||
- //   (await page.$('input[type="file"][accept*="video/*"]')) ||
+  //  (await page.$('input[type="file"][accept="image/*"]')) ||
+  //  (await page.$('input[type="file"][accept*="video/*"]')) ||
  //   (await page.$('input[type="file"]'));
 
-//  if (!fileInput) {
+ // if (!fileInput) {
   //  console.log("❌ Input file tidak ditemukan, upload gagal");
   //  return false;
 //  }
  
   //upload file 
-  //  await fileInput.uploadFile(filePath);
+   // await fileInput.uploadFile(filePath);
 //  console.log("✅ File sudah diattach:", filePath);
 
   // Trigger React
-//   await page.evaluate(() => {
-   //  const input = document.querySelector('input[type="file"]');
-   //  if (input) {
-     //  ["input", "change"].forEach(evt =>
-     //  input.dispatchEvent(new Event(evt, { bubbles: true }))
-   //  );
- //   }
+ // await page.evaluate(() => {
+ //   const input = document.querySelector('input[type="file"]');
+ //   if (input) {
+  //    ["input", "change"].forEach(evt =>
+  //      input.dispatchEvent(new Event(evt, { bubbles: true }))
+  //    );
+  //  }
 //  });
 
 // 3️⃣ Tunggu preview media (foto/video)
-//  let previewOk = false;
-//  let bufferTime = 10000;
+//let previewOk = false;
+//let bufferTime = 10000;
 
-// try {
-//  const ext = path.extname(fileName).toLowerCase();
+//try {
+ // const ext = path.extname(fileName).toLowerCase();
 
-  // if ([".jpg", ".jpeg", ".png"].includes(ext)) {
-   //  console.log("⏳ Tunggu foto preview...");
+ // if ([".jpg", ".jpeg", ".png"].includes(ext)) {
+   // console.log("⏳ Tunggu foto preview...");
 
-   //  await page.waitForSelector(
-   //    [
-   //     'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
-     //  'img[src*="scontent"]',                                    // foto dari CDN
-     //   'div[aria-label="Photo preview"] img',                     // fallback
-    //  ].join(", "),
+  //  await page.waitForSelector(
+   //   [
+    //    'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
+    //    'img[src*="scontent"]',                                    // foto dari CDN
+    //    'div[aria-label="Photo preview"] img',                     // fallback
+   //   ].join(", "),
    //   { timeout: 60000 }
-  //  );
+ //   );
 
   //  console.log("✅ Foto preview ready");
  //   previewOk = true;
 
 //  } else if ([".mp4", ".mov"].includes(ext)) {
-//    console.log("⏳ Tunggu video preview...");
+  //  console.log("⏳ Tunggu video preview...");
 
-//    await page.waitForSelector(
+  //  await page.waitForSelector(
    //   [
-      //  'div[data-mcomponent="VideoArea"] video',   // wrapper video
-      //  'video[src]',                               // video element
-     //   'div[aria-label="Video preview"]',          // fallback
-   //  ].join(", "),
-    //  { timeout: 120000 }
+    //    'div[data-mcomponent="VideoArea"] video',   // wrapper video
+    //    'video[src]',                               // video element
+    //    'div[aria-label="Video preview"]',          // fallback
+   //   ].join(", "),
+ //     { timeout: 120000 }
  //   );
 
   //  console.log("✅ Video preview ready");
-//   bufferTime = 15000;
+ //   bufferTime = 15000;
 //    previewOk = true;
 //  }
 
-//  } catch (e) {
- // console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
-// }
+//} catch (e) {
+//  console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
+//}
 
   // 5️⃣ Tunggu preview media muncul (foto/vi
 
-//  async function uploadMedia(page, filePath, fileName) {
- // console.log(`🚀 Mulai upload media: ${fileName}`);
+  async function uploadMedia(page, filePath, fileName) {
+  console.log(`🚀 Mulai upload media: ${fileName}`);
 
-//  const ext = path.extname(fileName).toLowerCase();
-//  let label = "Photos";
-//  if ([".mp4", ".mov"].includes(ext)) label = "Video";
+  const ext = path.extname(fileName).toLowerCase();
+  let label = "Photos";
+  if ([".mp4", ".mov"].includes(ext)) label = "Video";
 
-//  console.log(`🧩 Deteksi ekstensi ${ext}, target tombol: ${label}`);
+  console.log(`🧩 Deteksi ekstensi ${ext}, target tombol: ${label}`);
 
   // 1️⃣ Klik tombol Photo/Video (trigger React-friendly)
   const clicked = await page.evaluate((label) => {
@@ -239,14 +211,10 @@ async function uploadMedia(page, filePath, fileName, type = "Photos") {
          if (!fileInput)
           { console.log("❌ Input file tidak ditemukan, upload gagal"); 
            return false; }
-
-   // Upload ke input file Facebook
-await page.setInputFiles('input[type="file"][accept*="image/*"]', mediaPath);
-console.log("✅ File sudah diattach:", mediaPath);
     
   // 3️⃣ Upload file ke input
- // await fileInput.uploadFile(filePath);
-//  console.log(`✅ File sudah diattach: ${filePath}`);
+  await fileInput.uploadFile(filePath);
+  console.log(`✅ File sudah diattach: ${filePath}`);
 
   // 4️⃣ Trigger semua event agar React detect perubahan
   await page.evaluate(() => {
@@ -310,7 +278,7 @@ try {
   console.log(exists ? "✅ Screenshot tersimpan dengan baik" : "❌ Screenshot gagal disimpan");
 
   // 7️⃣ Tunggu buffer agar media siap dipost
-  
+  const bufferTime = ext.match(/mp4|mov/) ? 15000 : 10000;
   console.log(`⏳ Tunggu ${bufferTime / 1000}s agar preview stabil...`);
   await page.waitForTimeout(bufferTime);
 
@@ -477,17 +445,12 @@ console.log("FILL:", fillResult);
 
   // ===== 3️⃣ Download + upload media
  const today = process.env.DATE;
- const fileName ='akun_1{today}.jpg'; //ambil url nama media file 
+ const fileName = `akun1_${today}.png`; // bisa .mp4
 const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.png";
 
 // download media → simpan return value ke filePat
-  const filePath = await downloadMedia(mediaUrl, mediaPath);//fileName);
+  const filePath = await downloadMedia(mediaUrl, fileName);
 console.log(`✅ Media ${fileName} berhasil di-download.`);
-
-    // Pastikan file valid
-const stats = fs.statSync(mediaPath);
-console.log(`📏 Ukuran file: ${stats.size} bytes`);
-
 
 // upload ke Facebook
 
