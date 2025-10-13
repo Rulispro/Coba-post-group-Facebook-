@@ -61,18 +61,53 @@ const mediaFolder = path.join(__dirname, "media");
 if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder);
 
 async function downloadMedia(url, filename) {
+  const mediaFolder = path.join(__dirname, "media");
+  if (!fs.existsSync(mediaFolder)) fs.mkdirSync(mediaFolder, { recursive: true });
+
   const filePath = path.join(mediaFolder, filename);
   const options = {
     headers: { "User-Agent": "Mozilla/5.0 (PuppeteerBot)" }
   };
+
   return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(filePath);
-   https.get(url, (res) => {
+    const request = https.get(url, options, (res) => {
+      // 🔁 Handle redirect (301, 302)
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        console.log("🔁 Redirect ke:", res.headers.location);
+        return resolve(downloadMedia(res.headers.location, filename));
+      }
+
+      // ❌ Handle error status
+      if (res.statusCode !== 200) {
+        reject(new Error(`❌ Gagal download media: ${res.statusCode}`));
+        return;
+      }
+
+      // 💾 Tulis file ke disk
+      const file = fs.createWriteStream(filePath);
       res.pipe(file);
+
       file.on("finish", () => {
-        file.close(() => resolve(filePath)); // ✅ sekarang return path
+        file.close(() => {
+          try {
+            const stats = fs.statSync(filePath);
+            if (stats.size === 0) {
+              reject(new Error(`❌ File ${filename} kosong! Download gagal.`));
+              return;
+            }
+            console.log(`✅ Media selesai diunduh (${(stats.size / 1024).toFixed(2)} KB): ${filePath}`);
+            resolve(filePath);
+          } catch (err) {
+            reject(err);
+          }
+        });
       });
-    }).on("error", (err) => reject(err));
+    });
+
+    request.on("error", (err) => {
+      console.log("❌ Error saat download:", err.message);
+      reject(err);
+    });
   });
 }
 
@@ -183,27 +218,22 @@ async function downloadMedia(url, filename) {
 
   console.log(`🧩 Deteksi ekstensi ${ext}, target tombol: ${label}`);
 
-  // 1️⃣ Klik tombol Photo/Video (trigger React-friendly)
+    //klik tombol Photos/Video 
   const clicked = await page.evaluate((label) => {
-    const btn = [...document.querySelectorAll('div[role="button"]')].find(div => {
-      const txt = (div.innerText || "").toLowerCase();
-      const aria = (div.getAttribute("aria-label") || "").toLowerCase();
-      return txt.includes("Photos") || txt.includes("Video") || txt.includes("foto") || aria.includes("photo") || aria.includes("video");
-    });
+  const btn = [...document.querySelectorAll('div[role="button"]')].find(div => {
+    const txt = (div.innerText || "").toLowerCase();
+    const aria = (div.getAttribute("aria-label") || "").toLowerCase();
+    return txt.includes("Photos") || txt.includes("Video") || txt.includes("foto") || aria.includes("photo") || aria.includes("video");
+  });
 
-    if (!btn) return false;
-    ["pointerdown","mousedown","touchstart","mouseup","pointerup","touchend","click"].forEach(evt => {
-      btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
-    });
-    return true;
-  }, label);
+  if (!btn) return false;
+  ["pointerdown","mousedown","touchstart","mouseup","pointerup","touchend","click"].forEach(evt => {
+    btn.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+  });
+  return true;
+}, label);
 
-  if (!clicked) {
-    console.log(`❌ Tombol ${label} tidak ditemukan`);
-    return false;
-  } else {
-    console.log(`✅ Tombol ${label} diklik`);
-  }
+  
  
  // Tunggu input file muncul
     await page.waitForTimeout(3000);
@@ -215,9 +245,43 @@ async function downloadMedia(url, filename) {
           { console.log("❌ Input file tidak ditemukan, upload gagal"); 
            return false; }
     
-  // 3️⃣ Upload file ke input
-  await fileInput.uploadFile(filePath);
-  console.log(`✅ File sudah diattach: ${filePath}`);
+// ✅ Upload file ke input dan pastikan React detect File object asli
+const fileNameOnly = path.basename(filePath);
+const mimeType = ext === ".mp4" ? "video/mp4" : "image/png";
+const fileBuffer = fs.readFileSync(filePath);
+const base64Data = fileBuffer.toString("base64");
+
+await page.evaluate(
+  async ({ fileNameOnly, base64Data, mimeType }) => {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mimeType });
+    const file = new File([blob], fileNameOnly, { type: mimeType });
+
+    const input = document.querySelector('input[type="file"]');
+    if (!input) throw new Error("❌ Input file tidak ditemukan");
+
+    // Buat DataTransfer agar React tahu file benar-benar berubah
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    input.files = dataTransfer.files;
+
+    // Trigger event React
+    ["input", "change"].forEach(evt =>
+      input.dispatchEvent(new Event(evt, { bubbles: true }))
+    );
+
+    console.log("⚡ File injected ke React dengan File API browser");
+  },
+  { fileNameOnly, base64Data, mimeType }
+);
+
+console.log(`✅ File ${fileNameOnly} berhasil diinject sebagai File object`);
+
 
   // 4️⃣ Trigger semua event agar React detect perubahan
   await page.evaluate(() => {
