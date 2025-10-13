@@ -112,103 +112,6 @@ async function downloadMedia(url, filename) {
 }
 
 
-  // 4️⃣ Debug screenshot
-//  await page.screenshot({ path: "after_upload.png", fullPage: true });
-//  console.log("✅ Media siap diposting.");
-
-  
-//async function uploadMedia(page, filePath, fileName, type = "Photos") {
-//  console.log(`🚀 Mulai upload ${type}: ${fileName}`);
-
-// 1️⃣ Klik tombol Photo/Video di composer
-//  const btn = await page.evaluateHandle(() => {
-  //  return [...document.querySelectorAll('div[role="button"]')]
-      //.find(div => {
-       // const txt = (div.innerText || "").toLowerCase();
-     //   const aria = (div.getAttribute("aria-label") || "").toLowerCase();
-     //   return txt.includes("Photos") || txt.includes("Video") || aria.includes("photo") || aria.includes("video") || txt.includes("foto");
-    //  });
-//  });
-///
- // if (btn) {
-  //  await btn.asElement().click();
- //   console.log("✅ Tombol Photo/Video diklik");
-//  } else {
-  //  console.log("❌ Tombol Photo/Video tidak ditemukan");
-//    return false;
-//  }
-//
-    
-  // 2️⃣ Cari input file
-//  const fileInput =
-  //  (await page.$('input[type="file"][accept="image/*"]')) ||
-  //  (await page.$('input[type="file"][accept*="video/*"]')) ||
- //   (await page.$('input[type="file"]'));
-
- // if (!fileInput) {
-  //  console.log("❌ Input file tidak ditemukan, upload gagal");
-  //  return false;
-//  }
- 
-  //upload file 
-   // await fileInput.uploadFile(filePath);
-//  console.log("✅ File sudah diattach:", filePath);
-
-  // Trigger React
- // await page.evaluate(() => {
- //   const input = document.querySelector('input[type="file"]');
- //   if (input) {
-  //    ["input", "change"].forEach(evt =>
-  //      input.dispatchEvent(new Event(evt, { bubbles: true }))
-  //    );
-  //  }
-//  });
-
-// 3️⃣ Tunggu preview media (foto/video)
-//let previewOk = false;
-//let bufferTime = 10000;
-
-//try {
- // const ext = path.extname(fileName).toLowerCase();
-
- // if ([".jpg", ".jpeg", ".png"].includes(ext)) {
-   // console.log("⏳ Tunggu foto preview...");
-
-  //  await page.waitForSelector(
-   //   [
-    //    'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
-    //    'img[src*="scontent"]',                                    // foto dari CDN
-    //    'div[aria-label="Photo preview"] img',                     // fallback
-   //   ].join(", "),
-   //   { timeout: 60000 }
- //   );
-
-  //  console.log("✅ Foto preview ready");
- //   previewOk = true;
-
-//  } else if ([".mp4", ".mov"].includes(ext)) {
-  //  console.log("⏳ Tunggu video preview...");
-
-  //  await page.waitForSelector(
-   //   [
-    //    'div[data-mcomponent="VideoArea"] video',   // wrapper video
-    //    'video[src]',                               // video element
-    //    'div[aria-label="Video preview"]',          // fallback
-   //   ].join(", "),
- //     { timeout: 120000 }
- //   );
-
-  //  console.log("✅ Video preview ready");
- //   bufferTime = 15000;
-//    previewOk = true;
-//  }
-
-//} catch (e) {
-//  console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
-//}
-
-  // 5️⃣ Tunggu preview media muncul (foto/vi
-
   async function uploadMedia(page, filePath, fileName) {
   console.log(`🚀 Mulai upload media: ${fileName}`);
 
@@ -328,7 +231,7 @@ try {
     );
 
     console.log("✅ Video preview ready");
-    bufferTime = 15000;
+    bufferTime = 1000;
     previewOk = true;
   }
 
@@ -344,45 +247,13 @@ try {
   const exists = fs.existsSync(screenshotPath);
   console.log(exists ? "✅ Screenshot tersimpan dengan baik" : "❌ Screenshot gagal disimpan");
 
-  // 7️⃣ Tunggu buffer agar media siap dipost
-//  const bufferTime = ext.match(/mp4|mov/) ? 15000 : 10000;
- // console.log(`⏳ Tunggu ${bufferTime / 1000}s agar preview stabil...`);
-  //await page.waitForTimeout(bufferTime);
-
-  return true; //selesai 
+   return true; //selesai 
 }
 
 
 module.exports = { uploadMedia };
 
-
-  // 4️⃣ Screenshot
- // const screenshotPath = path.join(__dirname, "media", "after_upload.png");
- // await page.screenshot({ path: screenshotPath, fullPage: true });
-  //console.log(`📸 Screenshot preview media tersimpan: ${screenshotPath}`);
-
-  //if (fs.existsSync(screenshotPath)) {
-  //  console.log("✅ Screenshot ada di folder media");
-//  } else {
-   // console.log("❌ Screenshot TIDAK ADA di folder media");
-//  }
-
-  // Buffer ekstra
-  //console.log(`⏳ Tunggu buffer ${bufferTime / 1000}s sebelum klik POST...`);
- // await page.waitForTimeout(bufferTime);
-
- // console.log("✅ Upload selesai");
- // return true;
-//}
-
-
-    
-
-// ✅ Export fungsi yang benar
-//module.exports = { uploadMedia };
-
-
-  // 7️⃣ Optional: upload screenshot ke artifact GitHub
+ // 7️⃣ Optional: upload screenshot ke artifact GitHub
   if (process.env.GITHUB_ACTIONS) {
     console.log(`📤 Screenshot siap di-upload ke artifact (gunakan actions/upload-artifact di workflow)`);
   }
@@ -530,24 +401,6 @@ if (stats.size === 0) {
   
 await uploadMedia(page, filePath, fileName, "Photos");
    
-
-
-  // Delay berdasarkan jenis
-//  if (fileName.endsWith(".mp4") || fileName.endsWith(".mov")) {
- //   console.log("⏳ Tunggu minimal 10 detik untuk video processing...");
-  //  await new Promise(r => setTimeout(r, 10000));
-//  } else {
- //   console.log("⏳ Tunggu 5 detik untuk foto processing...");
- //   await new Promise(r => setTimeout(r, 5000));
-//  }
-
- // console.log("✅ Media siap diposting.");
-//}
-   
-
-    // ===== 3️⃣ Klik tombol POST
-    // Tunggu tombol muncul
-   
 // Cari tombol POST dengan innerText
 await page.evaluate(() => {
   const buttons = [...document.querySelectorAll('div[role="button"]')];
@@ -557,6 +410,8 @@ await page.evaluate(() => {
   }
 });
 console.log("✅ Klik POST berhasil (via innerText)");
+
+   await delay(3000); // kasih waktu 3 detik minimal
 
     // ===== Stop recorder
     await recorder.stop();
