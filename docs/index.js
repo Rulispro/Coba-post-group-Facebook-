@@ -223,9 +223,11 @@ try {
 
     await page.waitForSelector(
       [
-        'div[data-mcomponent="VideoArea"] video',   // wrapper video
-        'video[src]',                               // video element
-        'div[aria-label="Video preview"]',          // fallback
+    'div[data-mcomponent="VideoArea"] video[src]',
+    'video[src^="blob:"]',
+    'video[src^="https://static.xx.fbcdn.net"]',    
+    'video[src^="https://static.xx.fbcdn.net/rsrc.php/"]',
+        // fallback
      ].join(", "),
       { timeout: 120000 }
     );
