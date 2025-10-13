@@ -117,7 +117,7 @@ async function downloadMedia(url, filename) {
 
   const ext = path.extname(fileName).toLowerCase();
   const isVideo = [".mp4", ".mov"].includes(ext);
-  const label = isVideo ? "Video" : "Photo";
+  let label = isVideo ? "Video" : "Photo";
     
 ///  let label = "Photos";
   if ([".mp4", ".mov"].includes(ext)) label = "Video";
