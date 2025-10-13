@@ -231,16 +231,15 @@ try {
     console.log("⏳ Tunggu video preview...");
     await page.waitForSelector(
       [
-        'video[src^="blob:"]',
-        'video[src*="fbcdn.net"]',
-        'img[src^="blob:"]',
-        'img[src^="data:image"]',
-        'img[src*="fbcdn.net"]',
-        'img[src^="https://static.xx.fbcdn.net/rsrc.php"]',
-        'div[data-mcomponent="ImageArea"] img[data-type="image"]'
-      ].join(", "),
-      { timeout: 120000 }
-    );
+        await page.waitForSelector(
+  [
+    'video[src^="blob:"]', // kalau video langsung tampil
+    'video[src*="fbcdn.net"]', // video dari CDN
+    'div[data-mcomponent="ImageArea"] img[data-type="image"][data-image-id]', // thumbnail video m.facebook.com
+    'img[src*="fbcdn.net"][data-type="image"][data-image-id]', // fallback thumbnail
+  ].join(", "),
+  { timeout: 120000 }
+);
     console.log("✅ Video preview ready");
     await page.waitForTimeout(20000); // Tambahan waktu encode
     previewOk = true;
