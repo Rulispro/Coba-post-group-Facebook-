@@ -231,13 +231,17 @@ try {
     console.log("⏳ Tunggu video preview...");
     await page.waitForSelector(
       [
-        'video[src^="blob:"]',
-        'video[src^="https://static.xx.fbcdn.net"]',
-        'video[src^="https://scontent.xx.fbcdn.net"]',
-        'div[aria-label*="Video preview"] img',
-        'img[src*="fbcdn.net"][alt*="video"]',
-        'img[src*="fbcdn.net"]',
-        'div[aria-label*="Video preview"] img'
+    'video[src^="blob:"]',
+    'video[src*="fbcdn.net"]',
+    'img[src^="blob:"]',
+    'img[src^="data:image"]',
+    'img[src*="fbcdn.net"]',
+    'img[src^="https://static.xx.fbcdn.net/rsrc.php"]',
+    'div[data-mcomponent="ImageArea"] img[data-type="image"]'
+  ].join(", "),
+  { timeout: 120000 }
+);
+  
       ].join(", "),
       { timeout: 120000 }
     );
