@@ -155,7 +155,8 @@ async function downloadMedia(url, filename) {
     
 // ✅ Upload file ke input dan pastikan React detect File object asli
 const fileNameOnly = path.basename(filePath);
-const mimeType = ext === ".mp4" ? "video/mp4" : "image/png";
+const mimeType = isVideo ? "video/mp4" : "image/jpeg";
+///const mimeType = ext === ".mp4" ? "video/mp4" : "image/png";
 const fileBuffer = fs.readFileSync(filePath);
 const base64Data = fileBuffer.toString("base64");
 
