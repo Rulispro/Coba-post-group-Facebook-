@@ -119,7 +119,7 @@ async function downloadMedia(url, filename) {
   const isVideo = [".mp4", ".mov"].includes(ext);
   const label = isVideo ? "Video" : "Photo";
     
-  let label = "Photos";
+///  let label = "Photos";
   if ([".mp4", ".mov"].includes(ext)) label = "Video";
 
   console.log(`🧩 Deteksi ekstensi ${ext}, target tombol: ${label}`);
