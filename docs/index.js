@@ -117,7 +117,7 @@ async function downloadMedia(url, filename) {
 
   const ext = path.extname(fileName).toLowerCase();
   const isVideo = [".mp4", ".mov"].includes(ext);
-  let label = isVideo ? "Video" : "Photo";
+  let label = isVideo ? "Video" : "Photos";
     
 ///  let label = "Photos";
   if ([".mp4", ".mov"].includes(ext)) label = "Video";
@@ -231,17 +231,13 @@ try {
     console.log("⏳ Tunggu video preview...");
     await page.waitForSelector(
       [
-    'video[src^="blob:"]',
-    'video[src*="fbcdn.net"]',
-    'img[src^="blob:"]',
-    'img[src^="data:image"]',
-    'img[src*="fbcdn.net"]',
-    'img[src^="https://static.xx.fbcdn.net/rsrc.php"]',
-    'div[data-mcomponent="ImageArea"] img[data-type="image"]'
-  ].join(", "),
-  { timeout: 120000 }
-);
-  
+        'video[src^="blob:"]',
+        'video[src*="fbcdn.net"]',
+        'img[src^="blob:"]',
+        'img[src^="data:image"]',
+        'img[src*="fbcdn.net"]',
+        'img[src^="https://static.xx.fbcdn.net/rsrc.php"]',
+        'div[data-mcomponent="ImageArea"] img[data-type="image"]'
       ].join(", "),
       { timeout: 120000 }
     );
@@ -258,7 +254,7 @@ try {
         'img[src^="https://static.xx.fbcdn.net"]',
         'img[src*="fbcdn.net"]',
         'div[aria-label*="Video preview"] img',
-        'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"][data-type="image"][alt data-image-id]'
+        'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"][data-type="image"][alt][data-image-id]'
       ].join(", "),
       { timeout: 60000 }
     );
@@ -272,7 +268,8 @@ try {
 
 } catch (e) {
   console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
-}
+      }
+      
 
     
   // 6️⃣ Screenshot hasil preview
