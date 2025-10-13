@@ -229,9 +229,7 @@ try {
 
   } else if (isVideo) {
     console.log("⏳ Tunggu video preview...");
-    await page.waitForSelector(
-      [
-        await page.waitForSelector(
+     await page.waitForSelector(
   [
     'video[src^="blob:"]', // kalau video langsung tampil
     'video[src*="fbcdn.net"]', // video dari CDN
