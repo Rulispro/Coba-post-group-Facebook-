@@ -225,7 +225,7 @@ try {
       [
     'div[data-mcomponent="ImageArea"] Image[src^="https://static.xx.fbcdn.net"]',
     'video[src^="blob:"]',
-    'video[src^="https://static.xx.fbcdn.net"]',    
+    'video[src^="https://static.xx.fbcdn.net"]',
     'video[src^="https://static.xx.fbcdn.net/rsrc.php/"]',
         // fallback
      ].join(", "),
