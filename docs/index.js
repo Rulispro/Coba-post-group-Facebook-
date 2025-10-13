@@ -233,8 +233,11 @@ try {
       [
         'video[src^="blob:"]',
         'video[src^="https://static.xx.fbcdn.net"]',
-        'video[src^="https://static.xx.fbcdn.net/rsrc.php/"]',
-        'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"]'
+        'video[src^="https://scontent.xx.fbcdn.net"]',
+        'div[aria-label*="Video preview"] img',
+        'img[src*="fbcdn.net"][alt*="video"]',
+        'img[src*="fbcdn.net"]',
+        'div[aria-label*="Video preview"] img'
       ].join(", "),
       { timeout: 120000 }
     );
@@ -248,7 +251,10 @@ try {
       [
         'img[src^="blob:"]',
         'img[src^="data:image"]',
-        'img[src^="https://static.xx.fbcdn.net"]'
+        'img[src^="https://static.xx.fbcdn.net"]',
+        'img[src*="fbcdn.net"]',
+        'div[aria-label*="Video preview"] img',
+        'div[data-mcomponent="ImageArea"] 'img[src^="https://static.xx.fbcdn.net"] [data-type="image" alt [ data-image-id]
       ].join(", "),
       { timeout: 60000 }
     );
