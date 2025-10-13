@@ -116,6 +116,9 @@ async function downloadMedia(url, filename) {
   console.log(`🚀 Mulai upload media: ${fileName}`);
 
   const ext = path.extname(fileName).toLowerCase();
+  const isVideo = [".mp4", ".mov"].includes(ext);
+  const label = isVideo ? "Video" : "Photo";
+    
   let label = "Photos";
   if ([".mp4", ".mov"].includes(ext)) label = "Video";
 
@@ -208,47 +211,59 @@ let bufferTime = 10000;
 
 try {
   const ext = path.extname(fileName).toLowerCase();
+  const isVideo = [".mp4", ".mov"].includes(ext);
+  let previewOk = false;
 
   if ([".jpg", ".jpeg", ".png"].includes(ext)) {
     console.log("⏳ Tunggu foto preview...");
-
     await page.waitForSelector(
       [
-       'div[data-mcomponent="ImageArea"] img[src^="data:image"]' , // base64 inline
-       'img[src^="blob:"]',                                    // foto dari CDN
+        'div[data-mcomponent="ImageArea"] img[src^="data:image"]', // base64 inline
+        'img[src^="blob:"]',                                       // foto blob CDN
         'div[aria-label="Photo preview"] img',                     // fallback
       ].join(", "),
       { timeout: 60000 }
-   );
-
+    );
     console.log("✅ Foto preview ready");
     previewOk = true;
 
-  } else if ([".mp4", ".mov"].includes(ext)) {
+  } else if (isVideo) {
     console.log("⏳ Tunggu video preview...");
-
     await page.waitForSelector(
       [
-    'div[data-mcomponent="ImageArea"] Image[src^="https://static.xx.fbcdn.net"]',
-    'video[src^="blob:"]',
-    'video[src^="https://static.xx.fbcdn.net"]',
-    'video[src^="https://static.xx.fbcdn.net/rsrc.php/"]',
-    'img[src^="https://static.xx.fbcdn.net"]'
-        // fallback
-     ].join(", "),
+        'video[src^="blob:"]',
+        'video[src^="https://static.xx.fbcdn.net"]',
+        'video[src^="https://static.xx.fbcdn.net/rsrc.php/"]',
+        'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"]'
+      ].join(", "),
       { timeout: 120000 }
     );
-
     console.log("✅ Video preview ready");
-    bufferTime = 1000;
+    await page.waitForTimeout(20000); // Tambahan waktu encode
+    previewOk = true;
+
+  } else {
+    console.log("⏳ Tunggu preview foto (fallback)...");
+    await page.waitForSelector(
+      [
+        'img[src^="blob:"]',
+        'img[src^="data:image"]',
+        'img[src^="https://static.xx.fbcdn.net"]'
+      ].join(", "),
+      { timeout: 60000 }
+    );
+    console.log("✅ Preview foto ready (fallback)");
     previewOk = true;
   }
-// Tambah buffer agar Facebook encode selesai
-      await page.waitForTimeout(15000);
-      console.log("⏳ Tambahan waktu encode 15 detik selesai");
+
+  // Tambah buffer agar Facebook encode selesai
+  await page.waitForTimeout(15000);
+  console.log("⏳ Tambahan waktu encode 15 detik selesai");
+
 } catch (e) {
   console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
 }
+
     
   // 6️⃣ Screenshot hasil preview
   const screenshotPath = path.join(__dirname, "media", "after_upload.png");
