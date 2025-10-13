@@ -349,7 +349,7 @@ try {
  // console.log(`⏳ Tunggu ${bufferTime / 1000}s agar preview stabil...`);
   //await page.waitForTimeout(bufferTime);
 
-  return debug.found;
+  return true; //selesai 
 }
 
 
