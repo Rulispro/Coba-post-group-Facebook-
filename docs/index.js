@@ -223,7 +223,7 @@ try {
 
     await page.waitForSelector(
       [
-    'div[data-mcomponent="VideoArea"] video[src]',
+    'div[data-mcomponent="ImageArea"] Image[src^="https://static.xx.fbcdn.net"]',
     'video[src^="blob:"]',
     'video[src^="https://static.xx.fbcdn.net"]',    
     'video[src^="https://static.xx.fbcdn.net/rsrc.php/"]',
