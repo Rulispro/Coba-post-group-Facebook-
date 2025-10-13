@@ -147,6 +147,11 @@ async function downloadMedia(url, filename) {
          if (!fileInput)
           { console.log("❌ Input file tidak ditemukan, upload gagal"); 
            return false; }
+  
+    // Upload file
+  await fileInput.uploadFile(filePath);
+  console.log(`✅ File ${fileName} berhasil di-upload ke input`);
+    
     
 // ✅ Upload file ke input dan pastikan React detect File object asli
 const fileNameOnly = path.basename(filePath);
@@ -227,6 +232,7 @@ try {
     'video[src^="blob:"]',
     'video[src^="https://static.xx.fbcdn.net"]',
     'video[src^="https://static.xx.fbcdn.net/rsrc.php/"]',
+    'img[src^="https://static.xx.fbcdn.net"]'
         // fallback
      ].join(", "),
       { timeout: 120000 }
@@ -236,7 +242,9 @@ try {
     bufferTime = 1000;
     previewOk = true;
   }
-
+// Tambah buffer agar Facebook encode selesai
+      await page.waitForTimeout(15000);
+      console.log("⏳ Tambahan waktu encode 15 detik selesai");
 } catch (e) {
   console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
 }
