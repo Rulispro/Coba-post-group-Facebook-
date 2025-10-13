@@ -254,7 +254,7 @@ try {
         'img[src^="https://static.xx.fbcdn.net"]',
         'img[src*="fbcdn.net"]',
         'div[aria-label*="Video preview"] img',
-        'div[data-mcomponent="ImageArea"] 'img[src^="https://static.xx.fbcdn.net"] [data-type="image" alt [ data-image-id]
+        'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"][data-type="image"][alt data-image-id]'
       ].join(", "),
       { timeout: 60000 }
     );
