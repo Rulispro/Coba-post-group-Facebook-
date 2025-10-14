@@ -227,30 +227,13 @@ try {
     console.log("✅ Foto preview ready");
     previewOk = true;
 
-  } else if (isVideo) {
-    console.log("⏳ Tunggu video preview...");
-     await page.waitForSelector(
-  [
-    // ✅ Video langsung muncul (HTML5)
-      
+  } else (isVideo) {
+    console.log("⏳ Tunggu preview video ...");
+   
+    // 1️⃣ Tunggu elemen ImageArea muncul dulu
+  await page.waitForSelector('div[data-mcomponent="ImageArea"] img[data-type="image"]', { timeout: 120000 });
+  console.log("🔍 Elemen ImageArea terdeteksi (placeholder)");
 
-      // ✅ Thumbnail video m.facebook.com
-      'div[data-mcomponent="ImageArea"] img[data-type="image"][data-image-id]',
-      'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"]',
-
-      // ✅ Fallback untuk elemen div container video preview
-      'div[data-mcomponent="ImageArea"] video',
-      'div[data-mcomponent="ImageArea"] img.contain[data-type="image"]',
-      'div[aria-label*="Video preview"] img',
-  ].join(", "),
-  { timeout: 30000 }
-);
-    console.log("✅ Video preview ready");
-    await page.waitForTimeout(20000); // Tambahan waktu encode
-    previewOk = true;
-
-  } else {
-    console.log("⏳ Tunggu preview foto (fallback)...");
     await page.waitForFunction(() => {
     const thumbs = [...document.querySelectorAll('div[data-mcomponent="ImageArea"] img[data-type="image"]')];
     return thumbs.some(img => 
@@ -262,7 +245,7 @@ try {
   }, 
     { timeout: 60000 }
     );
-    console.log("✅ Preview foto ready (fallback)");
+    console.log("✅ Video thumbnail sudah berubah → preview ready");
     previewOk = true;
   }
 
