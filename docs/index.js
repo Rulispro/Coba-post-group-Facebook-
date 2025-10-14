@@ -404,8 +404,7 @@ console.log("FILL:", fillResult);
   // ===== 3️⃣ Download + upload media
  const today = process.env.DATE;
  const fileName = `akun1_${today}.mp4`; // bisa .mp4
-const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/vidu-high-performance--4-2024-09-30T06_44_49Z.mp4";
-
+const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.png";
 // download media → simpan return value ke filePat
   const filePath = await downloadMedia(mediaUrl, fileName);
 console.log(`✅ Media ${fileName} berhasil di-download.`);
