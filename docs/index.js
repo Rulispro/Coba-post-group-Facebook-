@@ -117,9 +117,9 @@ async function downloadMedia(url, filename) {
 
   const ext = path.extname(fileName).toLowerCase();
   const isVideo = [".mp4", ".mov"].includes(ext);
-  let label = isVideo ? "Video" : "Photos";
+///  let label = isVideo ? "Video" : "Photos";
     
-///  let label = "Photos";
+  let label = "Photos";
   if ([".mp4", ".mov"].includes(ext)) label = "Video";
 
   console.log(`🧩 Deteksi ekstensi ${ext}, target tombol: ${label}`);
@@ -158,8 +158,8 @@ async function downloadMedia(url, filename) {
     
 // ✅ Upload file ke input dan pastikan React detect File object asli
 const fileNameOnly = path.basename(filePath);
-const mimeType = isVideo ? "video/mp4" : "image/jpeg";
-///const mimeType = ext === ".mp4" ? "video/mp4" : "image/png";
+///const mimeType = isVideo ? "video/mp4" : "image/jpeg";
+const mimeType = ext === ".mp4" ? "video/mp4" : "image/png";
 const fileBuffer = fs.readFileSync(filePath);
 const base64Data = fileBuffer.toString("base64");
 
@@ -403,7 +403,7 @@ console.log("FILL:", fillResult);
 
   // ===== 3️⃣ Download + upload media
  const today = process.env.DATE;
- const fileName = `akun1_${today}.mp4`; // bisa .mp4
+ const fileName = `akun1_${today}.png`; // bisa .mp4
 const mediaUrl ="https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20250909-071607.png";
 // download media → simpan return value ke filePat
   const filePath = await downloadMedia(mediaUrl, fileName);
