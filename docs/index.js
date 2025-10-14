@@ -144,9 +144,9 @@ async function downloadMedia(url, filename) {
  // Tunggu input file muncul
     await page.waitForTimeout(3000);
 // 3️⃣ Cari input file 
-   const fileInput = ///(await page.$('input[type="file"][accept="image/*"]')) ||
-                     (await page.$('input[type="file"][accept*="video/*"]')) ///|| 
- ///                     (await page.$('input[type="file"]'));
+   const fileInput = (await page.$('input[type="file"][accept="image/*"]')) ||
+                     (await page.$('input[type="file"][accept*="video/*"]')) || 
+                      (await page.$('input[type="file"]'));
             if (!fileInput)
             { console.log("❌ Input file tidak ditemukan, upload gagal"); 
              return false; }
@@ -247,13 +247,9 @@ try {
     console.log("⏳ Tunggu preview foto (fallback)...");
     await page.waitForSelector(
       [
-        'img[src^="blob:"]',
-        'img[src^="data:image"]',
-        'img[src^="https://static.xx.fbcdn.net"]',
-        'img[src*="fbcdn.net"]',
+    
         'div[aria-label*="Video preview"] img',
         'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"][data-type="image"][alt][data-image-id]',
-        'div[data-mcomponent="ImageArea"] video, div[data-mcomponent="ImageArea"] img'
       ].join(", "),
       { timeout: 60000 }
     );
