@@ -261,8 +261,7 @@ try {
       (img.src.includes("fbcdn.net") || img.src.startsWith("blob:"))
     );
   }, 
-    .join(", "),
-      { timeout: 60000 }
+    { timeout: 60000 }
     );
     console.log("✅ Preview foto ready (fallback)");
     previewOk = true;
