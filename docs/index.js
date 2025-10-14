@@ -235,6 +235,7 @@ try {
     'video[src*="fbcdn.net"]', // video dari CDN
     'div[data-mcomponent="ImageArea"] img[data-type="image"][data-image-id]', // thumbnail video m.facebook.com
     'img[src*="fbcdn.net"][data-type="image"][data-image-id]', // fallback thumbnail
+    'div[data-mcomponent="ImageArea"] video, div[data-mcomponent="ImageArea"] img',
   ].join(", "),
   { timeout: 120000 }
 );
@@ -251,7 +252,8 @@ try {
         'img[src^="https://static.xx.fbcdn.net"]',
         'img[src*="fbcdn.net"]',
         'div[aria-label*="Video preview"] img',
-        'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"][data-type="image"][alt][data-image-id]'
+        'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"][data-type="image"][alt][data-image-id]',
+        'div[data-mcomponent="ImageArea"] video, div[data-mcomponent="ImageArea"] img'
       ].join(", "),
       { timeout: 60000 }
     );
