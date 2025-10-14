@@ -231,11 +231,18 @@ try {
     console.log("⏳ Tunggu video preview...");
      await page.waitForSelector(
   [
-    'video[src^="blob:"]', // kalau video langsung tampil
-    'video[src*="fbcdn.net"]', // video dari CDN
-    'div[data-mcomponent="ImageArea"] img[data-type="image"][data-image-id]', // thumbnail video m.facebook.com
-    'img[src*="fbcdn.net"][data-type="image"][data-image-id]', // fallback thumbnail
-    'div[data-mcomponent="ImageArea"] video, div[data-mcomponent="ImageArea"] img',
+    // ✅ Video langsung muncul (HTML5)
+      'video[src^="blob:"]',
+      'video[src*="fbcdn.net"]',
+
+      // ✅ Thumbnail video m.facebook.com
+      'div[data-mcomponent="ImageArea"] img[data-type="image"][data-image-id]',
+      'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"]',
+
+      // ✅ Fallback untuk elemen div container video preview
+      'div[data-mcomponent="ImageArea"] video',
+      'div[data-mcomponent="ImageArea"] img.contain[data-type="image"]',
+      'div[aria-label*="Video preview"] img',
   ].join(", "),
   { timeout: 120000 }
 );
@@ -245,12 +252,16 @@ try {
 
   } else {
     console.log("⏳ Tunggu preview foto (fallback)...");
-    await page.waitForSelector(
-      [
-    
-        'div[aria-label*="Video preview"] img',
-        'div[data-mcomponent="ImageArea"] img[src^="https://static.xx.fbcdn.net"][data-type="image"][alt][data-image-id]',
-      ].join(", "),
+    await page.waitForFunction(() => {
+    const thumbs = [...document.querySelectorAll('div[data-mcomponent="ImageArea"] img[data-type="image"]')];
+    return thumbs.some(img => 
+      img.src && 
+      !img.src.includes("rsrc.php") &&  // hindari placeholder
+      !img.src.startsWith("data:,") && 
+      (img.src.includes("fbcdn.net") || img.src.startsWith("blob:"))
+    );
+  }, 
+    .join(", "),
       { timeout: 60000 }
     );
     console.log("✅ Preview foto ready (fallback)");
