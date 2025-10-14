@@ -227,7 +227,7 @@ try {
     console.log("✅ Foto preview ready");
     previewOk = true;
 
-  } else (isVideo) {
+  } else if (isVideo) {
     console.log("⏳ Tunggu preview video ...");
    
     // 1️⃣ Tunggu elemen ImageArea muncul dulu
