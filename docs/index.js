@@ -145,7 +145,7 @@ async function downloadMedia(url, filename) {
     await page.waitForTimeout(3000);
 // 3️⃣ Cari input file 
    const fileInput = ///(await page.$('input[type="file"][accept="image/*"]')) ||
-                     (await page.$('input[type="file"][accept*="video/*"]')) || 
+                     (await page.$('input[type="file"][accept*="video/*"]')) ///|| 
  ///                     (await page.$('input[type="file"]'));
             if (!fileInput)
             { console.log("❌ Input file tidak ditemukan, upload gagal"); 
