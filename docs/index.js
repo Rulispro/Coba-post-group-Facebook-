@@ -48,8 +48,10 @@ const puppeteer = require("puppeteer");
       const buttons = Array.from(document.querySelectorAll('div[role="button"]'));
       const el = buttons.find(
         (btn) =>
-          btn.innerText?.toLowerCase().includes("suka") ||
-          btn.innerText?.toLowerCase().includes("like")
+          btn.innerText?.toLowerCase().includes("Suka"),
+          btn.innerText?.toLowerCase().includes("like"),
+          btn.innerText?.toLowerCase().includes("LIKE")
+      
       );
 
       if (!el) return "❌ Tidak ditemukan tombol Like.";
