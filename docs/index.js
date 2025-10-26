@@ -250,8 +250,8 @@ try {
   }
 
   // Tambah buffer agar Facebook encode selesai
-  await page.waitForTimeout(15000);
-  console.log("⏳ Tambahan waktu encode 15 detik selesai");
+  await page.waitForTimeout(3000);
+  console.log("⏳ Tambahan waktu encode 3 detik selesai");
 
 } catch (e) {
   console.log("⚠️ Preview tidak muncul dalam batas waktu, paksa lanjut...");
