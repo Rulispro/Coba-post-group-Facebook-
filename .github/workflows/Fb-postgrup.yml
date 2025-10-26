@@ -47,9 +47,9 @@ jobs:
       # ✅ Download media dengan nama file pakai tanggal otomatis
       - name: Download Media
         run: |
-          curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.png" -o media/akun1_${{ env.DATE }}.png
+          curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_${{ env.DATE }}.png" -o media/akun1_${{ env.DATE }}.png
           # kalau ada video juga
-          # curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.mp4" -o media/akun1_${{ env.DATE }}.mp4
+          # curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_${{ env.DATE }}.mp4" -o media/akun1_${{ env.DATE }}.mp4
 
       # ✅ Jalankan bot Puppeteer
       - name: Run Puppeteer bot
