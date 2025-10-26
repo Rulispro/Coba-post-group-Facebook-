@@ -297,7 +297,7 @@ function delay(ms) {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://m.facebook.com/groups/5763845890292336/";
+    const groupUrl = "https://facebook.com/groups/5763845890292336/ ";
     const caption = "🚀 Caption otomatis masuk dari Puppeteer!";
 
     const browser = await puppeteer.launch({
