@@ -430,37 +430,36 @@ await page.evaluate(() => {
 });
 console.log("✅ Klik POST berhasil (via innerText)");
 
-   await delay(3000); // kasih waktu 3 detik minimal
+///   await delay(3000); // kasih waktu 3 detik minimal
 
     // ... (semua kode kamu di atas tetap sama persis)
-await delay(2000); // kasih waktu 2 detik minimal
+//await delay(2000); // kasih waktu 2 detik minimal
 
 // ✅ === Tambahan: Setelah posting, buka link grup dan lakukan Like ===
-const TotalLikes = 10; // jumlah total like
-const Account = "akun1"; // opsional, biar log ada nama akun
+//const TotalLikes = 10; // jumlah total like
+//const Account = "akun1"; // opsional, biar log ada nama akun
+//console.log("🚀 Buka kembali halaman grup untuk mulai Like...");
+//await page.goto(groupUrl, { waitUntil: "networkidle2" });
+//await delay(3000);
 
-console.log("🚀 Buka kembali halaman grup untuk mulai Like...");
-await page.goto(groupUrl, { waitUntil: "networkidle2" });
-await delay(3000);
+//let clicked = 0;
+//while (clicked < TotalLikes) {
+ // const button = await page.$(
+ //   'div[role="button"][aria-label*="Like"], div[role="button"][aria-label*="Suka"]'
+ // );
+ // if (button) {
+  //  await button.tap();
+  //  clicked++;
+  //  console.log(`👍 ${Account} klik tombol Like ke-${clicked}`);
+//  } else {
+//    console.log("🔄 Tidak ada tombol Like, scroll dulu...");
+//  }
 
-let clicked = 0;
-while (clicked < TotalLikes) {
-  const button = await page.$(
-    'div[role="button"][aria-label*="Like"], div[role="button"][aria-label*="Suka"]'
-  );
-  if (button) {
-    await button.tap();
-    clicked++;
-    console.log(`👍 ${Account} klik tombol Like ke-${clicked}`);
-  } else {
-    console.log("🔄 Tidak ada tombol Like, scroll dulu...");
-  }
+//  await page.evaluate(() => window.scrollBy(0, 500));
+ // await delay(3000);
+///}
 
-  await page.evaluate(() => window.scrollBy(0, 500));
-  await delay(3000);
-}
-
-console.log(`🎉 ${Account} selesai Like ${clicked} postingan`);
+//console.log(`🎉 ${Account} selesai Like ${clicked} postingan`);
 // ✅ === Akhir tambahan ===
 
  
