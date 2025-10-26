@@ -349,6 +349,9 @@ page.on("response", res => {
     await page.setCookie(...cookies);
     console.log("✅ Cookies set");
 
+    await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
+
+
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(3000);
