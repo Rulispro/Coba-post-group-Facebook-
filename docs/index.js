@@ -156,8 +156,8 @@ async function downloadMedia(url, filename) {
              return false; }
   
     // Upload file
-////  await fileInput.uploadFile(filePath);
- /// console.log(`✅ File ${fileName} berhasil di-upload ke input`);
+  await fileInput.uploadFile(filePath);
+  console.log(`✅ File ${fileName} berhasil di-upload ke input`);
     
     
 // ✅ Upload file ke input dan pastikan React detect File object asli
@@ -301,7 +301,7 @@ function delay(ms) {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://facebook.com/groups/5763845890292336/ ";
+    const groupUrl = "https://m.facebook.com/groups/5763845890292336/";
     const caption = "🚀 Caption otomatis masuk dari Puppeteer!";
 
     const browser = await puppeteer.launch({
@@ -317,6 +317,9 @@ function delay(ms) {
     });
 
     const page = await browser.newPage();
+   
+    await page.setBypassCSP(true);
+                                           
      // 🔊 Monitor semua console dari browser
 page.on("console", msg => console.log("📢 [Browser]", msg.text()));
 page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
