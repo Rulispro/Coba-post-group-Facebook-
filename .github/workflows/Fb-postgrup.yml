@@ -47,7 +47,8 @@ jobs:
       # ✅ Download media dengan nama file pakai tanggal otomatis
       - name: Download Media
         run: |
-          curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_${{ env.DATE }}.png" -o media/akun1_${{ env.DATE }}.png
+          # curl -L "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20251013-115539.png" -o media/Screenshot_20251013-115539.png
+
           # kalau ada video juga
           # curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_${{ env.DATE }}.mp4" -o media/akun1_${{ env.DATE }}.mp4
 
