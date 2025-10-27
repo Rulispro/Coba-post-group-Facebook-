@@ -52,10 +52,7 @@ async function scanAllElementsVerbose(page, label = "Scan") {
         classes: el.className
       }));
   });
-  }
-);
-  
-  elements.forEach(el => console.log(`#${el.index}`, el));
+   elements.forEach(el => console.log(`#${el.index}`, el));
   return elements;
 }
 
