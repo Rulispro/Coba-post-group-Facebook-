@@ -444,7 +444,37 @@ await page.evaluate(() => {
 console.log("✅ Klik POST berhasil (via innerText)");
 
    await delay(3000); // kasih waktu 3 detik minimal
+  await page.goto(groupUrl, { waitUntil: "networkidle2" });
+  console.log(" mulai akan like");
+    
+  let max = 10;        // jumlah like maksimal
+  let delayMs = 3000;  // delay antar aksi (ms)
+  let clicked = 0;
 
+  async function delay(ms) {
+    return new Promise(res => setTimeout(res, ms));
+  }
+
+  while (clicked < max) {
+    const button = await page.$(
+      'div[role="button"][aria-label*="Like"],div[role="button"][aria-label*="like"], div[role="button"][aria-label*="Suka"]'
+   );
+
+    if (button) {
+      await button.tap(); // ✅ simulate tap (touchscreen)
+      clicked++;
+      console.log(`👍 Klik tombol Like ke-${clicked}`);
+    } else {
+      console.log("🔄 Tidak ada tombol Like, scroll...");
+    }
+
+    // Scroll sedikit biar postingan baru muncul
+    await page.evaluate(() => window.scrollBy(0, 500));
+   await delay(delayMs);
+ }
+
+ console.log(`🎉 Selesai! ${clicked} tombol Like sudah diklik.`);
+  
     // ===== Stop recorder
     await recorder.stop();
     console.log("🎬 Rekaman selesai: recording.mp4");
