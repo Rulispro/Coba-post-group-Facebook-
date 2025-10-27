@@ -75,6 +75,10 @@ async function downloadMedia(url, filename) {
 
   return new Promise((resolve, reject) => {
     const request = https.get(url, options, (res) => {
+    console.log("🌐 GET:", url);
+    console.log("🔢 Status:", res.statusCode);
+    console.log("📎 Location:", res.headers.location || "(tidak ada)");
+      
       // 🔁 Handle redirect (301, 302)
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         console.log("🔁 Redirect ke:", res.headers.location);
