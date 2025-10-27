@@ -37,10 +37,8 @@ async function safeClickXpath(page, xpath, desc = "elemen") {
 // ===== Fungsi scan elemen verbose
 async function scanAllElementsVerbose(page, label = "Scan") {
   console.log(`\n🔎 ${label} (50 elemen pertama)`);
-  const elements = await page.$$eval(
-  "div, span, a, button, textarea, input",
-  (nodes) => {
-    return Array.from(nodes)
+  const elements = await page.evaluate(() => {
+    return [...document.querySelectorAll("div, span, a, button, textarea, input")]
       .slice(0, 50)
       .map((el, i) => ({
         index: i,
@@ -51,8 +49,9 @@ async function scanAllElementsVerbose(page, label = "Scan") {
         role: el.getAttribute("role"),
         href: el.getAttribute("href"),
         contenteditable: el.getAttribute("contenteditable"),
-        classes: el.className,
+        classes: el.className
       }));
+  });
   }
 );
   
