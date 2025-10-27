@@ -414,8 +414,8 @@ console.log("FILL:", fillResult);
 
   // ===== 3️⃣ Download + upload media
  const today = process.env.DATE || new Date().toISOString().split("T")[0];
- const fileName = `akun1_${today}.png`;// bisa .mp4
- const mediaUrl = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/V1.0/akun1_${process.env.DATE}.png`;
+ const fileName = akun1_${today}.png;// bisa .mp4
+ const mediaUrl = 'https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/Screenshot_20251013-115539.png';
 
 
   // download media → simpan return value ke filePat
