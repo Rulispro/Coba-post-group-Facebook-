@@ -365,7 +365,7 @@ console.log("📌 Berhasil buka feed Facebook");
    /// await page.waitForTimeout(3000);
 
     // ===== 1️⃣ Klik composer / write something
-    let writeClicked = await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer");
+    let writeClicked = await safeClickXpath(page, "//*[contains(text(),'What's on your mind?')]", "Composer");
     if (!writeClicked) {
       console.log("⚠️ Composer tidak ditemukan, fallback scan");
       await scanAllElementsVerbose(page, "Composer");
@@ -376,7 +376,7 @@ const clickResult = await page.evaluate(() => {
   const btn = [...document.querySelectorAll("div[role='button']")]
     .find(el => {
       const t = (el.innerText || "").toLowerCase();
-      return t.includes("write something") || t.includes("buat postingan") || t.includes("tulis sesuatu");
+      return t.includes("What's on your mind?") || t.includes("buat postingan") || t.includes("tulis sesuatu");
     });
   if (!btn) return { ok: false, msg: "Placeholder tidak ditemukan" };
   ["mousedown", "mouseup", "click"].forEach(type => {
