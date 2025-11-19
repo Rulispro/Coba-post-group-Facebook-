@@ -301,7 +301,7 @@ function delay(ms) {
     console.log("🚀 Start bot...");
 
     const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://m.facebook.com/groups/5763845890292336/";
+  ////  const groupUrl = "https://m.facebook.com/groups/5763845890292336/";
     const caption = "🚀 Caption otomatis masuk dari Puppeteer!";
 
     const browser = await puppeteer.launch({
@@ -349,13 +349,20 @@ page.on("response", res => {
     await page.setCookie(...cookies);
     console.log("✅ Cookies set");
 
+   // Buka feed beranda Facebook
+await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
+await page.waitForTimeout(3000);
+console.log("📌 Berhasil buka feed Facebook");
+
+
+    
     // Buka versi mobile Facebook
-  await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
-  console.log("✅ Berhasil buka Facebook (mobile)");
+/////  await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
+ /// console.log("✅ Berhasil buka Facebook (mobile)");
     
     // ===== Buka grup
-    await page.goto(groupUrl, { waitUntil: "networkidle2" });
-    await page.waitForTimeout(3000);
+ ////   await page.goto(groupUrl, { waitUntil: "networkidle2" });
+   /// await page.waitForTimeout(3000);
 
     // ===== 1️⃣ Klik composer / write something
     let writeClicked = await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer");
