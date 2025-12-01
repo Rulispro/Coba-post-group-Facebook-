@@ -3,7 +3,7 @@ name: Facebook Bot
 on:
   workflow_dispatch:
   schedule:
-    - cron: " * *"
+    - cron: "0 */1 * * *" # jalan tiap 1 jam sekali (aman & hemat quota)
 
 jobs:
   run-bot:
@@ -36,37 +36,47 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # ✅ Tambah step untuk bikin variabel tanggal
+      # 📌 NEW — Load semua COOKIE_* secrets otomatis
+      - name: Load all COOKIE_* secrets automatically
+        run: |
+          for name in $(echo "${{ toJson(secrets) }}" | jq -r 'keys[]'); do
+            if [[ "$name" == COOKIE_* ]]; then
+              value="${{ secrets[$name] }}"
+              echo "$name=$value" >> $GITHUB_ENV
+              echo "Loaded $name"
+            fi
+          done
+        shell: bash
+
+      # 📌 Set variabel tanggal
       - name: Set DATE
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      # ✅ Buat folder media
+      # 📌 Buat folder media
       - name: Create media folder
         run: mkdir -p media
 
-      # ✅ Download media dengan nama file pakai tanggal otomatis
+      # 📌 Download media (foto/video)
       - name: Download Media
         run: |
           # curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.png" -o media/akun1_${{ env.DATE }}.png
+          # curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.mp4" -o media/akun1_${{ env.DATE }}.mp4
 
-          # kalau ada video juga
-          # curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_${{ env.DATE }}.mp4" -o media/akun1_${{ env.DATE }}.mp4
-
-      # ✅ Jalankan bot Puppeteer
+      # 📌 Jalankan bot
       - name: Run Puppeteer bot
         run: node docs/index.js
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
           DATE: ${{ env.DATE }}
 
-      # ✅ Upload recording
+      # 📌 Upload recording
       - name: Upload recording
         uses: actions/upload-artifact@v4
         with:
           name: recording-video
           path: recording.mp4
 
-      # ✅ Upload semua screenshot
+      # 📌 Upload screenshots
       - name: Upload all screenshots
         uses: actions/upload-artifact@v4
         with:
@@ -74,8 +84,7 @@ jobs:
           path: |
             docs/media/after_upload.png
             docs/media/after_upload_*.png
-            
-      # ✅ Bersihkan folder media
+
+      # 📌 Bersihkan media
       - name: Clean media folder
         run: rm -rf media/*
-        
