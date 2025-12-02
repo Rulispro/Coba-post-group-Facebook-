@@ -365,7 +365,7 @@ page.on("response", res => {
     await page.waitForTimeout(3000);
 
     // ===== 1️⃣ Klik composer / write something
-    let writeClicked = await safeClickXpath(page, "//*[contains(text(),'What's on your mind?')]", "Composer");
+    let writeClicked = await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer");
     if (!writeClicked) {
       console.log("⚠️ Composer tidak ditemukan, fallback scan");
       await scanAllElementsVerbose(page, "Composer");
