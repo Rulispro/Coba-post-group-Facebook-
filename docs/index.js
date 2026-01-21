@@ -11,7 +11,10 @@ puppeteer.use(StealthPlugin())
 
 // ===== HELPER =====
 function getTodayWIB() {
-  return new Date(    
+  return new Date(
+    new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Jakarta"
+    })
   );
 }
 
