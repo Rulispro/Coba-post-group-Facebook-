@@ -9,16 +9,33 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin());
 
+//-----CEK TANGGAL BULAN TAHUN ----/////
+function isToday(dateStr) {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  return dateStr === `${yyyy}-${mm}-${dd}`;
+}
+
+
 //--FUNGSI RUN ACCOUNT--//
 
 async function runAccount(page, acc) {
   const groupUrl = acc.groupUrl;
   const caption = acc.caption;
   const mediaUrl = acc.mediaUrl;
-      // Buka versi mobile Facebook
-  await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
-  console.log("✅ Berhasil buka Facebook (mobile)");
-    
+  
+    if (!groups || groups.length === 0) {
+    console.log(`⚠️ Tidak ada grup untuk ${acc.account}`);
+    return;
+  }
+
+  for (let i = 0; i < groups.length; i++) {
+    const groupUrl = groups[i];
+    console.log(`\n📌 [${acc.account}] Grup ${i + 1}/${groups.length}`);
+    console.log(`➡️ ${groupUrl}`);
+
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(3000);
@@ -150,8 +167,10 @@ await page.evaluate(() => {
 });
 
 console.log("✅ Klik POST (EN+ID)");
-        
+await delay(3000);
 console.log(`✅ Posting selesai untuk ${acc.account}`);
+// ⏳ JEDA ANTAR GRUP
+  await delay(8000); // 
 }
 
 //--FUNGSI KLIK ELEMEN WRITE SOMETHING --//
@@ -537,6 +556,12 @@ function delay(ms) {
 
       await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
       console.log(`✅ FB terbuka (${acc.account})`);
+
+      //---CEK TANGGAL---////
+      if (acc.schedule && !isToday(acc.schedule)) {
+      console.log(`⏭️ Skip ${acc.account} (jadwal ${acc.schedule})`);
+     continue;
+     }
 
       
       // === JALANKAN LOGIC AKUN
