@@ -2,8 +2,8 @@ name: Facebook Bot
 
 on:
   workflow_dispatch:
- # schedule:
-  #  - cron: " * * * * *"
+  schedule:
+    - cron: "*/5 * * * *"
 
 jobs:
   run-bot:
@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # ✅ Tambah step untuk bikin variabel tanggal
+      # ✅ Set tanggal
       - name: Set DATE
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
@@ -45,26 +45,25 @@ jobs:
         run: mkdir -p media
 
       # ✅ Download media multi akun
-- name: Download Media
-  run: |
-    # AKUN 1
-    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_post.jpg" \
-      -o media/akun1_post.jpg
+      - name: Download Media
+        run: |
+          # AKUN 1
+          curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_post.jpg" \
+            -o media/akun1_post.jpg
 
-    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_video.mp4" \
-      -o media/akun1_video.mp4
+          curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_video.mp4" \
+            -o media/akun1_video.mp4
 
-    # AKUN 2
-    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun2_post.jpg" \
-      -o media/akun2_post.jpg
+          # AKUN 2
+          curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun2_post.jpg" \
+            -o media/akun2_post.jpg
 
-    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun2_video.mp4" \
-      -o media/akun2_video.mp4
+          curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun2_video.mp4" \
+            -o media/akun2_video.mp4
 
-    # AKUN 3
-    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun3_post.png" \
-      -o media/akun3_post.png
-
+          # AKUN 3
+          curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun3_post.png" \
+            -o media/akun3_post.png
 
       # ✅ Jalankan bot Puppeteer
       - name: Run Puppeteer bot
@@ -80,7 +79,7 @@ jobs:
           name: recording-video
           path: recording.mp4
 
-      # ✅ Upload semua screenshot
+      # ✅ Upload screenshot
       - name: Upload all screenshots
         uses: actions/upload-artifact@v4
         with:
@@ -88,8 +87,8 @@ jobs:
           path: |
             docs/media/after_upload.png
             docs/media/after_upload_*.png
-            
-      # ✅ Bersihkan folder media
+
+      # ✅ Bersihkan media
       - name: Clean media folder
         run: rm -rf media/*
         
