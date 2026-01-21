@@ -15,7 +15,7 @@
       "https://m.facebook.com/groups/996446441414220/"
     ],
     "schedule": "2026-01-21",
-    "time": "19:31"
+    "time": "19:33"
   },
   {
   "account": "akun2",//FITRI YUNITASARI
@@ -43,7 +43,7 @@
     "https://m.facebook.com/groups/574870830947581/"
   ],
   "schedule": "2026-01-21",
-  "time": "19:30",
+  "time": "19:34",
 }
 
 ]
