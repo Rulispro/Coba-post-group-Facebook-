@@ -44,13 +44,27 @@ jobs:
       - name: Create media folder
         run: mkdir -p media
 
-      # ✅ Download media dengan nama file pakai tanggal otomatis
-      - name: Download Media
-        run: |
-          # curl -L "https://github.com/${{ github.repository }}/releases/download/v1.0/akun1_${{ env.DATE }}.png" -o media/akun1_${{ env.DATE }}.png
+      # ✅ Download media multi akun
+- name: Download Media
+  run: |
+    # AKUN 1
+    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_post.jpg" \
+      -o media/akun1_post.jpg
 
-          # kalau ada video juga
-          # curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_${{ env.DATE }}.mp4" -o media/akun1_${{ env.DATE }}.mp4
+    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun1_video.mp4" \
+      -o media/akun1_video.mp4
+
+    # AKUN 2
+    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun2_post.jpg" \
+      -o media/akun2_post.jpg
+
+    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun2_video.mp4" \
+      -o media/akun2_video.mp4
+
+    # AKUN 3
+    curl -L "https://github.com/${{ github.repository }}/releases/download/V1.0/akun3_post.png" \
+      -o media/akun3_post.png
+
 
       # ✅ Jalankan bot Puppeteer
       - name: Run Puppeteer bot
