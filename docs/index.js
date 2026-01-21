@@ -9,6 +9,15 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin());
 
+// ===== helper waktu WIB (GLOBAL, di atas / bawah main)
+function getNowWIB() {
+  return new Date(
+    new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Jakarta"
+    })
+  );
+}
+
 //-- CEK JAM POSTING --//
 
 function isScheduleNow(dateStr, timeStr) {
@@ -571,13 +580,7 @@ function delay(ms) {
       console.log(`✅ FB terbuka (${acc.account})`);
 
       //---CEK TANGGAL-- DAN JAM POSTING-////
-      
-      if (acc.schedule && !isScheduleNow(acc.schedule, acc.time)) {
-        console.log(
-      `⏭️ Skip ${acc.account} (jadwal ${acc.schedule} ${acc.time || ""})`
-      );
-       continue;
-       }
+
       
       
       // === JALANKAN LOGIC AKUN
