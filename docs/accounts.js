@@ -23,8 +23,8 @@
   "caption": "Halo grup 👋",
   "mediaUrl": "https://....jpg",
   "groups": [
-    "https://m.facebook.com/groups/111",
-    "https://m.facebook.com/groups/222"
+    "https://m.facebook.com/groups/663419820413851/",
+    "https://m.facebook.com/groups/996446441414220/"
   ],
   "schedule": "2026-01-21",
   "time": "09:00"
@@ -40,7 +40,7 @@
     "time": "09:00"
   },
   {
-    "account": "akun2",
+    "account": "Fitri yunitasari",
     "cookies": [ {
   "account": "akun2",
   "cookies": [
@@ -63,7 +63,8 @@
   "caption": "Caption akun 2",
   "mediaUrl": "https://....mp4",
   "groups": [
-    "https://m.facebook.com/groups/333"
+    "https://m.facebook.com/groups/2180948975371043/",
+    "https://m.facebook.com/groups/574870830947581/"
   ],
   "schedule": "2026-01-21",
   "time": "15:00"
