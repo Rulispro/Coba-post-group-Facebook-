@@ -8,6 +8,17 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin());
+
+//--FUNGSI RUN ACCOUNT--//
+
+async function runAccount(page, acc) {
+  const groupUrl = acc.groupUrl;
+  const caption = acc.caption;
+  const mediaUrl = acc.mediaUrl;
+  
+}
+
+//--FUNGSI KLIK ELEMEN WRITE SOMETHING --//
 async function safeClickEl(el) {
   if (!el) return false;
   try {
