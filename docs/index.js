@@ -9,6 +9,28 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin());
 
+//-- CEK JAM POSTING --//
+
+function isScheduleNow(dateStr, timeStr) {
+  const now = new Date();
+
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const today = `${yyyy}-${mm}-${dd}`;
+
+  if (dateStr !== today) return false;
+
+  if (!timeStr) return true; // kalau jam kosong → langsung
+
+  const [hh, min] = timeStr.split(":").map(Number);
+  const target = new Date(now);
+  target.setHours(hh, min, 0, 0);
+
+  return now >= target;
+}
+
+
 //-----CEK TANGGAL BULAN TAHUN ----/////
 function isToday(dateStr) {
   const today = new Date();
@@ -22,7 +44,7 @@ function isToday(dateStr) {
 //--FUNGSI RUN ACCOUNT--//
 
 async function runAccount(page, acc) {
-  const groupUrl = acc.groupUrl;
+  const groups = acc.groups;
   const caption = acc.caption;
   const mediaUrl = acc.mediaUrl;
   
@@ -557,12 +579,15 @@ function delay(ms) {
       await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
       console.log(`✅ FB terbuka (${acc.account})`);
 
-      //---CEK TANGGAL---////
-      if (acc.schedule && !isToday(acc.schedule)) {
-      console.log(`⏭️ Skip ${acc.account} (jadwal ${acc.schedule})`);
-     continue;
-     }
-
+      //---CEK TANGGAL-- DAN JAM POSTING-////
+      
+      if (acc.schedule && !isScheduleNow(acc.schedule, acc.time)) {
+        console.log(
+      `⏭️ Skip ${acc.account} (jadwal ${acc.schedule} ${acc.time || ""})`
+      );
+       continue;
+       }
+      
       
       // === JALANKAN LOGIC AKUN
       await runAccount(page, acc);
