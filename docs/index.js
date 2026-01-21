@@ -186,6 +186,8 @@ console.log(`✅ Posting selesai untuk ${acc.account}`);
 // ⏳ JEDA ANTAR GRUP
   await delay(8000); // 
 }
+  
+}
 
 //--FUNGSI KLIK ELEMEN WRITE SOMETHING --//
 async function safeClickEl(el) {
