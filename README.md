@@ -17,3 +17,9 @@ Contoh JSON:
   - Upload media ke composer Facebook
   - Penjadwalan dengan Luxon (Asia/Jakarta) + jitter (± menit)
   - Delay acak antar akun dan antar aksi
+
+
+CARA UPLOAD FOTO VIDEO KE GITHUB RELEASE 
+
+---->> rename dulu nama fito/video nya,masuk ke file manager,edit nama file nya misal 
+akun1_foto.jpg,akun2_video.mp4 dll
