@@ -31,14 +31,6 @@ function isScheduleNow(dateStr, timeStr) {
 }
 
 
-//-----CEK TANGGAL BULAN TAHUN ----/////
-function isToday(dateStr) {
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
-  return dateStr === `${yyyy}-${mm}-${dd}`;
-}
 
 
 //--FUNGSI RUN ACCOUNT--//
@@ -572,10 +564,7 @@ function delay(ms) {
       await page.setCookie(...acc.cookies);
       console.log(`✅ Cookies set (${acc.account})`);
 
-      const groupUrl = acc.groupUrl;
-      const caption = acc.caption;
-
-
+      //--BUKA m.facebook.com--///
       await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
       console.log(`✅ FB terbuka (${acc.account})`);
 
