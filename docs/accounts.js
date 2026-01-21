@@ -1,6 +1,6 @@
 [
   {
-    "account": "akun1",
+    "account": "ayu Wulandari",
     "cookies": [ {
   "account": "akun1",
   "cookies": [
