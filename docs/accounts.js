@@ -21,7 +21,7 @@
     { "name": "wl_cbv", "value": "v2%3Bclient_version%3A3058%3Btimestamp%3A1768979564", "domain": ".facebook.com", "path": "/" }
   ],
   "caption": "Halo grup 👋",
-  "mediaUrl": "https://....jpg",
+  "mediaUrl": "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/akun1_post.png",
   "groups": [
     "https://m.facebook.com/groups/663419820413851/",
     "https://m.facebook.com/groups/996446441414220/"
@@ -61,7 +61,7 @@
     { "name": "wl_cbv", "value": "v2%3Bclient_version%3A3058%3Btimestamp%3A1768979697", "domain": ".facebook.com", "path": "/" }
   ],
   "caption": "Caption akun 2",
-  "mediaUrl": "https://....mp4",
+  "mediaUrl": "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/V1.0/akun2_video.mp4",
   "groups": [
     "https://m.facebook.com/groups/2180948975371043/",
     "https://m.facebook.com/groups/574870830947581/"
@@ -69,14 +69,5 @@
   "schedule": "2026-01-21",
   "time": "15:00"
 }
- ],
-    "caption": "Caption akun 2",
-    "mediaUrl": "https://....mp4",
-    "groups": [
-      "https://m.facebook.com/groups/333"
-    ],
-    "schedule": "2026-01-21",
-    "time": "15:00"
-  }
-]
+ ]
 
