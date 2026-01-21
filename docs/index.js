@@ -7,17 +7,11 @@ const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
-puppeteer.use(StealthPlugin());
-
-
-const https = require("https");
+puppeteer.use(StealthPlugin())
 
 // ===== HELPER =====
 function getTodayWIB() {
-  return new Date(
-    new Date().toLocaleString("en-US", {
-      timeZone: "Asia/Jakarta"
-    })
+  return new Date(    
   );
 }
 
@@ -38,32 +32,6 @@ function urlExists(url) {
       .on("error", () => resolve(false));
   });
 }
-
-
-
-//-- CEK JAM POSTING --//
-
-function isScheduleNow(dateStr, timeStr) {
-  const now = new Date();
-
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  const today = `${yyyy}-${mm}-${dd}`;
-
-  if (dateStr !== today) return false;
-
-  if (!timeStr) return true; // kalau jam kosong → langsung
-
-  const [hh, min] = timeStr.split(":").map(Number);
-  const target = new Date(now);
-  target.setHours(hh, min, 0, 0);
-
-  return now >= target;
-}
-
-
-
 
 //--FUNGSI RUN ACCOUNT--//
 
@@ -521,14 +489,7 @@ module.exports = { uploadMedia };
     console.log(`📤 Screenshot siap di-upload ke artifact (gunakan actions/upload-artifact di workflow)`);
   }
                                           
-// ===== Ambil tanggal hari ini
-function getTodayString() {
-  const today = new Date();
- const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
+
 // 🕒 Fungsi delay
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
