@@ -9,14 +9,37 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin());
 
-// ===== helper waktu WIB (GLOBAL, di atas / bawah main)
-function getNowWIB() {
+
+const https = require("https");
+
+// ===== HELPER =====
+function getTodayWIB() {
   return new Date(
     new Date().toLocaleString("en-US", {
       timeZone: "Asia/Jakarta"
     })
   );
 }
+
+function getMediaUrl(acc) {
+  const today = getTodayWIB().toISOString().slice(0, 10);
+  const tag = `post-${today}`;
+
+  return {
+    image: `https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/${tag}/${acc.file}.jpg`,
+    video: `https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/${tag}/${acc.file}.mp4`
+  };
+}
+
+function urlExists(url) {
+  return new Promise(resolve => {
+    https
+      .get(url, res => resolve(res.statusCode === 200))
+      .on("error", () => resolve(false));
+  });
+}
+
+
 
 //-- CEK JAM POSTING --//
 
@@ -581,7 +604,18 @@ function delay(ms) {
 
       //---CEK TANGGAL-- DAN JAM POSTING-////
 
-      
+      const media = getMediaUrl(acc);
+
+// pilih otomatis (cek mana yang ada)
+    if (await urlExists(media.video)) {
+     acc.mediaUrl = media.video;
+     } else if (await urlExists(media.image)) {
+       acc.mediaUrl = media.image;
+     } else {
+       console.log(`⏭️ Skip ${acc.account} (media hari ini tidak ada)`);
+       continue;
+      }
+
       
       // === JALANKAN LOGIC AKUN
       await runAccount(page, acc);
