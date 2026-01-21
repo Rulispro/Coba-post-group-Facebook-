@@ -15,7 +15,143 @@ async function runAccount(page, acc) {
   const groupUrl = acc.groupUrl;
   const caption = acc.caption;
   const mediaUrl = acc.mediaUrl;
+      // Buka versi mobile Facebook
+  await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
+  console.log("✅ Berhasil buka Facebook (mobile)");
+    
+    // ===== Buka grup
+    await page.goto(groupUrl, { waitUntil: "networkidle2" });
+    await page.waitForTimeout(3000);
+
+    // ===== 1️⃣ Klik composer / write something
+  let writeClicked =
+  await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+
+    await page.waitForTimeout(2000);
+   // 1️⃣ Klik placeholder composer
+      await page.waitForSelector(
+    'div[role="button"][data-mcomponent="ServerTextArea"]',
+    { timeout: 20000 }
+  );
+
+  await page.evaluate(() => {
+    const el = document.querySelector(
+      'div[role="button"][data-mcomponent="ServerTextArea"]'
+    );
+    if (!el) return;
+
+    el.scrollIntoView({ block: "center" });
+
+    ["touchstart","touchend","mousedown","mouseup","click"]
+      .forEach(e =>
+        el.dispatchEvent(new Event(e, { bubbles: true }))
+      );
+  });
+
   
+await page.waitForFunction(() => {
+  return (
+    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+    document.querySelector('div[contenteditable="true"]') ||
+    document.querySelector('textarea') ||
+    document.querySelector('textarea[role="combobox"]') ||
+    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+    document.querySelector('[aria-label]')
+  );
+}, { timeout: 30000 });
+
+console.log("✅ Composer textbox terdeteksi");
+
+  const boxHandle = await page.evaluateHandle(() => {
+  return (
+    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+    document.querySelector('div[contenteditable="true"]') ||
+    document.querySelector('textarea') ||
+    document.querySelector('textarea[role="combobox"]') ||
+    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+    document.querySelector('[aria-label]')
+  );
+});
+const box = boxHandle.asElement();
+if (!box) {
+  throw new Error("❌ Composer textbox tidak valid");
+}
+
+  await box.focus();
+    
+  await page.keyboard.down("Control");
+  await page.keyboard.press("A");
+  await page.keyboard.up("Control");
+  await page.keyboard.press("Backspace");
+
+  await page.keyboard.type(caption, { delay: 90 });
+
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  console.log("✅ Caption diketik");
+
+    
+ await delay(3000); // kasih waktu 3 detik minimal
+
+
+  // ===== 3️⃣ Download + upload media
+ const today = process.env.DATE || new Date().toISOString().split("T")[0];
+ // HARUS sama dengan nama file di Release!
+
+const originalName = mediaUrl.split("?")[0].split("/").pop();
+ const fileName = `${acc.account}_${Date.now()}_${originalName}`;
+  
+ // download media → simpan return value ke filePat
+const filePath = await downloadMedia(mediaUrl, fileName);
+console.log(`✅ Media ${fileName} berhasil di-download.`);
+
+const stats = fs.statSync(filePath);
+if (stats.size === 0) {
+  throw new Error(`❌ File ${fileName} kosong! Download gagal.`);
+}
+
+
+// upload ke Facebook
+
+  
+await uploadMedia(page, filePath, fileName, "Photos");
+   
+// Cari tombol POST dengan innerText
+await page.evaluate(() => {
+  const keywords = [
+    "post", 
+    "Posting",
+    "POST",
+    "POSTING",
+    "posting",    // ID
+    "bagikan"     // ID (kadang muncul)
+  ];
+
+  const buttons = [...document.querySelectorAll('div[role="button"]')];
+
+  const postBtn = buttons.find(btn => {
+    const text = (btn.innerText || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+
+    return keywords.some(k => text === k || text.includes(k));
+  });
+
+  if (!postBtn) return false;
+
+  postBtn.scrollIntoView({ block: "center" });
+  postBtn.click();
+
+  return true;
+});
+
+console.log("✅ Klik POST (EN+ID)");
+        
+console.log(`✅ Posting selesai untuk ${acc.account}`);
 }
 
 //--FUNGSI KLIK ELEMEN WRITE SOMETHING --//
@@ -332,14 +468,16 @@ function delay(ms) {
 }
 
 // ===== Main Puppeteer
+
 (async () => {
   try {
     console.log("🚀 Start bot...");
 
-    const cookies = JSON.parse(fs.readFileSync(__dirname + "/cookies.json", "utf8"));
-    const groupUrl = "https://facebook.com/groups/5763845890292336/";
-    const caption = "🚀 semangat semuanya......";
+    const accounts = JSON.parse(
+      fs.readFileSync(__dirname + "/accounts.json", "utf8")
+    );
 
+    
     const browser = await puppeteer.launch({
       headless: "new",
       defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
@@ -352,217 +490,73 @@ function delay(ms) {
       ],
     });
 
-    const page = await browser.newPage();
-   
-    await page.setBypassCSP(true);
-                                           
-     // 🔊 Monitor semua console dari browser
-page.on("console", msg => console.log("📢 [Browser]", msg.text()));
-page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
-page.on("response", res => {
-  if (!res.ok()) console.log(`⚠️ [HTTP ${res.status()}] ${res.url()}`);
-});
-  
-    // ===== Mulai rekaman
-    const recorder = new PuppeteerScreenRecorder(page);
-    await recorder.start("recording.mp4");
+    // 🔁 LOOP PER AKUN
+    for (const acc of accounts) {
+      console.log(`\n🚀 Start akun: ${acc.account}`);
 
-    // ===== Anti-detect
-    await page.setUserAgent(
-      "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 " +
-      "(KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36"
-    );
-    await page.setViewport({ width: 360, height: 825, hasTouch: true, deviceScaleFactor: 2, isMobile: true });
+      const context = await browser.createIncognitoBrowserContext();
+      const page = await context.newPage();
 
-    await page.evaluateOnNewDocument(() => {
-      Object.defineProperty(navigator, "webdriver", { get: () => false });
-      window.navigator.chrome = { runtime: {} };
-      Object.defineProperty(navigator, "languages", { get: () => ["id-ID", "id"] });
-      Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
-    });
+      await page.setBypassCSP(true);
 
-    // ===== Pasang cookies
-    await page.setCookie(...cookies);
-    console.log("✅ Cookies set");
+      // 🔊 Monitor console
+      page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
+      page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
 
-    // Buka versi mobile Facebook
-  await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
-  console.log("✅ Berhasil buka Facebook (mobile)");
-    
-    // ===== Buka grup
-    await page.goto(groupUrl, { waitUntil: "networkidle2" });
-    await page.waitForTimeout(3000);
+      // ===== Recorder PER AKUN
+      const recorder = new PuppeteerScreenRecorder(page);
+      await recorder.start(`recording_${acc.account}.mp4`);
 
-    // ===== 1️⃣ Klik composer / write something
-  let writeClicked =
-  await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
-  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
-  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
-
-    await page.waitForTimeout(2000);
-   // 1️⃣ Klik placeholder composer
-      await page.waitForSelector(
-    'div[role="button"][data-mcomponent="ServerTextArea"]',
-    { timeout: 20000 }
-  );
-
-  await page.evaluate(() => {
-    const el = document.querySelector(
-      'div[role="button"][data-mcomponent="ServerTextArea"]'
-    );
-    if (!el) return;
-
-    el.scrollIntoView({ block: "center" });
-
-    ["touchstart","touchend","mousedown","mouseup","click"]
-      .forEach(e =>
-        el.dispatchEvent(new Event(e, { bubbles: true }))
+      // ===== Anti-detect (KODE KAMU, TETAP)
+      await page.setUserAgent(
+        "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36"
       );
-  });
+      await page.setViewport({
+        width: 360,
+        height: 825,
+        hasTouch: true,
+        deviceScaleFactor: 2,
+        isMobile: true
+      });
 
-  
-await page.waitForFunction(() => {
-  return (
-    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-    document.querySelector('div[contenteditable="true"]') ||
-    document.querySelector('textarea') ||
-    document.querySelector('textarea[role="combobox"]') ||
-    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
-    document.querySelector('[aria-label]')
-  );
-}, { timeout: 30000 });
+      await page.evaluateOnNewDocument(() => {
+        Object.defineProperty(navigator, "webdriver", { get: () => false });
+        window.navigator.chrome = { runtime: {} };
+        Object.defineProperty(navigator, "languages", { get: () => ["id-ID", "id"] });
+        Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
+      });
 
-console.log("✅ Composer textbox terdeteksi");
+      // ===== Cookies PER AKUN
+      await page.setCookie(...acc.cookies);
+      console.log(`✅ Cookies set (${acc.account})`);
 
-  const boxHandle = await page.evaluateHandle(() => {
-  return (
-    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-    document.querySelector('div[contenteditable="true"]') ||
-    document.querySelector('textarea') ||
-    document.querySelector('textarea[role="combobox"]') ||
-    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
-    document.querySelector('[aria-label]')
-  );
-});
-const box = boxHandle.asElement();
-if (!box) {
-  throw new Error("❌ Composer textbox tidak valid");
-}
-
-  await box.focus();
-    
-  await page.keyboard.down("Control");
-  await page.keyboard.press("A");
-  await page.keyboard.up("Control");
-  await page.keyboard.press("Backspace");
-
-  await page.keyboard.type(caption, { delay: 90 });
-
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
-
-  console.log("✅ Caption diketik");
-
-    
- await delay(3000); // kasih waktu 3 detik minimal
+      const groupUrl = acc.groupUrl;
+      const caption = acc.caption;
 
 
-  // ===== 3️⃣ Download + upload media
- const today = process.env.DATE || new Date().toISOString().split("T")[0];
- // HARUS sama dengan nama file di Release!
+      await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
+      console.log(`✅ FB terbuka (${acc.account})`);
 
-const fileName = `recording.mp4`;
-const mediaUrl = `https://github.com/sendy81/Coba-post-group-Facebook-/releases/download/V1.0/recording.mp4`;
+      
+      // === JALANKAN LOGIC AKUN
+      await runAccount(page, acc);
 
+      // ===== Stop recorder
+      await recorder.stop();
+      console.log(`🎬 Rekaman selesai: recording_${acc.account}.mp4`);
 
-  // download media → simpan return value ke filePat
-const filePath = await downloadMedia(mediaUrl, fileName);
-console.log(`✅ Media ${fileName} berhasil di-download.`);
+      await page.close();
+      await context.close();
 
-const stats = fs.statSync(filePath);
-if (stats.size === 0) {
-  throw new Error(`❌ File ${fileName} kosong! Download gagal.`);
-}
-
-
-// upload ke Facebook
-
-  
-await uploadMedia(page, filePath, fileName, "Photos");
-   
-// Cari tombol POST dengan innerText
-await page.evaluate(() => {
-  const keywords = [
-    "post", 
-    "Posting",
-    "POST",
-    "POSTING",
-    "posting",    // ID
-    "bagikan"     // ID (kadang muncul)
-  ];
-
-  const buttons = [...document.querySelectorAll('div[role="button"]')];
-
-  const postBtn = buttons.find(btn => {
-    const text = (btn.innerText || "")
-      .replace(/\s+/g, " ")
-      .trim()
-      .toLowerCase();
-
-    return keywords.some(k => text === k || text.includes(k));
-  });
-
-  if (!postBtn) return false;
-
-  postBtn.scrollIntoView({ block: "center" });
-  postBtn.click();
-
-  return true;
-});
-
-console.log("✅ Klik POST (EN+ID)");
-
-  await delay(3000); // kasih waktu 3 detik minimal
-
-  //----FUNGSI MELAKUKAN LIKE POSTINGAN DI LINK GRUP ---////
-    
- //$ await page.goto(groupUrl, { waitUntil: "networkidle2" });
- //$ console.log(" Mulai akan lakukan like postingan");
-    
-//  $let max = 10;        // jumlah like maksimal
- //$ let delayMs = 3000;  // delay antar aksi (ms)
- //$ let clicked = 0;
-
- //$ async function delay(ms) {
- //$   return new Promise(res => setTimeout(res, ms));
-//$  }
-
-//$  while (clicked < max) {
- //$   const button = await page.$(
-//$      'div[role="button"][aria-label*="Like"],div[role="button"][aria-label*="like"], div[role="button"][aria-label*="Suka"]'
-//$   );
-
-//$  if (button) {
-  //$    await button.tap(); // ✅ simulate tap (touchscreen)
- //$     clicked++;
- //$     console.log(`👍 Klik tombol Like ke-${clicked}`);
-  //$  } else {
- //$     console.log("🔄 Tidak ada tombol Like, scroll...");
-//$    }
-
-    // Scroll sedikit biar postingan baru muncul
- //$   await page.evaluate(() => window.scrollBy(0, 500));
-//$   await delay(delayMs);
-//$ }
-
-//$ console.log(`🎉 Selesai! ${clicked} tombol Like sudah diklik.`);
-
-    // ===== Stop recorder
-    await recorder.stop();
-    console.log("🎬 Rekaman selesai: recording.mp4");
+      console.log(`✅ Selesai akun: ${acc.account}`);
+      await delay(6000); // jeda aman antar akun
+    }
 
     await browser.close();
+    console.log("🎉 Semua akun selesai");
   } catch (err) {
     console.error("❌ Error utama:", err);
   }
 })();
+      
