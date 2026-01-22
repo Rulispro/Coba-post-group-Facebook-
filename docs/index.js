@@ -595,7 +595,7 @@ function delay(ms) {
      //  console.log(`⏭️ Skip ${acc.account} (media hari ini tidak ada)`);
     //   continue;
     //  }
-const TEMPLATE_PATH = "./docs/template.xlsx";
+const TEMPLATE_PATH = "./docs/template1.xlsx";
 
   if (!fs.existsSync(TEMPLATE_PATH)) {
     console.log("❌ template.xlsx tidak ditemukan:", TEMPLATE_PATH);
@@ -606,7 +606,7 @@ const TEMPLATE_PATH = "./docs/template.xlsx";
 
       
       //--AMBIL.GRUP HARI INI --//
-const template = readTemplate("./template.xlsx");
+const template = readTemplate("./template1.xlsx");
 for (const row of template) {
     if (row.account !== acc.account) continue; // ambil hanya row akun ini
 
