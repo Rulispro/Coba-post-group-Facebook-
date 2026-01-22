@@ -48,20 +48,20 @@ function readTemplate(file) {
 
 //--FUNGSI RUN ACCOUNT--//
 
-async function runAccount(page, acc) {
-  const groups = acc.groups;
-  const caption = acc.caption;
-  const mediaUrl = acc.mediaUrl;
+//async function runAccount(page, acc) {
+//  const groups = acc.groups;
+ // const caption = acc.caption;
+ // const mediaUrl = acc.mediaUrl;
   
-    if (!groups || groups.length === 0) {
-    console.log(`⚠️ Tidak ada grup untuk ${acc.account}`);
-    return;
-  }
+ //   if (!groups || groups.length === 0) {
+ //   console.log(`⚠️ Tidak ada grup untuk ${acc.account}`);
+ //   return;
+//  }
 
-  for (let i = 0; i < groups.length; i++) {
-    const groupUrl = groups[i];
-    console.log(`\n📌 [${acc.account}] Grup ${i + 1}/${groups.length}`);
-    console.log(`➡️ ${groupUrl}`);
+///  for (let i = 0; i < groups.length; i++) {
+ //  const groupUrl = groups[i];
+ //   console.log(`\n📌 [${acc.account}] Grup ${i + 1}/${groups.length}`);
+ //   console.log(`➡️ ${groupUrl}`);
 
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
