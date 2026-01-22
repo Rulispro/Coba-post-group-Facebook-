@@ -48,20 +48,25 @@ function readTemplate(file) {
 
 //--FUNGSI RUN ACCOUNT--//
 
-//async function runAccount(page, acc) {
-//  const groups = acc.groups;
- // const caption = acc.caption;
- // const mediaUrl = acc.mediaUrl;
+async function runAccount(page, acc) {
+  const groups = row.groups;
+  const caption = row.caption;
+  const mediaUrl = row.media_url || row.github_release;
   
- //   if (!groups || groups.length === 0) {
- //   console.log(`⚠️ Tidak ada grup untuk ${acc.account}`);
- //   return;
-//  }
+  const groups = String(row.grup_link)
+    .split(",")
+    .map(g => g.trim())
+    .filter(Boolean);
+  
+   if (!groups || groups.length === 0) {
+   console.log(`⚠️ Tidak ada grup untuk ${acc.account}`);
+    return;
+ }
 
-///  for (let i = 0; i < groups.length; i++) {
- //  const groupUrl = groups[i];
- //   console.log(`\n📌 [${acc.account}] Grup ${i + 1}/${groups.length}`);
- //   console.log(`➡️ ${groupUrl}`);
+  for (let i = 0; i < groups.length; i++) {
+   const groupUrl = groups[i];
+    console.log(`\n📌 [${acc.account}] Grup ${i + 1}/${groups.length}`);
+    console.log(`➡️ ${groupUrl}`);
 
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
@@ -628,7 +633,7 @@ for (const row of template) {
 
       
       // === JALANKAN LOGIC AKUN
-   //   await runAccount(page, acc);
+      await runAccount(page, acc);
 
       // ===== Stop recorder
       await recorder.stop();
