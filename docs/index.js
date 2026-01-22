@@ -18,16 +18,7 @@ function getTodayWIB() {
   );
 }
 
-function getMediaUrl(acc) {
-  const today = getTodayWIB().toISOString().slice(0, 10);
-  const tag = `post-${today}`;
-
-  return {
-    image: `https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/${tag}/${acc.file}.jpg`,
-    video: `https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/${tag}/${acc.file}.mp4`
-  };
-}
-
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function urlExists(url) {
   return new Promise(resolve => {
@@ -605,14 +596,17 @@ function delay(ms) {
     //  }
 
       //--AMBIL.GRUP HARI INI --//
-const today = getTodayWIB().toISOString().slice(0,10);
 const template = readTemplate("./template.xlsx");
 for (const row of template) {
-    const accCookies = getAccountCookies(row.account);
+    if (row.account !== acc.account) continue; // ambil hanya row akun ini
+
     const groups = row.grup_link.split(",").map(g => g.trim());
     const caption = row.caption;
-    const media = row.github_release;
-       }
+    const mediaUrl = row.github_release;
+
+    await runAccount(page, { account: acc.account, cookies: acc.cookies, groups, caption, mediaUrl });
+}
+
       
 
       
