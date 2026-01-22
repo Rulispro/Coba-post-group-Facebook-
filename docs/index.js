@@ -48,24 +48,24 @@ function readTemplate(file) {
 
 //--FUNGSI RUN ACCOUNT--//
 
-async function runAccount(page, acc) {
+async function runAccount(page, row) {
   const account = row.account;
   const caption = row.caption;
   const mediaUrl = row.media_url || row.github_release;
 
-  const groups = String(row.grup_link)
+  const groups = String(row.grup_link || "")
     .split(",")
     .map(g => g.trim())
     .filter(Boolean);
 
   if (!account || !caption || !mediaUrl || groups.length === 0) {
-    console.log(`⚠️ Row tidak lengkap, skip:`, row);
+    console.log("⚠️ Row XLSX tidak lengkap, skip:", row);
     return;
   }
 
   console.log(`🧠 runAccount (XLSX) → ${account}`);
   console.log(`🔗 Grup: ${groups.length}`);
-
+    
   for (let i = 0; i < groups.length; i++) {
     const groupUrl = groups[i];
    
@@ -638,7 +638,7 @@ for (const row of template) {
 
       
       // === JALANKAN LOGIC AKUN
-      await runAccount(page, acc);
+    //  await runAccount(page, acc);
 
       // ===== Stop recorder
       await recorder.stop();
