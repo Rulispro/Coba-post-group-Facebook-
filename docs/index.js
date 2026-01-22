@@ -597,6 +597,14 @@ function delay(ms) {
     //   continue;
     //  }
 
+      //--AMBIL.GRUP HARI INI --//
+const today = getTodayWIB().toISOString().slice(0,10);
+const groups = acc.groups[today] || [];
+if (!groups.length) return console.log(`⚠️ Tidak ada grup hari ini untuk ${acc.account}`);
+await runAccount(page, { ...acc, groups });
+
+      
+
 // ================= MEDIA RESOLUTION =================
 if (acc.mediaUrl && acc.mediaUrl.trim() !== "") {
   console.log(`📦 Pakai mediaUrl langsung (tanpa cek):`);
