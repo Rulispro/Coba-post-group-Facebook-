@@ -46,6 +46,13 @@ function urlExists(url) {
   });
 }
 
+//BACA TEMPLATE XLSX///
+const XLSX = require("xlsx");
+function readTemplate(file) {
+  const wb = XLSX.readFile(file);
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(sheet);
+}
 
 //--FUNGSI RUN ACCOUNT--//
 
@@ -599,9 +606,14 @@ function delay(ms) {
 
       //--AMBIL.GRUP HARI INI --//
 const today = getTodayWIB().toISOString().slice(0,10);
-const groups = acc.groups[today] || [];
-if (!groups.length) return console.log(`⚠️ Tidak ada grup hari ini untuk ${acc.account}`);
-await runAccount(page, { ...acc, groups });
+const template = readTemplate("./template.xlsx");
+for (const row of template) {
+    const accCookies = getAccountCookies(row.account);
+    const groups = row.grup_link.split(",").map(g => g.trim());
+    const caption = row.caption;
+    const media = row.github_release;
+       }
+      
 
       
 
