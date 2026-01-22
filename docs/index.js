@@ -156,8 +156,10 @@ if (!box) {
  // HARUS sama dengan nama file di Release!
 
 const originalName = mediaUrl.split("?")[0].split("/").pop();
- const fileName = `${acc.account}_${Date.now()}_${originalName}`;
-  
+ 
+  const fileName = `${account}_${Date.now()}_${originalName}`;
+console.log(`✅ Posting selesai untuk ${account}`);
+
  // download media → simpan return value ke filePat
 const filePath = await downloadMedia(mediaUrl, fileName);
 console.log(`✅ Media ${fileName} berhasil di-download.`);
@@ -617,22 +619,11 @@ const TEMPLATE_PATH = "./docs/template1.xlsx";
       
       //--AMBIL.GRUP HARI INI --//
 
+
 for (const row of template) {
   if (row.account !== acc.account) continue;
-
-  const groups = row.grup_link.split(",").map(g => g.trim());
-  const caption = row.caption;
-  const mediaUrl = row.github_release;
-
-  await runAccount(page, {
-    account: acc.account,
-    cookies: acc.cookies,
-    groups,
-    caption,
-    mediaUrl
-  });
+  await runAccount(page, row);
 }
-
 
 // ================= MEDIA RESOLUTION =================
 
