@@ -29,22 +29,23 @@ function getMediaUrl(acc) {
 }
 
 
-// ================= MEDIA RESOLUTION =================
-if (acc.mediaUrl) {
-  console.log(`📦 Pakai mediaUrl langsung (tanpa cek):`);
-  console.log(acc.mediaUrl);
-} else {
-  const media = getMediaUrl(acc);
-
-  if (await urlExists(media.video)) {
-    acc.mediaUrl = media.video;
-  } else if (await urlExists(media.image)) {
-    acc.mediaUrl = media.image;
-  } else {
-    console.log(`⏭️ Skip ${acc.account} (media tidak ditemukan)`);
-    continue;
-  }
+function urlExists(url) {
+  return new Promise(resolve => {
+    https.get(
+      url,
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "*/*"
+        }
+      },
+      res => {
+        resolve(res.statusCode >= 200 && res.statusCode < 400);
+      }
+    ).on("error", () => resolve(false));
+  });
 }
+
 
 //--FUNGSI RUN ACCOUNT--//
 
@@ -596,11 +597,11 @@ function delay(ms) {
     //   continue;
     //  }
 
-      // ✅ PRIORITAS 1: pakai mediaUrl dari accounts.json
-if (acc.mediaUrl && await urlExists(acc.mediaUrl)) {
-  console.log(`📦 Pakai mediaUrl dari accounts.json`);
+// ================= MEDIA RESOLUTION =================
+if (acc.mediaUrl && acc.mediaUrl.trim() !== "") {
+  console.log(`📦 Pakai mediaUrl langsung (tanpa cek):`);
+  console.log(acc.mediaUrl);
 } else {
-  // ✅ FALLBACK: auto berdasarkan tanggal
   const media = getMediaUrl(acc);
 
   if (await urlExists(media.video)) {
