@@ -606,7 +606,7 @@ const TEMPLATE_PATH = "./docs/template1.xlsx";
 
       
       //--AMBIL.GRUP HARI INI --//
-const template = readTemplate("./template1.xlsx");
+
 for (const row of template) {
     if (row.account !== acc.account) continue; // ambil hanya row akun ini
 
