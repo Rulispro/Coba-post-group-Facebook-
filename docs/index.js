@@ -37,6 +37,7 @@ function urlExists(url) {
   });
 }
 
+
 //BACA TEMPLATE XLSX///
 const XLSX = require("xlsx");
 function readTemplate(file) {
@@ -594,7 +595,16 @@ function delay(ms) {
      //  console.log(`⏭️ Skip ${acc.account} (media hari ini tidak ada)`);
     //   continue;
     //  }
+const TEMPLATE_PATH = "./docs/template.xlsx";
 
+  if (!fs.existsSync(TEMPLATE_PATH)) {
+    console.log("❌ template.xlsx tidak ditemukan:", TEMPLATE_PATH);
+    return;
+  }
+
+  const template = readTemplate(TEMPLATE_PATH);
+
+      
       //--AMBIL.GRUP HARI INI --//
 const template = readTemplate("./template.xlsx");
 for (const row of template) {
@@ -607,9 +617,6 @@ for (const row of template) {
     await runAccount(page, { account: acc.account, cookies: acc.cookies, groups, caption, mediaUrl });
 }
 
-      
-
-      
 
 // ================= MEDIA RESOLUTION =================
 if (acc.mediaUrl && acc.mediaUrl.trim() !== "") {
