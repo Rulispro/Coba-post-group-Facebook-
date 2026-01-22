@@ -9,9 +9,9 @@ on:
     - cron: "0 9 * * *"
 
   # Jalan juga kalau bikin tag: post-YYYY-MM-DD
-  push:
-    tags:
-      - 'post-*'
+ # push:
+  #  tags:
+      #- 'post-*'
 
 jobs:
   run-bot:
