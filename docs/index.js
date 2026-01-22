@@ -49,24 +49,29 @@ function readTemplate(file) {
 //--FUNGSI RUN ACCOUNT--//
 
 async function runAccount(page, acc) {
-  const groups = row.groups;
+  const account = row.account;
   const caption = row.caption;
   const mediaUrl = row.media_url || row.github_release;
-  
+
   const groups = String(row.grup_link)
     .split(",")
     .map(g => g.trim())
     .filter(Boolean);
-  
-   if (!groups || groups.length === 0) {
-   console.log(`⚠️ Tidak ada grup untuk ${acc.account}`);
+
+  if (!account || !caption || !mediaUrl || groups.length === 0) {
+    console.log(`⚠️ Row tidak lengkap, skip:`, row);
     return;
- }
+  }
+
+  console.log(`🧠 runAccount (XLSX) → ${account}`);
+  console.log(`🔗 Grup: ${groups.length}`);
 
   for (let i = 0; i < groups.length; i++) {
-   const groupUrl = groups[i];
-    console.log(`\n📌 [${acc.account}] Grup ${i + 1}/${groups.length}`);
+    const groupUrl = groups[i];
+   
+    console.log(`\n📌 [${account}] Grup ${i + 1}/${groups.length}`);
     console.log(`➡️ ${groupUrl}`);
+    
 
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
