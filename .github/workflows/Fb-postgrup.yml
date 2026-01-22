@@ -2,11 +2,11 @@ name: Facebook Bot
 
 on:
   # Manual trigger (WAJIB ada buat test)
-  #workflow_dispatch:
+workflow_dispatch:
 
   # Jalan otomatis jam 07:36 WIB (UTC+7 → 00:36 UTC)
   schedule:
-    - cron: "10 10 * * *"
+    - cron: "10 11 * * *"
 
   # Jalan juga kalau bikin tag: post-YYYY-MM-DD
  # push:
