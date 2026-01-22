@@ -6,7 +6,7 @@ on:
 
   # Jalan otomatis jam 07:36 WIB (UTC+7 → 00:36 UTC)
   schedule:
-    - cron: "6 1 * * *"
+    - cron: "46 1 * * *"
 
   # Jalan juga kalau bikin tag: post-YYYY-MM-DD
   push:
