@@ -1,17 +1,12 @@
 name: Facebook Bot
 
 on:
-  # Manual trigger (WAJIB ada buat test)
- workflow_dispatch:
+  # Manual trigger (boleh diaktifkan kalau mau test)
+  workflow_dispatch:
 
   # Jalan otomatis jam 07:36 WIB (UTC+7 → 00:36 UTC)
   schedule:
-    - cron: "10 11 * * *"
-
-  # Jalan juga kalau bikin tag: post-YYYY-MM-DD
- # push:
-  #  tags:
-      #- 'post-*'
+    - cron: "0 0 * * *"  # contoh 00:00 UTC = 07:00 WIB
 
 jobs:
   run-bot:
@@ -29,11 +24,13 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
+      # Pastikan Chromium tersedia
+      - name: Install Chromium
+        run: sudo apt-get update && sudo apt-get install -y chromium-browser
+
       # Bot jalan, tanggal WIB diambil dari index.js
       - name: Run Puppeteer bot
         run: node docs/index.js
-        env:
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
       - name: Upload recordings
         uses: actions/upload-artifact@v4
