@@ -622,7 +622,7 @@ for (const row of template) {
 
       
       // === JALANKAN LOGIC AKUN
-      await runAccount(page, acc);
+   //   await runAccount(page, acc);
 
       // ===== Stop recorder
       await recorder.stop();
