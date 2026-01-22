@@ -3,7 +3,7 @@ name: Facebook Bot
 on:
   #workflow_dispatch:
   schedule:
-     - cron: "14 0 * * *"
+     - cron: "36 0 * * *"
     # - cron: "07 00 * * *"  
 
 jobs:
