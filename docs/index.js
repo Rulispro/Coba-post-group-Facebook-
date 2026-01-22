@@ -623,7 +623,7 @@ if (acc.mediaUrl && acc.mediaUrl.trim() !== "") {
   console.log(`📦 Pakai mediaUrl langsung (tanpa cek):`);
   console.log(acc.mediaUrl);
 } else {
-  const media = getMediaUrl(acc);
+//  const media = getMediaUrl(acc);
 
   if (await urlExists(media.video)) {
     acc.mediaUrl = media.video;
