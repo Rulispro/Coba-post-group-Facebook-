@@ -39,12 +39,28 @@ function urlExists(url) {
 
 
 //BACA TEMPLATE XLSX///
-const XLSX = require("xlsx");
 function readTemplate(file) {
   const wb = XLSX.readFile(file);
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  return XLSX.utils.sheet_to_json(sheet);
+
+  console.log("📄 Sheet tersedia:", wb.SheetNames);
+
+  const sheetName = wb.SheetNames.find(
+    n => n.trim().toLowerCase() === "lembar 1"
+  );
+
+  if (!sheetName) {
+    throw new Error("❌ Sheet 'Lembar 1' tidak ditemukan");
+  }
+
+  const sheet = wb.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+  console.log(`📄 Pakai sheet: ${sheetName}`);
+  console.log("📋 Preview row pertama:", rows[0]);
+
+  return rows;
 }
+
 
 //--FUNGSI RUN ACCOUNT--//
 
