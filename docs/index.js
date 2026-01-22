@@ -619,21 +619,6 @@ for (const row of template) {
 
 
 // ================= MEDIA RESOLUTION =================
-if (acc.mediaUrl && acc.mediaUrl.trim() !== "") {
-  console.log(`📦 Pakai mediaUrl langsung (tanpa cek):`);
-  console.log(acc.mediaUrl);
-} else {
-//  const media = getMediaUrl(acc);
-
-  if (await urlExists(media.video)) {
-    acc.mediaUrl = media.video;
-  } else if (await urlExists(media.image)) {
-    acc.mediaUrl = media.image;
-  } else {
-    console.log(`⏭️ Skip ${acc.account} (media tidak ditemukan)`);
-    continue;
-  }
-}
 
       
       // === JALANKAN LOGIC AKUN
