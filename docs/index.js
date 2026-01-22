@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
+const XLSX = require("xlsx");   
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
@@ -38,25 +39,41 @@ function urlExists(url) {
 }
 
 
-//BACA TEMPLATE XLSX///
+
 function readTemplate(file) {
+  console.log("📂 readTemplate dipanggil");
+  console.log("📄 File:", file);
+
+  if (!fs.existsSync(file)) {
+    throw new Error("❌ File XLSX tidak ditemukan: " + file);
+  }
+
+  console.log("📦 XLSX object:", typeof XLSX);
+
   const wb = XLSX.readFile(file);
 
-  console.log("📄 Sheet tersedia:", wb.SheetNames);
+  console.log("📑 SheetNames:", wb.SheetNames);
 
-  const sheetName = wb.SheetNames.find(
-    n => n.trim().toLowerCase() === "lembar 1"
+  const targetSheet = wb.SheetNames.find(
+    s => s.trim().toLowerCase() === "lembar 1"
   );
 
-  if (!sheetName) {
+  if (!targetSheet) {
     throw new Error("❌ Sheet 'Lembar 1' tidak ditemukan");
   }
 
-  const sheet = wb.Sheets[sheetName];
-  const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  console.log("✅ Pakai sheet:", targetSheet);
 
-  console.log(`📄 Pakai sheet: ${sheetName}`);
-  console.log("📋 Preview row pertama:", rows[0]);
+  const sheet = wb.Sheets[targetSheet];
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    defval: "",
+    raw: false
+  });
+
+  console.log("📊 Total row:", rows.length);
+  console.log("🧪 Row[0]:", rows[0]);
+  console.log("🧪 Keys row[0]:", Object.keys(rows[0] || {}));
 
   return rows;
 }
@@ -65,7 +82,8 @@ function readTemplate(file) {
 //--FUNGSI RUN ACCOUNT--//
 
 async function runAccount(page, row) {
-  const account = row.account;
+  console.log("\n🧪 runAccount row:", row);
+    const account = row.account;
   const caption = row.caption;
   const mediaUrl = row.media_url || row.github_release;
 
