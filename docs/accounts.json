@@ -2,11 +2,7 @@
   {
     "account": "ayu Wulandari",
     "file": "ayu_Wulandari",
-    "cookies": [
-{
-  "account": "ayu Wulandari",
-  "file": "ayu_Wulandari",
-  "cookies": [
+   "cookies": [
     { "name": "datr", "value": "xN8taKSRj14g2OqdDJRuQsTh", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": true },
     { "name": "sb", "value": "xN8taLnQjBtn7csMtQswlPqw", "domain": ".facebook.com", "path": "/", "secure": true },
     { "name": "locale", "value": "id_ID", "domain": ".facebook.com", "path": "/" },
