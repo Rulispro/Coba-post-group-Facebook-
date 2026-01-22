@@ -558,13 +558,19 @@ function delay(ms) {
         Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
       });
 
-      // ===== Cookies PER AKUN
-      await page.setCookie(...acc.cookies);
-      console.log(`✅ Cookies set (${acc.account})`);
+    await page.goto("https://m.facebook.com", { waitUntil: "domcontentloaded" });
 
-      //--BUKA m.facebook.com--///
-      await page.goto("https://m.facebook.com/", { waitUntil: "networkidle2" });
-      console.log(`✅ FB terbuka (${acc.account})`);
+    await page.setCookie(
+     ...acc.cookies.map(c => ({
+       name: c.name,
+       value: c.value,
+       domain: ".facebook.com",
+       path: "/",
+      secure: true
+     }))
+     );
+
+    await page.reload({ waitUntil: "networkidle2" });
 
       //---CEK TANGGAL-- DAN JAM POSTING-////
 
