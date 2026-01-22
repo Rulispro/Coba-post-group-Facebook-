@@ -3,21 +3,12 @@
     "account": "ayu Wulandari",
     "file": "ayu_Wulandari",
     "cookies": [
-      { "name": "datr", "value": "xN8taKSRj14g2OqdDJRuQsTh", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": true },
-      { "name": "sb", "value": "xN8taLnQjBtn7csMtQswlPqw", "domain": ".facebook.com", "path": "/", "secure": true },
-      { "name": "locale", "value": "id_ID", "domain": ".facebook.com", "path": "/" },
-      { "name": "ps_l", "value": "1", "domain": ".facebook.com", "path": "/" },
-      { "name": "ps_n", "value": "1", "domain": ".facebook.com", "path": "/" },
-      { "name": "m_pixel_ratio", "value": "2", "domain": ".facebook.com", "path": "/" },
-      { "name": "vpd", "value": "v1;687x360x2", "domain": ".facebook.com", "path": "/" },
-      { "name": "dpr", "value": "2", "domain": ".facebook.com", "path": "/" },
-      { "name": "wd", "value": "360x825", "domain": ".facebook.com", "path": "/" },
-      { "name": "c_user", "value": "61576156023619", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": true },
-      { "name": "xs", "value": "29:XiZf2tDj-sAjIQ:2:1769044627:-1:-1", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": true },
-      { "name": "fr", "value": "0RQn1oMPRkO0lIoXx.AWeV1QSfIdS21jjZMRgupZSXMpvN5FJoQyXUQna-I1rlFtG4Ql8.BoLd_E..AAA.0.0.BpcXqY.AWd9gs5tJjrYfbzIcxMKDKoiZvA", "domain": ".facebook.com", "path": "/" },
-      { "name": "pas", "value": "61576001021086:UQYJ9AuaM7,61576156023619:0XtatjXJiO", "domain": ".facebook.com", "path": "/" },
-      { "name": "wl_cbv", "value": "v2;client_version:3058;timestamp:1769044632", "domain": ".facebook.com", "path": "/" },
-      { "name": "fbl_st", "value": "101435642;T:29484077", "domain": ".facebook.com", "path": "/" }
+      { "name": "c_user", "value": "61576156023619" },
+      { "name": "xs", "value": "29:XiZf2tDj-sAjIQ:2:1769044627:-1:-1" },
+      { "name": "datr", "value": "xN8taKSRj14g2OqdDJRuQsTh" },
+      { "name": "sb", "value": "xN8taLnQjBtn7csMtQswlPqw" },
+      { "name": "fr", "value": "0RQn1oMPRkO0lIoXx.AWeV1QSfIdS21jjZMRgupZSXMpvN5FJoQyXUQna-I1rlFtG4Ql8.BoLd_E..AAA.0.0.BpcXqY.AWd9gs5tJjrYfbzIcxMKDKoiZvA" },
+      { "name": "locale", "value": "id_ID" }
     ],
     "caption": "Halo grup 👋",
     "mediaUrl": "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/post-2026-01-22/ayu_Wulandari.png",
@@ -30,21 +21,12 @@
     "account": "Fitri Yunita Sari",
     "file": "Fitri_Yunita_Sari",
     "cookies": [
-      { "name": "sb", "value": "xN8taLnQjBtn7csMtQswlPqw", "domain": ".facebook.com", "path": "/", "secure": true },
-      { "name": "locale", "value": "id_ID", "domain": ".facebook.com", "path": "/" },
-      { "name": "ps_l", "value": "1", "domain": ".facebook.com", "path": "/" },
-      { "name": "ps_n", "value": "1", "domain": ".facebook.com", "path": "/" },
-      { "name": "m_pixel_ratio", "value": "2", "domain": ".facebook.com", "path": "/" },
-      { "name": "vpd", "value": "v1;687x360x2", "domain": ".facebook.com", "path": "/" },
-      { "name": "dpr", "value": "2", "domain": ".facebook.com", "path": "/" },
-      { "name": "wd", "value": "360x825", "domain": ".facebook.com", "path": "/" },
-      { "name": "datr", "value": "l5pwaVAiCrP_JCbkFfW4mdBf", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": true },
-      { "name": "c_user", "value": "61576977154304", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": true },
-      { "name": "xs", "value": "30:9Zzy8pRgSI4PzA:2:1768987358:-1:-1", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": true },
-      { "name": "fr", "value": "0RQn1oMPRkO0lIoXx.AWeBv5JzfPi13_xeurUQQvInRwOFcZbERDOcqfwobYJBVhJwdDo.BoLd_E..AAA.0.0.BpcJrj.AWcrEbEniuC29llUhJatO4NP6Yo", "domain": ".facebook.com", "path": "/", "secure": true },
-      { "name": "pas", "value": "61576001021086:UQYJ9AuaM7,61576977154304:duA8yBMfeh", "domain": ".facebook.com", "path": "/", "secure": true },
-      { "name": "fbl_st", "value": "100619721;T:29483122", "domain": ".facebook.com", "path": "/" },
-      { "name": "wl_cbv", "value": "v2;client_version:3058;timestamp:1768987364", "domain": ".facebook.com", "path": "/" }
+      { "name": "c_user", "value": "61576977154304" },
+      { "name": "xs", "value": "30:9Zzy8pRgSI4PzA:2:1768987358:-1:-1" },
+      { "name": "datr", "value": "l5pwaVAiCrP_JCbkFfW4mdBf" },
+      { "name": "sb", "value": "xN8taLnQjBtn7csMtQswlPqw" },
+      { "name": "fr", "value": "0RQn1oMPRkO0lIoXx.AWeBv5JzfPi13_xeurUQQvInRwOFcZbERDOcqfwobYJBVhJwdDo.BoLd_E..AAA.0.0.BpcJrj.AWcrEbEniuC29llUhJatO4NP6Yo" },
+      { "name": "locale", "value": "id_ID" }
     ],
     "caption": "Caption akun 2",
     "mediaUrl": "https://github.com/Rulispro/Coba-post-group-Facebook-/releases/download/post-2026-01-22/Fitri_Yunita_Sari.mp4",
@@ -54,4 +36,3 @@
     ]
   }
 ]
-
