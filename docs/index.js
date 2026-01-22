@@ -608,13 +608,19 @@ const TEMPLATE_PATH = "./docs/template1.xlsx";
       //--AMBIL.GRUP HARI INI --//
 
 for (const row of template) {
-    if (row.account !== acc.account) continue; // ambil hanya row akun ini
+  if (row.account !== acc.account) continue;
 
-    const groups = row.grup_link.split(",").map(g => g.trim());
-    const caption = row.caption;
-    const mediaUrl = row.github_release;
+  const groups = row.grup_link.split(",").map(g => g.trim());
+  const caption = row.caption;
+  const mediaUrl = row.github_release;
 
-    await runAccount(page, { account: acc.account, cookies: acc.cookies, groups, caption, mediaUrl });
+  await runAccount(page, {
+    account: acc.account,
+    cookies: acc.cookies,
+    groups,
+    caption,
+    mediaUrl
+  });
 }
 
 
