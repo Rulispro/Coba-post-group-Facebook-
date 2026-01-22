@@ -574,17 +574,34 @@ function delay(ms) {
 
       //---CEK TANGGAL-- DAN JAM POSTING-////
 
-      const media = getMediaUrl(acc);
+     //$ const media = getMediaUrl(acc);
 
 // pilih otomatis (cek mana yang ada)
-    if (await urlExists(media.video)) {
-     acc.mediaUrl = media.video;
-     } else if (await urlExists(media.image)) {
-       acc.mediaUrl = media.image;
-     } else {
-       console.log(`⏭️ Skip ${acc.account} (media hari ini tidak ada)`);
-       continue;
-      }
+   //$ if (await urlExists(media.video)) {
+   //  acc.mediaUrl = media.video;
+   //  } else if (await urlExists(media.image)) {
+    //   acc.mediaUrl = media.image;
+    // } else {
+     //  console.log(`⏭️ Skip ${acc.account} (media hari ini tidak ada)`);
+    //   continue;
+    //  }
+
+      // ✅ PRIORITAS 1: pakai mediaUrl dari accounts.json
+if (acc.mediaUrl && await urlExists(acc.mediaUrl)) {
+  console.log(`📦 Pakai mediaUrl dari accounts.json`);
+} else {
+  // ✅ FALLBACK: auto berdasarkan tanggal
+  const media = getMediaUrl(acc);
+
+  if (await urlExists(media.video)) {
+    acc.mediaUrl = media.video;
+  } else if (await urlExists(media.image)) {
+    acc.mediaUrl = media.image;
+  } else {
+    console.log(`⏭️ Skip ${acc.account} (media tidak ditemukan)`);
+    continue;
+  }
+}
 
       
       // === JALANKAN LOGIC AKUN
