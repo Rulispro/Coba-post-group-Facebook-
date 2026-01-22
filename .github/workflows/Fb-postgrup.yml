@@ -1,10 +1,17 @@
 name: Facebook Bot
 
 on:
-  #workflow_dispatch:
+  # Manual trigger (WAJIB ada buat test)
+  workflow_dispatch:
+
+  # Jalan otomatis jam 07:36 WIB (UTC+7 → 00:36 UTC)
   schedule:
-     - cron: "36 0 * * *"
-    # - cron: "07 00 * * *"  
+    - cron: "36 0 * * *"
+
+  # Jalan juga kalau bikin tag: post-YYYY-MM-DD
+  push:
+    tags:
+      - 'post-*'
 
 jobs:
   run-bot:
@@ -22,9 +29,7 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # 👉 TIDAK PERLU set DATE di workflow
-      # 👉 TANGGAL DIAMBIL DARI index.js (WIB)
-
+      # Bot jalan, tanggal WIB diambil dari index.js
       - name: Run Puppeteer bot
         run: node docs/index.js
         env:
