@@ -268,7 +268,7 @@ await page.evaluate(() => {
 
 console.log("✅ Klik POST (EN+ID)");
 await delay(3000);
-console.log(`✅ Posting selesai untuk ${account}`
+console.log(`✅ Posting selesai untuk ${account}`);
 
 // ⏳ JEDA ANTAR GRUP (ACAK)
 const delayGrup =
