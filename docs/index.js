@@ -75,7 +75,19 @@ function readTemplate(file) {
   console.log("🧪 Row[0]:", rows[0]);
   console.log("🧪 Keys row[0]:", Object.keys(rows[0] || {}));
 
-  return rows;
+  function normalizeRow(row) {
+  const clean = {};
+  for (const k in row) {
+    clean[k.trim()] =
+      typeof row[k] === "string" ? row[k].trim() : row[k];
+  }
+  return clean;
+}
+
+return rows.map(normalizeRow);
+
+
+  
 }
 
 
@@ -654,10 +666,20 @@ const TEMPLATE_PATH = "./docs/template1.xlsx";
       //--AMBIL.GRUP HARI INI --//
 
 
+const today = new Date().toISOString().slice(0, 10);
+
 for (const row of template) {
   if (row.account !== acc.account) continue;
+
+  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
+  if (rowDate !== today) {
+    console.log("⏭️ Skip row (bukan hari ini):", row.tanggal);
+    continue;
+  }
+
   await runAccount(page, row);
-}
+    }
+    
 
 // ================= MEDIA RESOLUTION =================
 
@@ -671,9 +693,10 @@ for (const row of template) {
 
       await page.close();
       await context.close();
-
-      console.log(`✅ Selesai akun: ${acc.account}`);
+    console.log(`✅ Posting selesai untuk ${account}`);
+      
       await delay(6000); // jeda aman antar akun
+      
     }
 
     await browser.close();
