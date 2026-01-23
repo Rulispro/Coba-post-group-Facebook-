@@ -150,11 +150,18 @@ async function runAccount(page, row) {
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
 
+    ///KLIK COMPOSER TRIGGER REACT///
+    let writeClicked = await clickComposer(page);
+   if (!writeClicked) {
+    console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
+     // skip grup ini jika tidak ketemu
+    }
+
     // ===== 1️⃣ Klik composer / write something
-  let writeClicked =
-  await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
-  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
-  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+ //$ let writeClicked =
+  //$await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+  //$await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+  //$await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
 
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
@@ -309,18 +316,57 @@ async function safeClickEl(el) {
   }
 }
 
-// ===== Fungsi klik by XPath
-async function safeClickXpath(page, xpath, desc = "elemen") {
+// ===== Klik composer aman pakai trigger React
+async function clickComposer(page) {
   try {
-    const el = await page.waitForXPath(xpath, { visible: true, timeout: 8000 });
-    await el.click();
-    console.log(`✅ Klik ${desc}`);
-    return true;
-  } catch (e) {
-    console.log(`❌ Gagal klik ${desc}:`, e.message);
+    const result = await page.evaluate(() => {
+      const span = [...document.querySelectorAll("span")].find(e =>
+        e.innerText?.toLowerCase().includes("write something") ||
+        e.innerText?.toLowerCase().includes("tulis sesuatu")
+      );
+      if (!span) return false;
+
+      const el = span.closest("div[data-mcomponent='TextArea']") ||
+                 span.closest("div[role='textbox']") ||
+                 span.parentElement;
+
+      if (!el) return false;
+
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      ["pointerdown", "mousedown", "mouseup", "click"].forEach(type =>
+        el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }))
+      );
+
+      el.dispatchEvent(new FocusEvent("focus", { bubbles: true }));
+      el.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+
+      return true;
+    });
+
+    if (result) console.log("✅ Composer berhasil dibuka (React trigger)");
+    else console.log("❌ Composer tidak ketemu");
+
+    return result;
+  } catch (err) {
+    console.log("⚠️ Error klik composer:", err.message);
     return false;
   }
 }
+
+
+// ===== Fungsi klik by XPath
+//$async function safeClickXpath(page, xpath, desc = "elemen") {
+  //$try {
+  //$  const el = await page.waitForXPath(xpath, { visible: true, timeout: 8000 });
+  //$  await el.click();
+   //$ console.log(`✅ Klik ${desc}`);
+   //$ return true;
+ //$ } catch (e) {
+   //$ console.log(`❌ Gagal klik ${desc}:`, e.message);
+  //$  return false;
+ //$ }
+//$}
 
 // ===== Fungsi scan elemen verbose
 async function scanAllElementsVerbose(page, label = "Scan") {
