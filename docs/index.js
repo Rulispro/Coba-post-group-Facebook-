@@ -692,9 +692,8 @@ if (rowsForAccount.length === 0) {
   continue;
 }
       
-
-    await page.goto("https://m.facebook.com", { waitUntil: "domcontentloaded" });
-
+await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" })
+    console.log("👉 BUKA FACEBOOK.COM");
     await page.setCookie(
      ...acc.cookies.map(c => ({
        name: c.name,
