@@ -117,9 +117,10 @@ async function runAccount(page, row) {
 
   // ===== PARSE DELAY GRUP DARI XLSX =====
   const delayGroupList = String(row.delay_grup || "")
-    .split(",")
-    .map(v => parseInt(v.trim(), 10))
-    .filter(v => !isNaN(v) && v > 0);
+  .replace(/\./g, ",")  // ganti titik jadi koma
+  .split(/,/)           // split koma
+  .map(v => parseInt(v.trim(), 10))
+  .filter(v => !isNaN(v) && v > 0);
 
   const defaultDelayGroup = 5000; // fallback kalau kosong
 
