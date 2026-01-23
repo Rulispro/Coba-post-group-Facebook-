@@ -148,7 +148,7 @@ async function runAccount(page, row) {
 
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(4000);
 
     // ===== 1️⃣ Klik composer / write something
   let writeClicked =
