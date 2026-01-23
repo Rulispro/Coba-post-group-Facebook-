@@ -1,3 +1,7 @@
+----//// FORMAT NOMOR/ANGKA DI TEMPLATE XLSX HARUS TEKS,TULIS ANGKANYA,KLIK SEGITIGA KANAN , KEBAWAH,BARU KETIK ULANG ---/////
+
+//--- FORMAT FILE FOTO VIDEO HARUS SAMA DENGAN NAMA AKUN/FILE AKUN DI ACCOUNTS.JSON,
+
 index.js
   Gabungan script lengkap untuk:
   GitHub Secrets — simpan cookie per akun:
