@@ -11,8 +11,18 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 puppeteer.use(StealthPlugin())
 
 //--ACAK JEDA LINK GRUPNYA --//
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+let lastDelay = null;
+
+function pickRandomNoRepeat(arr) {
+  if (arr.length === 1) return arr[0];
+
+  let picked;
+  do {
+    picked = arr[Math.floor(Math.random() * arr.length)];
+  } while (picked === lastDelay);
+
+  lastDelay = picked;
+  return picked;
 }
 
 
@@ -111,15 +121,12 @@ async function runAccount(page, row) {
     .filter(Boolean);
   
   // ===== PARSE DELAY GRUP (RANDOM) =====
-const delayGroupList = String(row.delay_grup || "")
-  .split(",")
-  .map(v => parseInt(v.trim()))
-  .filter(v => !isNaN(v) && v > 0);
-
-const defaultDelayGroup = 8000;
+    const delayGrup =
+  delayGroupList.length > 0
+    ? pickRandomNoRepeat(delayGroupList)
+    : defaultDelayGroup;
   
-
-  if (!account || !caption || !mediaUrl || groups.length === 0) {
+   if (!account || !caption || !mediaUrl || groups.length === 0) {
     console.log("⚠️ Row XLSX tidak lengkap, skip:", row);
     return;
   }
