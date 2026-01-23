@@ -576,6 +576,17 @@ function delay(ms) {
       fs.readFileSync(__dirname + "/accounts.json", "utf8")
     );
 
+    // ✅ BACA TEMPLATE SEKALI DI AWAL
+    const TEMPLATE_PATH = "./docs/template1.xlsx";
+
+    if (!fs.existsSync(TEMPLATE_PATH)) {
+      throw new Error("❌ template1.xlsx tidak ditemukan");
+    }
+
+    const templateRows = readTemplate(TEMPLATE_PATH);
+
+    console.log("📦 Template rows siap dipakai:", templateRows.length);
+    
     
     const browser = await puppeteer.launch({
       headless: "new",
@@ -640,6 +651,10 @@ function delay(ms) {
 
     await page.reload({ waitUntil: "networkidle2" });
 
+      // ✅ LANGSUNG PAKAI DATA
+for (const row of rowsForAccount) {
+  await runAccount(page, row);
+}
       //---CEK TANGGAL-- DAN JAM POSTING-////
 
      //$ const media = getMediaUrl(acc);
@@ -653,30 +668,27 @@ function delay(ms) {
      //  console.log(`⏭️ Skip ${acc.account} (media hari ini tidak ada)`);
     //   continue;
     //  }
-const TEMPLATE_PATH = "./docs/template1.xlsx";
 
-  if (!fs.existsSync(TEMPLATE_PATH)) {
-    console.log("❌ template.xlsx tidak ditemukan:", TEMPLATE_PATH);
-    return;
-  }
-
-  const template = readTemplate(TEMPLATE_PATH);
-
-      
       //--AMBIL.GRUP HARI INI --//
 
 
 const today = new Date().toISOString().slice(0, 10);
 
-for (const row of template) {
-  if (row.account !== acc.account) continue;
+// ✅ SIAPKAN DATA DULU (TANPA FB)
+const rowsForAccount = templateRows.filter(row => {
+  if (row.account !== acc.account) return false;
 
   const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
-  if (rowDate !== today) {
-    console.log("⏭️ Skip row (bukan hari ini):", row.tanggal);
-    continue;
-  }
+  return rowDate === today;
+});
 
+console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
+
+// ❌ kalau kosong, JANGAN buka FB
+if (rowsForAccount.length === 0) {
+  console.log("⏭️ Tidak ada jadwal posting hari ini");
+  continue;
+}
   await runAccount(page, row);
     }
     
