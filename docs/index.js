@@ -115,6 +115,15 @@ async function runAccount(page, row) {
   const caption = row.caption;
   const mediaUrl = row.media_url || row.github_release;
 
+  // ===== PARSE DELAY GRUP DARI XLSX =====
+  const delayGroupList = String(row.delay_grup || "")
+    .split(",")
+    .map(v => parseInt(v.trim(), 10))
+    .filter(v => !isNaN(v) && v > 0);
+
+  const defaultDelayGroup = 5000; // fallback kalau kosong
+
+  
   const groups = String(row.grup_link || "")
     .split(",")
     .map(g => g.trim())
