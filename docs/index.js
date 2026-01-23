@@ -692,9 +692,13 @@ if (rowsForAccount.length === 0) {
   continue;
 }
       
-await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" })
+await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     console.log("👉 BUKA FACEBOOK.COM");
-    await page.setCookie(
+
+      await page.waitForTimeout(3000);
+      console.log("👉 Tunggu 3 detik")
+      
+      await page.setCookie(
      ...acc.cookies.map(c => ({
        name: c.name,
        value: c.value,
