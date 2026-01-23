@@ -129,11 +129,6 @@ async function runAccount(page, row) {
     .map(g => g.trim())
     .filter(Boolean);
   
-  // ===== PARSE DELAY GRUP (RANDOM) =====
-    const delayGrup =
-  delayGroupList.length > 0
-    ? pickRandomNoRepeat(delayGroupList)
-    : defaultDelayGroup;
   
    if (!account || !caption || !mediaUrl || groups.length === 0) {
     console.log("⚠️ Row XLSX tidak lengkap, skip:", row);
@@ -286,10 +281,12 @@ console.log("✅ Klik POST (EN+ID)");
 await delay(3000);
 console.log(`✅ Posting selesai untuk ${account}`);
 
-// ⏳ JEDA ANTAR GRUP (ACAK)
+
+
+// ⏳ JEDA ANTAR GRUP (ACAK, TANPA PENGULANGAN)
 const delayGrup =
   delayGroupList.length > 0
-    ? pickRandom(delayGroupList)
+    ? pickRandomNoRepeat(delayGroupList)
     : defaultDelayGroup;
 
 console.log(`🎲 Delay grup (acak): ${delayGrup} ms`);
