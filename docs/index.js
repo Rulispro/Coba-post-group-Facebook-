@@ -10,6 +10,12 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
 
+//--ACAK JEDA LINK GRUPNYA --//
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+
 // ===== HELPER =====
 function getTodayWIB() {
   return new Date(
@@ -103,6 +109,15 @@ async function runAccount(page, row) {
     .split(",")
     .map(g => g.trim())
     .filter(Boolean);
+  
+  // ===== PARSE DELAY GRUP (RANDOM) =====
+const delayGroupList = String(row.delay_grup || "")
+  .split(",")
+  .map(v => parseInt(v.trim()))
+  .filter(v => !isNaN(v) && v > 0);
+
+const defaultDelayGroup = 8000;
+  
 
   if (!account || !caption || !mediaUrl || groups.length === 0) {
     console.log("⚠️ Row XLSX tidak lengkap, skip:", row);
@@ -253,9 +268,17 @@ await page.evaluate(() => {
 
 console.log("✅ Klik POST (EN+ID)");
 await delay(3000);
-console.log(`✅ Posting selesai untuk ${account}`);
-// ⏳ JEDA ANTAR GRUP
-  await delay(8000); // 
+console.log(`✅ Posting selesai untuk ${account}`
+
+// ⏳ JEDA ANTAR GRUP (ACAK)
+const delayGrup =
+  delayGroupList.length > 0
+    ? pickRandom(delayGroupList)
+    : defaultDelayGroup;
+
+console.log(`🎲 Delay grup (acak): ${delayGrup} ms`);
+await delay(delayGrup);
+
 }
   
 }
@@ -706,7 +729,10 @@ for (const row of rowsForAccount) {
       await page.close();
       await context.close();
       console.log(`✅ Posting selesai untuk ${acc.account}`);
-     await delay(6000); // jeda aman antar akun
+    //await delay(6000); // jeda aman antar akun
+     const delayAkun = Number(rowsForAccount[0]?.delay_akun) || 60000;
+     console.log(`⏳ Delay antar akun: ${delayAkun} ms`);
+     await delay(delayAkun);   
     
     }
 
