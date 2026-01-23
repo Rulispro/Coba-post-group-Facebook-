@@ -705,8 +705,8 @@ for (const row of rowsForAccount) {
 
       await page.close();
       await context.close();
-      console.log(`✅ Posting selesai untuk ${acc.account}`);
- 
+      console.log(`✅ Posting selesai untuk ${account}`);
+    
       await delay(6000); // jeda aman antar akun
     
     }
