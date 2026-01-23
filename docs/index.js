@@ -637,6 +637,25 @@ function delay(ms) {
         Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
       });
 
+      // ================== FILTER DULU ==================
+const today = new Date().toISOString().slice(0, 10);
+
+const rowsForAccount = templateRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
+  return rowDate === today;
+});
+
+console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
+
+// ❌ JIKA TIDAK ADA DATA → JANGAN BUKA FACEBOOK
+if (rowsForAccount.length === 0) {
+  console.log("⏭️ Tidak ada jadwal posting hari ini");
+  continue;
+}
+      
+
     await page.goto("https://m.facebook.com", { waitUntil: "domcontentloaded" });
 
     await page.setCookie(
@@ -672,25 +691,6 @@ for (const row of rowsForAccount) {
       //--AMBIL.GRUP HARI INI --//
 
 
-const today = new Date().toISOString().slice(0, 10);
-
-// ✅ SIAPKAN DATA DULU (TANPA FB)
-const rowsForAccount = templateRows.filter(row => {
-  if (row.account !== acc.account) return false;
-
-  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
-  return rowDate === today;
-});
-
-console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
-
-// ❌ kalau kosong, JANGAN buka FB
-if (rowsForAccount.length === 0) {
-  console.log("⏭️ Tidak ada jadwal posting hari ini");
-  continue;
-}
-  await runAccount(page, row);
-    }
     
 
 // ================= MEDIA RESOLUTION =================
@@ -705,10 +705,10 @@ if (rowsForAccount.length === 0) {
 
       await page.close();
       await context.close();
-    console.log(`✅ Posting selesai untuk ${account}`);
-      
+      console.log(`✅ Posting selesai untuk ${acc.account}`);
+ 
       await delay(6000); // jeda aman antar akun
-      
+    
     }
 
     await browser.close();
