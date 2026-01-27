@@ -692,10 +692,9 @@ function delay(ms) {
 
 
     const templates = readTemplate(TEMPLATE_PATH);
-    📑 Sheet terbaca: [ 'postGroup', 'postStatus' ]
-
-const groupRows = templates.postGroup || [];
-const statusRows = templates.postStatus || [];
+    console.log("📑 Sheet terbaca:", Object.keys(templates));
+    const groupRows = templates.postGroup || [];
+    const statusRows = templates.postStatus || [];
    // const templateRows = readTemplate(TEMPLATE_PATH);
 
     //console.log("📦 Template rows siap dipakai:", templateRows.length);
