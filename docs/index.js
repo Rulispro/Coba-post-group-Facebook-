@@ -60,7 +60,7 @@ async function runStatus(page, row) {
 
   // 3️⃣ TUNGGU TEXTBOX
   
-/ 1️⃣ Klik placeholder composer
+// 1️⃣ Klik placeholder composer
       await page.waitForSelector(
     'div[role="button"][data-mcomponent="ServerTextArea"]',
     { timeout: 20000 }
