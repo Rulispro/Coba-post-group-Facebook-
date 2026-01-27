@@ -781,14 +781,22 @@ if (rowsForAccount.length === 0) {
   const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
   return rowDate === today;
 });
-console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
+//lamaconsole.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
 
 // ❌ JIKA TIDAK ADA DATA → JANGAN BUKA FACEBOOK
-if (rowsForAccount.length === 0) {
-  console.log("⏭️ Tidak ada jadwal posting hari ini");
+//if (rowsForAccount.length === 0) {
+ /// console.log("⏭️ Tidak ada jadwal posting hari ini");
+ /// continue;
+//}
+      //baru 
+console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
+console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
+
+// kalau dua-duanya kosong → skip akun
+if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0) {
+  console.log("⏭️ Tidak ada jadwal group & status hari ini");
   continue;
 }
-      
       
 await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     console.log("👉 BUKA FACEBOOK.COM");
