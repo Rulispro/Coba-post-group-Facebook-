@@ -10,6 +10,183 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
 
+//FUNGSI POSTING STATUS 
+async function runStatus(page, row) {
+  console.log(`\n📝 Post STATUS → ${row.account}`);
+
+  const caption = row.caption;
+  const mediaUrl = row.media_url || row.github_release;
+
+  if (!caption && !mediaUrl) {
+    console.log("⚠️ Status kosong, skip");
+    return;
+  }
+
+  // 1️⃣ BUKA HOME FB (WAJIB)
+  await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
+  await delay(3000);
+
+  // 2️⃣ KLIK COMPOSER
+  const clicked = await page.evaluate(() => {
+    const keywords = [
+      "what's on your mind",
+      "apa yang anda pikirkan",
+      "tulis sesuatu",
+      "buat postingan"
+    ];
+
+    const btn = [...document.querySelectorAll('div[role="button"]')]
+      .find(el =>
+        keywords.some(k =>
+          (el.innerText || "").toLowerCase().includes(k)
+        )
+      );
+
+    if (!btn) return false;
+
+    btn.scrollIntoView({ block: "center" });
+    ["pointerdown","mousedown","mouseup","click"]
+      .forEach(e => btn.dispatchEvent(new MouseEvent(e, { bubbles: true })));
+
+    return true;
+  });
+
+  if (!clicked) {
+    console.log("❌ Composer status tidak ketemu");
+    return;
+  }
+
+  console.log("✅ Composer diklik");
+
+  // 3️⃣ TUNGGU TEXTBOX
+  
+/ 1️⃣ Klik placeholder composer
+      await page.waitForSelector(
+    'div[role="button"][data-mcomponent="ServerTextArea"]',
+    { timeout: 20000 }
+  );
+
+  await page.evaluate(() => {
+    const el = document.querySelector(
+      'div[role="button"][data-mcomponent="ServerTextArea"]'
+    );
+    if (!el) return;
+
+    el.scrollIntoView({ block: "center" });
+
+    ["touchstart","touchend","mousedown","mouseup","click"]
+      .forEach(e =>
+        el.dispatchEvent(new Event(e, { bubbles: true }))
+      );
+  });
+
+  
+await page.waitForFunction(() => {
+  return (
+    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+    document.querySelector('div[contenteditable="true"]') ||
+    document.querySelector('textarea') ||
+    document.querySelector('textarea[role="combobox"]') ||
+    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+    document.querySelector('[aria-label]')
+  );
+}, { timeout: 30000 });
+
+console.log("✅ Composer textbox terdeteksi");
+
+  const boxHandle = await page.evaluateHandle(() => {
+  return (
+    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+    document.querySelector('div[contenteditable="true"]') ||
+    document.querySelector('textarea') ||
+    document.querySelector('textarea[role="combobox"]') ||
+    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+    document.querySelector('[aria-label]')
+  );
+});
+const box = boxHandle.asElement();
+if (!box) {
+  throw new Error("❌ Composer textbox tidak valid");
+}
+
+  await box.focus();
+    
+  await page.keyboard.down("Control");
+  await page.keyboard.press("A");
+  await page.keyboard.up("Control");
+  await page.keyboard.press("Backspace");
+
+  await page.keyboard.type(caption, { delay: 90 });
+
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  console.log("✅ Caption diketik");
+
+    
+ await delay(3000); // kasih waktu 3 detik minimal
+
+
+  // ===== 3️⃣ Download + upload media
+ const today = process.env.DATE || new Date().toISOString().split("T")[0];
+ // HARUS sama dengan nama file di Release!
+
+const originalName = mediaUrl.split("?")[0].split("/").pop();
+ 
+  const fileName = `${account}_${Date.now()}_${originalName}`;
+console.log(`✅ Posting selesai untuk ${account}`);
+
+ // download media → simpan return value ke filePat
+const filePath = await downloadMedia(mediaUrl, fileName);
+console.log(`✅ Media ${fileName} berhasil di-download.`);
+
+const stats = fs.statSync(filePath);
+if (stats.size === 0) {
+  throw new Error(`❌ File ${fileName} kosong! Download gagal.`);
+}
+
+
+// upload ke Facebook
+
+  
+await uploadMedia(page, filePath, fileName, "Photos");
+   
+// Cari tombol POST dengan innerText
+await page.evaluate(() => {
+  const keywords = [
+    "post", 
+    "Posting",
+    "POST",
+    "POSTING",
+    "posting",    // ID
+    "bagikan"     // ID (kadang muncul)
+  ];
+
+  const buttons = [...document.querySelectorAll('div[role="button"]')];
+
+  const postBtn = buttons.find(btn => {
+    const text = (btn.innerText || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+
+    return keywords.some(k => text === k || text.includes(k));
+  });
+
+  if (!postBtn) return false;
+
+  postBtn.scrollIntoView({ block: "center" });
+  postBtn.click();
+
+  return true;
+});
+
+console.log("✅ Klik POST (EN+ID)");
+await delay(3000);
+console.log(`✅ Posting selesai untuk ${account}`);
+
+            
+  
 //--ACAK JEDA LINK GRUPNYA --//
 let lastDelay = null;
 
