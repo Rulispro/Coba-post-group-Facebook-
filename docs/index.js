@@ -71,7 +71,7 @@ function readTemplate(file) {
   console.log("📑 SheetNames:", wb.SheetNames);
 
   const targetSheet = wb.SheetNames.find(
-    s => s.trim().toLowerCase() === "postgrup"
+    s => s.trim().toLowerCase() === "postGroup"
   );
 
   if (!targetSheet) {
