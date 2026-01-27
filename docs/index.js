@@ -927,7 +927,11 @@ function delay(ms) {
       });
 
       // ================== FILTER DULU ==================
-const today = new Date().toISOString().slice(0, 10);
+//lama$const today = new Date().toISOString().slice(0, 10);
+//baru 
+      const today = new Date(
+  new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
+).toISOString().slice(0, 10);
 
 //const rowsForAccount = templateRows.filter(row => {
  // if (row.account !== acc.account) return false;
