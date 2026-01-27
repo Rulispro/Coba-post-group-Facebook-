@@ -774,6 +774,21 @@ if (rowsForAccount.length === 0) {
   console.log("⏭️ Tidak ada jadwal posting hari ini");
   continue;
 }
+      //UNTUK POST STATUS 
+  const rowsStatusForAccount = statusRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
+  return rowDate === today;
+});
+console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
+
+// ❌ JIKA TIDAK ADA DATA → JANGAN BUKA FACEBOOK
+if (rowsForAccount.length === 0) {
+  console.log("⏭️ Tidak ada jadwal posting hari ini");
+  continue;
+}
+      
       
 await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     console.log("👉 BUKA FACEBOOK.COM");
