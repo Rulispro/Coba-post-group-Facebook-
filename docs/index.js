@@ -932,6 +932,9 @@ function delay(ms) {
       const today = new Date(
   new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
 ).toISOString().slice(0, 10);
+      console.log("📅 TODAY (WIB):", today);
+console.log("📋 Semua status rows:", statusRows);
+      
 
 //const rowsForAccount = templateRows.filter(row => {
  // if (row.account !== acc.account) return false;
@@ -942,7 +945,13 @@ function delay(ms) {
       //versi grup baru 
  const rowsForAccount = groupRows.filter(row => {
   if (row.account !== acc.account) return false;
-
+   //baru 
+   statusRows.forEach(r => {
+  console.log("STATUS XLSX:", `[${r.account}]`, r.tanggal);
+});
+console.log("ACCOUNT JSON:", `[${acc.account}]`);
+   
+//Lama
   const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
   return rowDate === today;
 });
