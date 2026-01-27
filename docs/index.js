@@ -55,57 +55,81 @@ function urlExists(url) {
 }
 
 
+// BACA TEMPLATE XLSX GRUP LAMA BERHASIL 
+//function readTemplate(file) {
+  //console.log("📂 readTemplate dipanggil");
+ // console.log("📄 File:", file);
 
+ // if (!fs.existsSync(file)) {
+    //throw new Error("❌ File XLSX tidak ditemukan: " + file);
+ // }
+
+ //) console.log("📦 XLSX object:", typeof XLSX);
+
+ // const wb = XLSX.readFile(file);
+
+ /// console.log("📑 SheetNames:", wb.SheetNames);
+
+ /// const targetSheet = wb.SheetNames.find(
+  //)  s => s.trim().toLowerCase() === "postGroup"
+ //) );
+
+ // if (!targetSheet) {
+   // throw new Error("❌ Sheet 'Lembar 1' tidak ditemukan");
+//  }
+
+ // console.log("✅ Pakai sheet:", targetSheet);
+
+  //const sheet = wb.Sheets[targetSheet];
+
+ // const rows = XLSX.utils.sheet_to_json(sheet, {
+  //  defval: "",
+   // raw: false
+ /// });
+
+///  console.log("📊 Total row:", rows.length);
+//  console.log("🧪 Row[0]:", rows[0]);
+//  console.log("🧪 Keys row[0]:", Object.keys(rows[0] || {}));
+
+ /// function normalizeRow(row) {
+  ///const clean = {};
+  ///for (const k in row) {
+    ///clean[k.trim()] =
+     /// typeof row[k] === "string" ? row[k].trim() : row[k];
+ /// }
+///  return clean;
+//}
+
+////return rows.map(normalizeRow);
+//}
+//VERSI BARU BUAT TEST
 function readTemplate(file) {
-  console.log("📂 readTemplate dipanggil");
-  console.log("📄 File:", file);
-
   if (!fs.existsSync(file)) {
     throw new Error("❌ File XLSX tidak ditemukan: " + file);
   }
 
-  console.log("📦 XLSX object:", typeof XLSX);
-
   const wb = XLSX.readFile(file);
+  const result = {};
 
-  console.log("📑 SheetNames:", wb.SheetNames);
+  for (const sheetName of wb.SheetNames) {
+    const sheet = wb.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet, {
+      defval: "",
+      raw: false
+    });
 
-  const targetSheet = wb.SheetNames.find(
-    s => s.trim().toLowerCase() === "postGroup"
-  );
-
-  if (!targetSheet) {
-    throw new Error("❌ Sheet 'Lembar 1' tidak ditemukan");
+    result[sheetName.trim()] = rows.map(row => {
+      const clean = {};
+      for (const k in row) {
+        clean[k.trim()] =
+          typeof row[k] === "string" ? row[k].trim() : row[k];
+      }
+      return clean;
+    });
   }
 
-  console.log("✅ Pakai sheet:", targetSheet);
-
-  const sheet = wb.Sheets[targetSheet];
-
-  const rows = XLSX.utils.sheet_to_json(sheet, {
-    defval: "",
-    raw: false
-  });
-
-  console.log("📊 Total row:", rows.length);
-  console.log("🧪 Row[0]:", rows[0]);
-  console.log("🧪 Keys row[0]:", Object.keys(rows[0] || {}));
-
-  function normalizeRow(row) {
-  const clean = {};
-  for (const k in row) {
-    clean[k.trim()] =
-      typeof row[k] === "string" ? row[k].trim() : row[k];
-  }
-  return clean;
+  return result;
 }
-
-return rows.map(normalizeRow);
-
-
-  
-}
-
 
 //--FUNGSI RUN ACCOUNT--//
 
@@ -666,9 +690,15 @@ function delay(ms) {
       throw new Error("❌ template1.xlsx tidak ditemukan");
     }
 
-    const templateRows = readTemplate(TEMPLATE_PATH);
 
-    console.log("📦 Template rows siap dipakai:", templateRows.length);
+    const templates = readTemplate(TEMPLATE_PATH);
+    📑 Sheet terbaca: [ 'postGroup', 'postStatus' ]
+
+const groupRows = templates.postGroup || [];
+const statusRows = templates.postStatus || [];
+   // const templateRows = readTemplate(TEMPLATE_PATH);
+
+    //console.log("📦 Template rows siap dipakai:", templateRows.length);
     
     
     const browser = await puppeteer.launch({
