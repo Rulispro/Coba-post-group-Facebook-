@@ -752,12 +752,20 @@ function delay(ms) {
       // ================== FILTER DULU ==================
 const today = new Date().toISOString().slice(0, 10);
 
-const rowsForAccount = templateRows.filter(row => {
+//const rowsForAccount = templateRows.filter(row => {
+ // if (row.account !== acc.account) return false;
+
+  ///const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
+  ///return rowDate === today;
+///});
+      //versi grup baru 
+ const rowsForAccount = groupRows.filter(row => {
   if (row.account !== acc.account) return false;
 
   const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
   return rowDate === today;
 });
+
 
 console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
 
