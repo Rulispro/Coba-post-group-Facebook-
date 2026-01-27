@@ -13,7 +13,8 @@ puppeteer.use(StealthPlugin())
 //FUNGSI POSTING STATUS 
 async function runStatus(page, row) {
   console.log(`\n📝 Post STATUS → ${row.account}`);
-
+  const account = row.account;
+  console.log(`\n📝 Post STATUS → ${account}`);
   const caption = row.caption;
   const mediaUrl = row.media_url || row.github_release;
 
@@ -184,9 +185,8 @@ await page.evaluate(() => {
 console.log("✅ Klik POST (EN+ID)");
 await delay(3000);
 console.log(`✅ Posting selesai untuk ${account}`);
+}
 
-            
-  
 //--ACAK JEDA LINK GRUPNYA --//
 let lastDelay = null;
 
