@@ -397,10 +397,10 @@ await page.evaluate(() => {
 
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
-      await page.waitForSelector(
-    'div[role="button"][data-mcomponent="ServerTextArea"]',
-    { timeout: 20000 }
-  );
+   //   await page.waitForSelector(
+   // 'div[role="button"][data-mcomponent="ServerTextArea"]',
+   /// { timeout: 20000 }
+///  );
 
   await page.evaluate(() => {
     const el = document.querySelector(
