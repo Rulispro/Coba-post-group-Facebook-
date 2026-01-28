@@ -530,35 +530,63 @@ async function safeClickEl(el) {
 }
 
 // ===== Klik composer aman pakai trigger React
+
 async function clickComposer(page) {
   try {
     const result = await page.evaluate(() => {
-      const span = [...document.querySelectorAll("span")].find(e =>
-        e.innerText?.toLowerCase().includes("write something") ||
-        e.innerText?.toLowerCase().includes("tulis sesuatu")
-      );
-      if (!span) return false;
 
-      const el = span.closest("div[data-mcomponent='TextArea']") ||
-                 span.closest("div[role='textbox']") ||
-                 span.parentElement;
+      function reactTrigger(el) {
+        el.scrollIntoView({ block: "center" });
 
-      if (!el) return false;
+        const events = [
+          "pointerdown",
+          "touchstart",
+          "mousedown",
+          "mouseup",
+          "touchend",
+          "click"
+        ];
 
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
+        events.forEach(type => {
+          el.dispatchEvent(
+            new Event(type, { bubbles: true, cancelable: true })
+          );
+        });
 
-      ["pointerdown", "mousedown", "mouseup", "click"].forEach(type =>
-        el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }))
-      );
+        el.focus?.();
+      }
 
-      el.dispatchEvent(new FocusEvent("focus", { bubbles: true }));
-      el.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+      // 1️⃣ CARI BERDASARKAN TEKS (KALAU ADA)
+      let target = [...document.querySelectorAll("span")].find(e => {
+        const t = e.innerText?.toLowerCase() || "";
+        return t.includes("write something") || t.includes("tulis sesuatu");
+      });
 
+      if (target) {
+        target =
+          target.closest("div[data-mcomponent='TextArea']") ||
+          target.closest("div[role='textbox']") ||
+          target.parentElement;
+      }
+
+      // 2️⃣ FALLBACK — CARI TEXTBOX / CONTENTEDITABLE
+      if (!target) {
+        target =
+          document.querySelector("div[role='textbox']") ||
+          document.querySelector("div[contenteditable='true']");
+      }
+
+      if (!target) return false;
+
+      reactTrigger(target);
       return true;
     });
 
-    if (result) console.log("✅ Composer berhasil dibuka (React trigger)");
-    else console.log("❌ Composer tidak ketemu");
+    if (result) {
+      console.log("✅ Composer berhasil dibuka (React trigger)");
+    } else {
+      console.log("❌ Composer tidak ketemu");
+    }
 
     return result;
   } catch (err) {
