@@ -969,37 +969,37 @@ console.log("📋 Semua status rows:", statusRows);
 //});
 
       //coba baru filter grup 
-   //  const rowsForAccount = groupRows.filter(row => {
- // if (row.account !== acc.account) return false;
-  //const rowDate = parseTanggalXLSX(row.tanggal);
- // return rowDate === today;
-//});
+     const rowsForAccount = groupRows.filter(row => {
+    if (row.account !== acc.account) return false;
+    const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+ });
       
  // ================== FILTER GROUP BERDASARKAN TANGGAL ==================
-const rowsForAccount = groupRows.filter(row => {
-  if (row.account !== acc.account) return false;
+//group/const rowsForAccount = groupRows.filter(row => {
+ // if (row.account !== acc.account) return false;
 
-  if (!row.tanggal) {
-    console.log("⚠️ Row grup TANPA tanggal, skip:", row);
-    return false;
-  }
+ // if (!row.tanggal) {
+//    console.log("⚠️ Row grup TANPA tanggal, skip:", row);
+  //  return false;
+  //}
+//
+ // const rowDate = parseTanggalXLSX(row.tanggal);
 
-  const rowDate = parseTanggalXLSX(row.tanggal);
+//  if (!rowDate) {
+   // console.log("⚠️ Format tanggal grup tidak valid:", row.tanggal);
+  //  return false;
+  //}
 
-  if (!rowDate) {
-    console.log("⚠️ Format tanggal grup tidak valid:", row.tanggal);
-    return false;
-  }
+ // if (rowDate !== today) {
+   // console.log(
+    ///  `⏭️ Skip grup karena beda tanggal → XLSX: ${rowDate}, TODAY: ${today}`
+   // );
+   /// return false;
+ /// }
 
-  if (rowDate !== today) {
-    console.log(
-      `⏭️ Skip grup karena beda tanggal → XLSX: ${rowDate}, TODAY: ${today}`
-    );
-    return false;
-  }
-
-  return true;
-});
+ /// return true;
+//$group});
 
 console.log("ACCOUNT JSON:", `[${acc.account}]`);
    
