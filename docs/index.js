@@ -368,7 +368,19 @@ async function runAccount(page, row) {
     console.log(`➡️ ${groupUrl}`);
     
 
+// ✅ Validasi URL grup
+    if (!groupUrl.startsWith("http")) {
+      groupUrl = "https://m.facebook.com/" + groupUrl.replace(/^\/+/, "");
+    }
 
+    if (!groupUrl.includes("/groups/")) {
+      console.log("❌ URL grup tidak valid, skip:", groupUrl);
+      continue; // skip kalau bukan URL grup
+    }
+
+    console.log(`\n📌 [${account}] Membuka grup ${i + 1}/${groups.length}`);
+    console.log("➡️", groupUrl);
+    
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
