@@ -367,7 +367,7 @@ async function runAccount(page, row) {
   let writeClicked = await clickComposer(page);
   if (!writeClicked) {
    console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
-    skip grup ini jika tidak ketemu
+    //skip grup ini jika tidak ketemu
     }
 
     // ===== 1️⃣ Klik composer / write something
