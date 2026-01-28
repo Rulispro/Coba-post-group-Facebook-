@@ -348,9 +348,9 @@ async function runAccount(page, row) {
 
   
   const groups = String(row.grup_link || "")
-    .split(",")
-    .map(g => g.trim())
-    .filter(Boolean);
+  .split(",")
+  .map(g => g.replace(/[\s\r\n]+/g, "").trim()) // hapus spasi, CR, LF
+  .filter(Boolean);
   
   
    if (!account || !caption || !mediaUrl || groups.length === 0) {
