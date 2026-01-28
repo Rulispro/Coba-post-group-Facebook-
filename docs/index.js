@@ -373,7 +373,7 @@ async function runAccount(page, row) {
     await page.waitForTimeout(4000);
 
     ///KLIK COMPOSER TRIGGER REACT///
-  let writeClicked = await clickComposer(page);
+  let writeClicked = await clickComposerGroup(page);
   if (!writeClicked) {
    console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
     //skip grup ini jika tidak ketemu
@@ -542,44 +542,40 @@ async function safeClickEl(el) {
 
 
 async function clickComposer(page) {
-try {
+  try {
     const result = await page.evaluate(() => {
 
       function reactTrigger(el) {
         el.scrollIntoView({ block: "center" });
 
-       const events = [
-         "pointerdown",
+        [
+          "pointerdown",
           "touchstart",
           "mousedown",
-         "mouseup",
+          "mouseup",
           "touchend",
           "click"
-       ];
-
-        events.forEach(type => {
+        ].forEach(type =>
           el.dispatchEvent(
             new Event(type, { bubbles: true, cancelable: true })
-          );
-        });
+          )
+        );
 
         el.focus?.();
-     }
+      }
 
-      // 1️⃣ CARI BERDASARKAN TEKS (KALAU ADA)
       let target = [...document.querySelectorAll("span")].find(e => {
-       const t = e.innerText?.toLowerCase() || "";
-       return t.includes("write something") || t.includes("tulis sesuatu");
+        const t = e.innerText?.toLowerCase() || "";
+        return t.includes("write something") || t.includes("tulis sesuatu");
       });
 
       if (target) {
         target =
           target.closest("div[data-mcomponent='TextArea']") ||
-        target.closest("div[role='textbox']") ||
+          target.closest("div[role='textbox']") ||
           target.parentElement;
       }
 
-      // 2️⃣ FALLBACK — CARI TEXTBOX / CONTENTEDITABLE
       if (!target) {
         target =
           document.querySelector("div[role='textbox']") ||
@@ -592,13 +588,13 @@ try {
       return true;
     });
 
-    if (result) {
-   console.log("✅ Composer berhasil dibuka (React trigger)");
-    } else {
-      console.log("❌ Composer tidak ketemu");
-    }
+    console.log(
+      result
+        ? "✅ Composer berhasil dibuka (React trigger)"
+        : "❌ Composer tidak ketemu"
+    );
 
-   return result;
+    return result;
   } catch (err) {
     console.log("⚠️ Error klik composer:", err.message);
     return false;
