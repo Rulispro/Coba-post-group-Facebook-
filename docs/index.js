@@ -396,24 +396,24 @@ await page.evaluate(() => {
 });
 
     ///KLIK COMPOSER TRIGGER REACT///
-  let writeClicked = await clickComposerGroup(page);
-  if (!writeClicked) {
-   console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
+  //let writeClicked = await clickComposerGroup(page);
+ // if (!writeClicked) {
+   //console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
     //skip grup ini jika tidak ketemu
     }
 
     // ===== 1️⃣ Klik composer / write something
- // let writeClicked =
- /// await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
-  ///await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
- //// await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+  let writeClicked =
+  await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
 
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
-   //   await page.waitForSelector(
-   // 'div[role="button"][data-mcomponent="ServerTextArea"]',
-   /// { timeout: 20000 }
-///  );
+   await page.waitForSelector(
+    'div[role="button"][data-mcomponent="ServerTextArea"]',
+    { timeout: 20000 }
+  );
 
   await page.evaluate(() => {
     const el = document.querySelector(
@@ -562,68 +562,7 @@ async function safeClickEl(el) {
 }
 
 // ===== Klik composer aman pakai trigger React
-async function clickComposerGroup(page) {
-  try {
-    const result = await page.evaluate(() => {
 
-      function reactTrigger(el) {
-        el.scrollIntoView({ block: "center", behavior: "instant" });
-
-        [
-          "pointerdown",
-          "touchstart",
-          "mousedown",
-          "mouseup",
-          "touchend",
-          "click",
-          "focus"
-        ].forEach(type =>
-          el.dispatchEvent(
-            new Event(type, { bubbles: true, cancelable: true })
-          )
-        );
-
-        el.focus && el.focus();
-      }
-
-      // 1️⃣ TARGET UTAMA: TextArea container (sesuai markup f1)
-      let target = document.querySelector(
-        'div[data-mcomponent="TextArea"]'
-      );
-
-      // 2️⃣ FALLBACK: span.f1 → naik ke TextArea
-      if (!target) {
-        const label = document.querySelector("span.f1");
-        if (label) {
-          target = label.closest('div[data-mcomponent="TextArea"]');
-        }
-      }
-
-      // 3️⃣ FALLBACK LAMA (jaga-jaga FB A/B test)
-      if (!target) {
-        target =
-          document.querySelector('div[role="textbox"]') ||
-          document.querySelector('div[contenteditable="true"]');
-      }
-
-      if (!target) return false;
-
-      reactTrigger(target);
-      return true;
-    });
-
-    console.log(
-      result
-        ? "✅ Composer GROUP (TextArea f1) berhasil diklik"
-        : "❌ Composer GROUP TextArea tidak ditemukan"
-    );
-
-    return result;
-  } catch (err) {
-    console.log("⚠️ Error clickComposerGroup:", err.message);
-    return false;
-  }
-}
 
 
       
