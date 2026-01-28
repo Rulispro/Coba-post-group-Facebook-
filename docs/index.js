@@ -541,7 +541,7 @@ async function safeClickEl(el) {
 // ===== Klik composer aman pakai trigger React
 
 
-async function clickComposer(page) {
+async function clickComposerGroup(page) {
   try {
     const result = await page.evaluate(() => {
 
