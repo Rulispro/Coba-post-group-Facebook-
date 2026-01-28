@@ -994,10 +994,10 @@ function delay(ms) {
 ).toISOString().slice(0, 10);
       console.log("📅 TODAY (WIB):", today);
 console.log("📋 Semua status rows:", statusRows);
-      
-
-//const rowsForAccount = templateRows.filter(row => {
- // if (row.account !== acc.account) return false;
+     
+      //coba
+const rowsForAccount = templateRows.filter(row => {
+  if (row.account !== acc.account) return false;
 //baru sementara 
       const rowsStatusForAccount = statusRows.filter(row => {
   if (row.account !== acc.account) return false;
@@ -1027,9 +1027,9 @@ console.log("📋 Semua status rows:", statusRows);
 console.log("ACCOUNT JSON:", `[${acc.account}]`);
    
 //Lama
-   const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
-   return rowDate === today;
-});
+ //  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
+  /// return rowDate === today;
+///});
 
 
 console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
