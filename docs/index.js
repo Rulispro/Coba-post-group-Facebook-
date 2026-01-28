@@ -991,10 +991,11 @@ if (rowsForAccount.length === 0) {
 //  return rowDate === today;
     
       //baru sementara 
-    const rowDate = parseTanggalXLSX(row.tanggal);
-return rowDate === today;
+    //const rowDate = parseTanggalXLSX(row.tanggal);
+///return rowDate === today;
 
-});
+//});
+      
 //lamaconsole.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
 
 // ❌ JIKA TIDAK ADA DATA → JANGAN BUKA FACEBOOK
