@@ -9,6 +9,18 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
+//SEMENTARA 
+function parseTanggalXLSX(tgl) {
+  if (!tgl) return null;
+
+  // format: M/D/YY atau MM/DD/YY
+  const [m, d, y] = tgl.split("/");
+
+  const year = Number(y) < 100 ? 2000 + Number(y) : Number(y);
+
+  return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                    }
+
 
 //FUNGSI POSTING STATUS 
 async function runStatus(page, row) {
@@ -938,7 +950,14 @@ console.log("📋 Semua status rows:", statusRows);
 
 //const rowsForAccount = templateRows.filter(row => {
  // if (row.account !== acc.account) return false;
+//baru sementara 
+      const rowsStatusForAccount = statusRows.filter(row => {
+  if (row.account !== acc.account) return false;
 
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+});
+      
   ///const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
   ///return rowDate === today;
 ///});
@@ -965,11 +984,16 @@ if (rowsForAccount.length === 0) {
   continue;
 }
       //UNTUK POST STATUS 
-  const rowsStatusForAccount = statusRows.filter(row => {
-  if (row.account !== acc.account) return false;
+ //lama const rowsStatusForAccount = statusRows.filter(row => {
+  //if (row.account !== acc.account) return false;
 
-  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
-  return rowDate === today;
+//lama  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
+//  return rowDate === today;
+    
+      //baru sementara 
+    const rowDate = parseTanggalXLSX(row.tanggal);
+return rowDate === today;
+
 });
 //lamaconsole.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
 
