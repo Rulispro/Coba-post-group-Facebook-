@@ -962,12 +962,20 @@ console.log("📋 Semua status rows:", statusRows);
   ///return rowDate === today;
 ///});
       //versi grup baru 
- const rowsForAccount = groupRows.filter(row => {
-  if (row.account !== acc.account) return false;
+// const rowsForAccount = groupRows.filter(row => {
+  //if (row.account !== acc.account) return false;
    //baru 
-   statusRows.forEach(r => {
-  console.log("STATUS XLSX:", `[${r.account}]`, r.tanggal);
+ ///  statusRows.forEach(r => {
+ /// console.log("STATUS XLSX:", `[${r.account}]`, r.tanggal);
+///});
+
+      //coba baru filter grup 
+     const rowsForAccount = groupRows.filter(row => {
+  if (row.account !== acc.account) return false;
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
 });
+ 
 console.log("ACCOUNT JSON:", `[${acc.account}]`);
    
 //Lama
