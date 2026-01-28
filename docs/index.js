@@ -1082,9 +1082,9 @@ for (const row of rowsForAccount) {
   await runAccount(page, row);
 }
       // POST STATUS (kalau ada)
-for (const row of rowsStatusForAccount) {
-  await runStatus(page, row);
-}
+//for (const row of rowsStatusForAccount) {
+//  await runStatus(page, row);
+//}
 
       // ===== Stop recorder
       await recorder.stop();
