@@ -368,6 +368,7 @@ async function runAccount(page, row) {
     console.log(`➡️ ${groupUrl}`);
     
 
+
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
@@ -952,6 +953,16 @@ function delay(ms) {
     // 🔁 LOOP PER AKUN
     for (const acc of accounts) {
       console.log(`\n🚀 Start akun: ${acc.account}`);
+      let groupUrl = groups[i];
+
+if (!groupUrl.startsWith("http")) {
+  groupUrl = "https://m.facebook.com/" + groupUrl.replace(/^\/+/, "");
+}
+
+if (!groupUrl.includes("/groups/")) {
+  console.log("❌ URL grup tidak valid, skip:", groupUrl);
+  continue;
+}
 
       const context = await browser.createIncognitoBrowserContext();
       const page = await context.newPage();
@@ -1018,12 +1029,38 @@ console.log("📋 Semua status rows:", statusRows);
 //});
 
       //coba baru filter grup 
-     const rowsForAccount = groupRows.filter(row => {
+   //  const rowsForAccount = groupRows.filter(row => {
+ // if (row.account !== acc.account) return false;
+  //const rowDate = parseTanggalXLSX(row.tanggal);
+ // return rowDate === today;
+//});
+      
+ // ================== FILTER GROUP BERDASARKAN TANGGAL ==================
+const rowsForAccount = groupRows.filter(row => {
   if (row.account !== acc.account) return false;
+
+  if (!row.tanggal) {
+    console.log("⚠️ Row grup TANPA tanggal, skip:", row);
+    return false;
+  }
+
   const rowDate = parseTanggalXLSX(row.tanggal);
-  return rowDate === today;
+
+  if (!rowDate) {
+    console.log("⚠️ Format tanggal grup tidak valid:", row.tanggal);
+    return false;
+  }
+
+  if (rowDate !== today) {
+    console.log(
+      `⏭️ Skip grup karena beda tanggal → XLSX: ${rowDate}, TODAY: ${today}`
+    );
+    return false;
+  }
+
+  return true;
 });
- 
+
 console.log("ACCOUNT JSON:", `[${acc.account}]`);
    
 //Lama
@@ -1069,6 +1106,7 @@ if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0) {
   continue;
 }
       
+
 await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     console.log("👉 BUKA FACEBOOK.COM");
 
