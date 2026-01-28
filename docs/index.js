@@ -987,10 +987,10 @@ console.log("ACCOUNT JSON:", `[${acc.account}]`);
 console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
 
 // ❌ JIKA TIDAK ADA DATA → JANGAN BUKA FACEBOOK
-if (rowsForAccount.length === 0) {
-  console.log("⏭️ Tidak ada jadwal posting hari ini");
-  continue;
-}
+//if (rowsForAccount.length === 0) {
+ /// console.log("⏭️ Tidak ada jadwal posting hari ini");
+///  continue;
+//}
       //UNTUK POST STATUS 
  //lama const rowsStatusForAccount = statusRows.filter(row => {
   //if (row.account !== acc.account) return false;
