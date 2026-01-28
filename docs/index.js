@@ -1116,16 +1116,6 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
 
       // ✅ LANGSUNG POSTGROUP PAKAI DATA
 for (const row of rowsForAccount) {
-  let groupUrl = groups[i];
-
-if (!groupUrl.startsWith("http")) {
-  groupUrl = "https://m.facebook.com/" + groupUrl.replace(/^\/+/, "");
-}
-
-if (!groupUrl.includes("/groups/")) {
-  console.log("❌ URL grup tidak valid, skip:", groupUrl);
-  continue;
-}
   await runAccount(page, row);
 }
       // POST STATUS (kalau ada)
