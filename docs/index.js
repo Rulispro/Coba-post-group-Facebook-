@@ -538,108 +538,72 @@ async function safeClickEl(el) {
   }
 }
 
-async function clickComposerGroup(page) {
-  const ok = await page.evaluate(() => {
-    const el = document.querySelector(
-      'div[data-mcomponent="ServerTextArea"]'
-    );
-    if (!el) return false;
-
-    el.scrollIntoView({ block: "center" });
-
-    const events = [
-      "pointerdown",
-      "touchstart",
-      "mousedown",
-      "pointerup",
-      "touchend",
-      "mouseup",
-      "click"
-    ];
-
-    events.forEach(type =>
-      el.dispatchEvent(
-        new Event(type, { bubbles: true, cancelable: true })
-      )
-    );
-
-    return true;
-  });
-
-  console.log(ok
-    ? "✅ Composer GROUP diklik (ServerTextArea)"
-    : "❌ ServerTextArea tidak ditemukan"
-  );
-
-  return ok;
-}
-
 // ===== Klik composer aman pakai trigger React
 
 
-//$async function clickComposer(page) {
-  //try {
-  //  const result = await page.evaluate(() => {
+async function clickComposer(page) {
+try {
+    const result = await page.evaluate(() => {
 
-    //  function reactTrigger(el) {
-        //el.scrollIntoView({ block: "center" });
+      function reactTrigger(el) {
+        el.scrollIntoView({ block: "center" });
 
-       /// const events = [
-        ///  "pointerdown",
-         /// "touchstart",
-         /// "mousedown",
-         /// "mouseup",
-        ///  "touchend",
-         /// "click"
-       /// ];
+       const events = [
+         "pointerdown",
+          "touchstart",
+          "mousedown",
+         "mouseup",
+          "touchend",
+          "click"
+       ];
 
-       /// events.forEach(type => {
-         /// el.dispatchEvent(
-          ///  new Event(type, { bubbles: true, cancelable: true })
-         /// );
-        ///});
+        events.forEach(type => {
+          el.dispatchEvent(
+            new Event(type, { bubbles: true, cancelable: true })
+          );
+        });
 
-      ///  el.focus?.();
-    ///  }
+        el.focus?.();
+     }
 
       // 1️⃣ CARI BERDASARKAN TEKS (KALAU ADA)
-     /// let target = [...document.querySelectorAll("span")].find(e => {
-       /// const t = e.innerText?.toLowerCase() || "";
-       /// return t.includes("write something") || t.includes("tulis sesuatu");
-     /// });
+      let target = [...document.querySelectorAll("span")].find(e => {
+       const t = e.innerText?.toLowerCase() || "";
+       return t.includes("write something") || t.includes("tulis sesuatu");
+      });
 
-     /// if (target) {
-       /// target =
-          //target.closest("div[data-mcomponent='TextArea']") ||
-        //  target.closest("div[role='textbox']") ||
-        ///  target.parentElement;
-    ///  }
+      if (target) {
+        target =
+          target.closest("div[data-mcomponent='TextArea']") ||
+        target.closest("div[role='textbox']") ||
+          target.parentElement;
+      }
 
       // 2️⃣ FALLBACK — CARI TEXTBOX / CONTENTEDITABLE
-    ///  if (!target) {
-      ///  target =
-        ///  document.querySelector("div[role='textbox']") ||
-         /// document.querySelector("div[contenteditable='true']");
-     /// }
+      if (!target) {
+        target =
+          document.querySelector("div[role='textbox']") ||
+          document.querySelector("div[contenteditable='true']");
+      }
 
-     /// if (!target) return false;
+      if (!target) return false;
 
-     /// reactTrigger(target);
-     /// return true;
-  ///  });
+      reactTrigger(target);
+      return true;
+    });
 
-   /// if (result) {
-     /// console.log("✅ Composer berhasil dibuka (React trigger)");
-   /// } else {
-     /// console.log("❌ Composer tidak ketemu");
-   /// }
+    if (result) {
+   console.log("✅ Composer berhasil dibuka (React trigger)");
+    } else {
+      console.log("❌ Composer tidak ketemu");
+    }
 
-   /// return result;
-///  } catch (err) {
-   /// console.log("⚠️ Error klik composer:", err.message);
-  ///  return false;
- /// }
-//}
+   return result;
+  } catch (err) {
+    console.log("⚠️ Error klik composer:", err.message);
+    return false;
+  }
+}
 
 
 // ===== Fungsi klik by XPath
