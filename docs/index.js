@@ -906,7 +906,25 @@ function delay(ms) {
       console.log(`\n🚀 Start akun: ${acc.account}`);
       const context = await browser.createIncognitoBrowserContext();
       const page = await context.newPage();
-
+      // ===== PATCH BUG userAgentData FACEBOOK (WAJIB)
+      await page.evaluateOnNewDocument(() => {
+        try {
+        if (navigator.userAgentData) {
+         navigator.userAgentData.getHighEntropyValues = () => {
+         return Promise.resolve({
+          architecture: "arm",
+          model: "",
+          platform: "Android",
+          platformVersion: "10",
+          uaFullVersion: "120.0.0.0"
+           });
+           };
+         }
+        } catch (e) {
+    // silent
+        }
+       });
+      
       await page.setBypassCSP(true);
 
       // 🔊 Monitor console
