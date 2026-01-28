@@ -37,8 +37,13 @@ async function runStatus(page, row) {
 
   // 1️⃣ BUKA HOME FB (WAJIB)
   await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
+  
   await delay(3000);
-
+  let statusClicked = await clickComposerStatus(page);
+  if (!statusClicked) {
+   console.log("⚠️ Composer gagal dibuka, skip status ini atau coba scan manual");
+    //skip grup ini jika tidak ketemu
+    }
   // 2️⃣ KLIK COMPOSER
   const clicked = await page.evaluate(() => {
     const keywords = [
@@ -364,7 +369,7 @@ async function runAccount(page, row) {
     await page.waitForTimeout(4000);
 
     ///KLIK COMPOSER TRIGGER REACT///
-  let writeClicked = await clickComposer(page);
+  let writeClicked = await clickComposerGroup(page);
   if (!writeClicked) {
    console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
     //skip grup ini jika tidak ketemu
@@ -529,7 +534,7 @@ async function safeClickEl(el) {
   }
 }
 
-async function clickComposer(page) {
+async function clickComposerGroup(page) {
   const ok = await page.evaluate(() => {
     const el = document.querySelector(
       'div[data-mcomponent="ServerTextArea"]'
