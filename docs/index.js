@@ -332,19 +332,7 @@ function readTemplate(file) {
 //--FUNGSI RUN ACCOUNT--//
 
 async function runAccount(page, row) {
-  (async () => {
-  await page.evaluate(() => {
-    console.log(
-      "SPAN:",
-      [...document.querySelectorAll("span")]
-        .map(e => e.textContent?.trim())
-        .filter(Boolean)
-        .slice(0, 20)
-    );
-  });
-})();
-  
-  console.log("\n🧪 runAccount row:", row);
+ console.log("\n🧪 runAccount row:", row);
     const account = row.account;
   const caption = row.caption;
   const mediaUrl = row.media_url || row.github_release;
@@ -383,6 +371,16 @@ async function runAccount(page, row) {
     // ===== Buka grup
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
+    // DEBUG SETELAH PAGE SIAP
+await page.evaluate(() => {
+  console.log(
+    "SPAN:",
+    [...document.querySelectorAll("span")]
+      .map(e => e.textContent?.trim())
+      .filter(Boolean)
+      .slice(0, 20)
+  );
+});
 
     ///KLIK COMPOSER TRIGGER REACT///
   let writeClicked = await clickComposerGroup(page);
@@ -958,8 +956,8 @@ function delay(ms) {
       await page.setBypassCSP(true);
 
       // 🔊 Monitor console
-    //$  page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
-   //$   page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
+      page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
+      page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
 
       // ===== Recorder PER AKUN
       const recorder = new PuppeteerScreenRecorder(page);
