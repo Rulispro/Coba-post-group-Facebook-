@@ -373,7 +373,7 @@ async function runAccount(page, row) {
     await page.waitForTimeout(4000);
 
     ///KLIK COMPOSER TRIGGER REACT///
-  let writeClicked = await clickComposerGroup(page);
+  let writeClicked = await clickComposer(page);
   if (!writeClicked) {
    console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
     //skip grup ini jika tidak ketemu
