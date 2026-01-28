@@ -364,17 +364,17 @@ async function runAccount(page, row) {
     await page.waitForTimeout(4000);
 
     ///KLIK COMPOSER TRIGGER REACT///
-    let writeClicked = await clickComposer(page);
-   if (!writeClicked) {
-    console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
+  //  let writeClicked = await clickComposer(page);
+  // if (!writeClicked) {
+   // console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
      // skip grup ini jika tidak ketemu
-    }
+   // }
 
     // ===== 1️⃣ Klik composer / write something
- //$ let writeClicked =
-  //$await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
-  //$await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
-  //$await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+  let writeClicked =
+  await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
 
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
@@ -531,83 +531,83 @@ async function safeClickEl(el) {
 
 // ===== Klik composer aman pakai trigger React
 
-async function clickComposer(page) {
-  try {
-    const result = await page.evaluate(() => {
+//$async function clickComposer(page) {
+  //try {
+  //  const result = await page.evaluate(() => {
 
-      function reactTrigger(el) {
-        el.scrollIntoView({ block: "center" });
+    //  function reactTrigger(el) {
+        //el.scrollIntoView({ block: "center" });
 
-        const events = [
-          "pointerdown",
-          "touchstart",
-          "mousedown",
-          "mouseup",
-          "touchend",
-          "click"
-        ];
+       /// const events = [
+        ///  "pointerdown",
+         /// "touchstart",
+         /// "mousedown",
+         /// "mouseup",
+        ///  "touchend",
+         /// "click"
+       /// ];
 
-        events.forEach(type => {
-          el.dispatchEvent(
-            new Event(type, { bubbles: true, cancelable: true })
-          );
-        });
+       /// events.forEach(type => {
+         /// el.dispatchEvent(
+          ///  new Event(type, { bubbles: true, cancelable: true })
+         /// );
+        ///});
 
-        el.focus?.();
-      }
+      ///  el.focus?.();
+    ///  }
 
       // 1️⃣ CARI BERDASARKAN TEKS (KALAU ADA)
-      let target = [...document.querySelectorAll("span")].find(e => {
-        const t = e.innerText?.toLowerCase() || "";
-        return t.includes("write something") || t.includes("tulis sesuatu");
-      });
+     /// let target = [...document.querySelectorAll("span")].find(e => {
+       /// const t = e.innerText?.toLowerCase() || "";
+       /// return t.includes("write something") || t.includes("tulis sesuatu");
+     /// });
 
-      if (target) {
-        target =
-          target.closest("div[data-mcomponent='TextArea']") ||
-          target.closest("div[role='textbox']") ||
-          target.parentElement;
-      }
+     /// if (target) {
+       /// target =
+          //target.closest("div[data-mcomponent='TextArea']") ||
+        //  target.closest("div[role='textbox']") ||
+        ///  target.parentElement;
+    ///  }
 
       // 2️⃣ FALLBACK — CARI TEXTBOX / CONTENTEDITABLE
-      if (!target) {
-        target =
-          document.querySelector("div[role='textbox']") ||
-          document.querySelector("div[contenteditable='true']");
-      }
+    ///  if (!target) {
+      ///  target =
+        ///  document.querySelector("div[role='textbox']") ||
+         /// document.querySelector("div[contenteditable='true']");
+     /// }
 
-      if (!target) return false;
+     /// if (!target) return false;
 
-      reactTrigger(target);
-      return true;
-    });
+     /// reactTrigger(target);
+     /// return true;
+  ///  });
 
-    if (result) {
-      console.log("✅ Composer berhasil dibuka (React trigger)");
-    } else {
-      console.log("❌ Composer tidak ketemu");
-    }
+   /// if (result) {
+     /// console.log("✅ Composer berhasil dibuka (React trigger)");
+   /// } else {
+     /// console.log("❌ Composer tidak ketemu");
+   /// }
 
-    return result;
-  } catch (err) {
-    console.log("⚠️ Error klik composer:", err.message);
-    return false;
-  }
-}
+   /// return result;
+///  } catch (err) {
+   /// console.log("⚠️ Error klik composer:", err.message);
+  ///  return false;
+ /// }
+//}
 
 
 // ===== Fungsi klik by XPath
-//$async function safeClickXpath(page, xpath, desc = "elemen") {
-  //$try {
-  //$  const el = await page.waitForXPath(xpath, { visible: true, timeout: 8000 });
-  //$  await el.click();
-   //$ console.log(`✅ Klik ${desc}`);
-   //$ return true;
- //$ } catch (e) {
-   //$ console.log(`❌ Gagal klik ${desc}:`, e.message);
-  //$  return false;
- //$ }
-//$}
+async function safeClickXpath(page, xpath, desc = "elemen") {
+  try {
+    const el = await page.waitForXPath(xpath, { visible: true, timeout: 8000 });
+    await el.click();
+    console.log(`✅ Klik ${desc}`);
+    return true;
+  } catch (e) {
+    console.log(`❌ Gagal klik ${desc}:`, e.message);
+    return false;
+  }
+}
 
 // ===== Fungsi scan elemen verbose
 async function scanAllElementsVerbose(page, label = "Scan") {
