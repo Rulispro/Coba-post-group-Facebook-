@@ -332,6 +332,18 @@ function readTemplate(file) {
 //--FUNGSI RUN ACCOUNT--//
 
 async function runAccount(page, row) {
+  (async () => {
+  await page.evaluate(() => {
+    console.log(
+      "SPAN:",
+      [...document.querySelectorAll("span")]
+        .map(e => e.textContent?.trim())
+        .filter(Boolean)
+        .slice(0, 20)
+    );
+  });
+})();
+  
   console.log("\n🧪 runAccount row:", row);
     const account = row.account;
   const caption = row.caption;
@@ -539,20 +551,6 @@ async function safeClickEl(el) {
 }
 
 // ===== Klik composer aman pakai trigger React
-(async () => {
-  await page.evaluate(() => {
-    console.log(
-      "SPAN:",
-      [...document.querySelectorAll("span")]
-        .map(e => e.textContent?.trim())
-        .filter(Boolean)
-        .slice(0, 20)
-    );
-  });
-})();
-
-
-
 async function clickComposerGroup(page) {
   try {
     const result = await page.evaluate(() => {
@@ -584,7 +582,8 @@ async function clickComposerGroup(page) {
       if (target) {
         target =
           target.closest("div[data-mcomponent='TextArea']") ||
-          target.closest("div[role='ServerTextArea']") ||
+          target.closest("div[data-mcomponent='ServerTextArea']") ||
+          target.closest("div[role='textbox']") ||
           target.parentElement;
       }
 
@@ -602,13 +601,13 @@ async function clickComposerGroup(page) {
 
     console.log(
       result
-        ? "✅ Composer berhasil dibuka"
-        : "❌ Composer tidak ketemu"
+        ? "✅ Composer GROUP berhasil dibuka"
+        : "❌ Composer GROUP tidak ketemu"
     );
 
     return result;
   } catch (err) {
-    console.log("⚠️ Error clickComposer:", err.message);
+    console.log("⚠️ Error clickComposerGroup:", err.message);
     return false;
   }
 }
