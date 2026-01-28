@@ -554,7 +554,7 @@ async function clickComposerGroup(page) {
     const result = await page.evaluate(() => {
 
       function reactTrigger(el) {
-        el.scrollIntoView({ block: "center" });
+        el.scrollIntoView({ block: "center", behavior: "instant" });
 
         [
           "pointerdown",
@@ -562,33 +562,35 @@ async function clickComposerGroup(page) {
           "mousedown",
           "mouseup",
           "touchend",
-          "click"
+          "click",
+          "focus"
         ].forEach(type =>
           el.dispatchEvent(
             new Event(type, { bubbles: true, cancelable: true })
           )
         );
 
-        el.focus?.();
+        el.focus && el.focus();
       }
 
-      let target = [...document.querySelectorAll("span")].find(e => {
-        const t = (e.textContent || "").toLowerCase();
-        return t.includes("write something") || t.includes("tulis sesuatu");
-      });
+      // 1️⃣ TARGET UTAMA: TextArea container (sesuai markup f1)
+      let target = document.querySelector(
+        'div[data-mcomponent="TextArea"]'
+      );
 
-      if (target) {
-        target =
-          target.closest("div[data-mcomponent='TextArea']") ||
-          target.closest("div[data-mcomponent='ServerTextArea']") ||
-          target.closest("div[role='textbox']") ||
-          target.parentElement;
+      // 2️⃣ FALLBACK: span.f1 → naik ke TextArea
+      if (!target) {
+        const label = document.querySelector("span.f1");
+        if (label) {
+          target = label.closest('div[data-mcomponent="TextArea"]');
+        }
       }
 
+      // 3️⃣ FALLBACK LAMA (jaga-jaga FB A/B test)
       if (!target) {
         target =
-          document.querySelector("div[role='textbox']") ||
-          document.querySelector("div[contenteditable='true']");
+          document.querySelector('div[role="textbox"]') ||
+          document.querySelector('div[contenteditable="true"]');
       }
 
       if (!target) return false;
@@ -599,8 +601,8 @@ async function clickComposerGroup(page) {
 
     console.log(
       result
-        ? "✅ Composer GROUP berhasil dibuka"
-        : "❌ Composer GROUP tidak ketemu"
+        ? "✅ Composer GROUP (TextArea f1) berhasil diklik"
+        : "❌ Composer GROUP TextArea tidak ditemukan"
     );
 
     return result;
@@ -609,6 +611,7 @@ async function clickComposerGroup(page) {
     return false;
   }
 }
+
 
       
 
