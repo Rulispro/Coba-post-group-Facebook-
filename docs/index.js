@@ -539,9 +539,17 @@ async function safeClickEl(el) {
 }
 
 // ===== Klik composer aman pakai trigger React
+await page.evaluate(() => {
+  console.log(
+    "SPAN:",
+    [...document.querySelectorAll("span")]
+      .map(e => e.textContent?.trim())
+      .filter(Boolean)
+      .slice(0, 20)
+  );
+});
 
-
-async function clickComposerGroup(page) {
+async function clickComposer(page) {
   try {
     const result = await page.evaluate(() => {
 
@@ -565,7 +573,7 @@ async function clickComposerGroup(page) {
       }
 
       let target = [...document.querySelectorAll("span")].find(e => {
-        const t = e.innerText?.toLowerCase() || "";
+        const t = (e.textContent || "").toLowerCase();
         return t.includes("write something") || t.includes("tulis sesuatu");
       });
 
@@ -590,16 +598,17 @@ async function clickComposerGroup(page) {
 
     console.log(
       result
-        ? "✅ Composer berhasil dibuka (React trigger)"
+        ? "✅ Composer berhasil dibuka"
         : "❌ Composer tidak ketemu"
     );
 
     return result;
   } catch (err) {
-    console.log("⚠️ Error klik composer:", err.message);
+    console.log("⚠️ Error clickComposer:", err.message);
     return false;
   }
-}
+        }
+      
 
 
 // ===== Fungsi klik by XPath
