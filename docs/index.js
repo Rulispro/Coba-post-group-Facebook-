@@ -953,17 +953,6 @@ function delay(ms) {
     // 🔁 LOOP PER AKUN
     for (const acc of accounts) {
       console.log(`\n🚀 Start akun: ${acc.account}`);
-      let groupUrl = groups[i];
-
-if (!groupUrl.startsWith("http")) {
-  groupUrl = "https://m.facebook.com/" + groupUrl.replace(/^\/+/, "");
-}
-
-if (!groupUrl.includes("/groups/")) {
-  console.log("❌ URL grup tidak valid, skip:", groupUrl);
-  continue;
-}
-
       const context = await browser.createIncognitoBrowserContext();
       const page = await context.newPage();
 
@@ -1127,6 +1116,16 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
 
       // ✅ LANGSUNG POSTGROUP PAKAI DATA
 for (const row of rowsForAccount) {
+  let groupUrl = groups[i];
+
+if (!groupUrl.startsWith("http")) {
+  groupUrl = "https://m.facebook.com/" + groupUrl.replace(/^\/+/, "");
+}
+
+if (!groupUrl.includes("/groups/")) {
+  console.log("❌ URL grup tidak valid, skip:", groupUrl);
+  continue;
+}
   await runAccount(page, row);
 }
       // POST STATUS (kalau ada)
