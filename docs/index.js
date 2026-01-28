@@ -1027,9 +1027,9 @@ console.log("📋 Semua status rows:", statusRows);
 console.log("ACCOUNT JSON:", `[${acc.account}]`);
    
 //Lama
-//  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
-///  return rowDate === today;
-///});
+   const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
+   return rowDate === today;
+});
 
 
 console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
