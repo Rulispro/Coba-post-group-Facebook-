@@ -39,13 +39,9 @@ async function runStatus(page, row) {
   await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
   
   await delay(3000);
-  let statusClicked = await clickComposerStatus(page);
-  if (!statusClicked) {
-   console.log("⚠️ Composer gagal dibuka, skip status ini atau coba scan manual");
-    //skip grup ini jika tidak ketemu
-    }
-  // 2️⃣ KLIK COMPOSER
-  const clicked = await page.evaluate(() => {
+  
+async function clickComposerStatus(page) {
+  const ok = await page.evaluate(() => {
     const keywords = [
       "what's on your mind",
       "apa yang anda pikirkan",
@@ -63,19 +59,27 @@ async function runStatus(page, row) {
     if (!btn) return false;
 
     btn.scrollIntoView({ block: "center" });
-    ["pointerdown","mousedown","mouseup","click"]
-      .forEach(e => btn.dispatchEvent(new MouseEvent(e, { bubbles: true })));
+
+    [
+      "pointerdown",
+      "touchstart",
+      "mousedown",
+      "mouseup",
+      "touchend",
+      "click"
+    ].forEach(e =>
+      btn.dispatchEvent(new Event(e, { bubbles: true, cancelable: true }))
+    );
 
     return true;
   });
 
-  if (!clicked) {
-    console.log("❌ Composer status tidak ketemu");
-    return;
-  }
-
-  console.log("✅ Composer diklik");
-
+  console.log(
+    ok ? "✅ Composer STATUS diklik" : "❌ Tombol STATUS tidak ditemukan"
+  );
+  return ok;
+}
+  
   // 3️⃣ TUNGGU TEXTBOX
   
 // 1️⃣ Klik placeholder composer
