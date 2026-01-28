@@ -539,17 +539,20 @@ async function safeClickEl(el) {
 }
 
 // ===== Klik composer aman pakai trigger React
-await page.evaluate(() => {
-  console.log(
-    "SPAN:",
-    [...document.querySelectorAll("span")]
-      .map(e => e.textContent?.trim())
-      .filter(Boolean)
-      .slice(0, 20)
-  );
-});
+(async () => {
+  await page.evaluate(() => {
+    console.log(
+      "SPAN:",
+      [...document.querySelectorAll("span")]
+        .map(e => e.textContent?.trim())
+        .filter(Boolean)
+        .slice(0, 20)
+    );
+  });
+})();
 
-async function clickComposer(page) {
+
+async function clickComposerGroup(page) {
   try {
     const result = await page.evaluate(() => {
 
@@ -607,7 +610,8 @@ async function clickComposer(page) {
     console.log("⚠️ Error clickComposer:", err.message);
     return false;
   }
-        }
+}
+
       
 
 
