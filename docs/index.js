@@ -552,6 +552,7 @@ async function safeClickEl(el) {
 })();
 
 
+
 async function clickComposerGroup(page) {
   try {
     const result = await page.evaluate(() => {
@@ -583,7 +584,7 @@ async function clickComposerGroup(page) {
       if (target) {
         target =
           target.closest("div[data-mcomponent='TextArea']") ||
-          target.closest("div[role='textbox']") ||
+          target.closest("div[role='ServerTextArea']") ||
           target.parentElement;
       }
 
