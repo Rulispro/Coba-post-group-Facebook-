@@ -400,7 +400,7 @@ await page.evaluate(() => {
  // if (!writeClicked) {
    //console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
     //skip grup ini jika tidak ketemu
-    }
+ //   }
 
     // ===== 1️⃣ Klik composer / write something
   let writeClicked =
