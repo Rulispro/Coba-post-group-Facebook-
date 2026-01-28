@@ -364,17 +364,17 @@ async function runAccount(page, row) {
     await page.waitForTimeout(4000);
 
     ///KLIK COMPOSER TRIGGER REACT///
-  //  let writeClicked = await clickComposer(page);
-  // if (!writeClicked) {
-   // console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
-     // skip grup ini jika tidak ketemu
-   // }
+  let writeClicked = await clickComposer(page);
+  if (!writeClicked) {
+   console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
+    skip grup ini jika tidak ketemu
+    }
 
     // ===== 1️⃣ Klik composer / write something
-  let writeClicked =
-  await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
-  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
-  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+ // let writeClicked =
+ /// await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+  ///await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+ //// await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
 
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
@@ -529,7 +529,44 @@ async function safeClickEl(el) {
   }
 }
 
+async function clickComposer(page) {
+  const ok = await page.evaluate(() => {
+    const el = document.querySelector(
+      'div[data-mcomponent="ServerTextArea"]'
+    );
+    if (!el) return false;
+
+    el.scrollIntoView({ block: "center" });
+
+    const events = [
+      "pointerdown",
+      "touchstart",
+      "mousedown",
+      "pointerup",
+      "touchend",
+      "mouseup",
+      "click"
+    ];
+
+    events.forEach(type =>
+      el.dispatchEvent(
+        new Event(type, { bubbles: true, cancelable: true })
+      )
+    );
+
+    return true;
+  });
+
+  console.log(ok
+    ? "✅ Composer GROUP diklik (ServerTextArea)"
+    : "❌ ServerTextArea tidak ditemukan"
+  );
+
+  return ok;
+}
+
 // ===== Klik composer aman pakai trigger React
+
 
 //$async function clickComposer(page) {
   //try {
