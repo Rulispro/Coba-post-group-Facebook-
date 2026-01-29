@@ -15,42 +15,37 @@ async function typeCaptionSafe(page, boxHandle, caption) {
   const box = boxHandle.asElement();
   if (!box) throw new Error("❌ Box handle invalid");
 
-  const checkFilled = async () => {
-    return await page.evaluate(el =>
-      el.innerText && el.innerText.trim().length > 0
-    , box);
-  };
+  const checkFilled = async () =>
+    await page.evaluate(el => el.innerText?.trim().length > 0, box);
 
-  // ===== 1️⃣ CARA UTAMA (JANGAN DIHAPUS) =====
+  // 🔐 LOCK supaya ga dobel
+  let ok = false;
+
+  // ===== 1️⃣ KEYBOARD (UTAMA – JANGAN DIHAPUS) =====
   await box.focus();
   await page.keyboard.type(caption, { delay: 90 });
   await page.waitForTimeout(300);
+  ok = await checkFilled();
 
-  let ok = await checkFilled();
-
-  // ===== 2️⃣ beforeinput (React-safe) =====
+  // ===== 2️⃣ beforeinput =====
   if (!ok) {
-    console.log("⚠️ Keyboard gagal → beforeinput");
-
+    console.log("⚠️ keyboard gagal → beforeinput");
     ok = await page.evaluate((el, text) => {
       el.focus();
-
       el.dispatchEvent(new InputEvent("beforeinput", {
         inputType: "insertText",
         data: text,
         bubbles: true,
         cancelable: true
       }));
-
       el.dispatchEvent(new InputEvent("input", { bubbles: true }));
       return el.innerText?.trim().length > 0;
     }, box, caption);
   }
 
-  // ===== 3️⃣ innerText TERIKAT =====
+  // ===== 3️⃣ innerText =====
   if (!ok) {
     console.log("⚠️ beforeinput gagal → innerText");
-
     ok = await page.evaluate((el, text) => {
       el.focus();
       el.innerText = text;
@@ -60,26 +55,28 @@ async function typeCaptionSafe(page, boxHandle, caption) {
     }, box, caption);
   }
 
-  // ===== 4️⃣ Clipboard =====
+  // ===== 4️⃣ CLIPBOARD =====
   if (!ok) {
     console.log("⚠️ innerText gagal → clipboard");
-
     await page.evaluate(text => navigator.clipboard.writeText(text), caption);
     await box.focus();
     await page.keyboard.down("Control");
     await page.keyboard.press("V");
     await page.keyboard.up("Control");
-
     await page.waitForTimeout(300);
     ok = await checkFilled();
   }
 
-  if (!ok) {
-    throw new Error("❌ Semua metode gagal → caption kosong");
-  }
+  if (!ok) throw new Error("❌ Semua metode gagal");
 
-  console.log("✅ Caption TERISI (BOX TERIKAT)");
+  // 👁️ BIAR KELIHATAN DI VIDEO (AMAN)
+  await page.evaluate(el => el.blur(), box);
+  await page.evaluate(el => el.focus(), box);
+
+  console.log("✅ Caption TERISI (SINGLE SOURCE)");
+  return true;
 }
+
 
 //PARSE TANGGAL///
 function parseTanggalXLSX(tgl) {
