@@ -239,8 +239,9 @@ if (!box) {
   await page.keyboard.up("Control");
   await page.keyboard.press("Backspace");
 
-  await page.keyboard.type(caption, { delay: 90 });
-
+  // 🔥 PAKAI FUNGSI AMAN
+  await typeCaptionSafe(page, caption);
+  
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
 
