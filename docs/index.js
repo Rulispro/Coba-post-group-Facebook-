@@ -15,67 +15,27 @@ async function typeCaptionSafe(page, boxHandle, caption) {
   const box = boxHandle.asElement();
   if (!box) throw new Error("❌ Box handle invalid");
 
-  const checkFilled = async () =>
-    await page.evaluate(el => el.innerText?.trim().length > 0, box);
+  const ok = await page.evaluate((el, text) => {
+    el.focus();
 
-  // 🔐 LOCK supaya ga dobel
-  let ok = false;
+    // 🔥 CARA PALING AMAN UNTUK FB MOBILE
+    const success = document.execCommand("insertText", false, text);
 
-  // ===== 1️⃣ KEYBOARD (UTAMA – JANGAN DIHAPUS) =====
-  await box.focus();
-  await page.keyboard.type(caption, { delay: 90 });
-  await page.waitForTimeout(300);
-  ok = await checkFilled();
+    // Trigger React render
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
 
-  // ===== 2️⃣ beforeinput =====
+    return success && el.innerText?.trim().length > 0;
+  }, box, caption);
+
   if (!ok) {
-    console.log("⚠️ keyboard gagal → beforeinput");
-    ok = await page.evaluate((el, text) => {
-      el.focus();
-      el.dispatchEvent(new InputEvent("beforeinput", {
-        inputType: "insertText",
-        data: text,
-        bubbles: true,
-        cancelable: true
-      }));
-      el.dispatchEvent(new InputEvent("input", { bubbles: true }));
-      return el.innerText?.trim().length > 0;
-    }, box, caption);
+    throw new Error("❌ execCommand insertText gagal");
   }
 
-  // ===== 3️⃣ innerText =====
-  if (!ok) {
-    console.log("⚠️ beforeinput gagal → innerText");
-    ok = await page.evaluate((el, text) => {
-      el.focus();
-      el.innerText = text;
-      el.dispatchEvent(new InputEvent("input", { bubbles: true }));
-      el.dispatchEvent(new Event("change", { bubbles: true }));
-      return el.innerText?.trim().length > 0;
-    }, box, caption);
-  }
-
-  // ===== 4️⃣ CLIPBOARD =====
-  if (!ok) {
-    console.log("⚠️ innerText gagal → clipboard");
-    await page.evaluate(text => navigator.clipboard.writeText(text), caption);
-    await box.focus();
-    await page.keyboard.down("Control");
-    await page.keyboard.press("V");
-    await page.keyboard.up("Control");
-    await page.waitForTimeout(300);
-    ok = await checkFilled();
-  }
-
-  if (!ok) throw new Error("❌ Semua metode gagal");
-
-  // 👁️ BIAR KELIHATAN DI VIDEO (AMAN)
-  await page.evaluate(el => el.blur(), box);
-  await page.evaluate(el => el.focus(), box);
-
-  console.log("✅ Caption TERISI (SINGLE SOURCE)");
+  console.log("✅ Caption TERISI & TERLIHAT (React-safe)");
   return true;
 }
+
 
 
 //PARSE TANGGAL///
