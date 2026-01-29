@@ -200,23 +200,16 @@ if (!box) {
   throw new Error("❌ Composer textbox tidak valid");
 }
 
-  await box.focus();
-    
-  await page.keyboard.down("Control");
-  await page.keyboard.press("A");
-  await page.keyboard.up("Control");
-  await page.keyboard.press("Backspace");
+  // ✅ LANGSUNG PAKAI FUNGSI AMAN
+const ok = await typeCaptionSafe(page, boxHandle, caption);
 
-  // 🔥 PAKAI FUNGSI AMAN
-  await typeCaptionSafe(page, boxHandle, caption);
-  
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
+if (!ok) {
+  throw new Error("❌ Caption gagal terisi");
+}
 
-  console.log("✅ Caption diketik");
+console.log("✅ Caption diketik (via typeCaptionSafe)");
 
-    
- await delay(3000); // kasih waktu 3 detik minimal
+  await delay(3000); // kasih waktu 3 detik minimal
 
 
   // ===== 3️⃣ Download + upload media
