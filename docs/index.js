@@ -11,32 +11,73 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 puppeteer.use(StealthPlugin())
 //SEMENTARA 
 //Helper isi caption status 
-async function typeCaptionSafe(page, boxHandle, caption) {
-  const box = boxHandle.asElement();
-  if (!box) throw new Error("❌ Box handle invalid");
+async function typeCaptionSafe(page, caption) {
+  const selector =
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
-  const ok = await page.evaluate((el, text) => {
+  // 🔥 PASTIKAN KOSONG TOTAL
+  await page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.focus();
+    el.innerText = "";
+    el.dispatchEvent(new InputEvent("input", { bubbles: true }));
+  }, selector);
+
+  await page.waitForTimeout(200);
+
+  // === CARA UTAMA: beforeinput (React-friendly)
+  const ok = await page.evaluate((sel, text) => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+
     el.focus();
 
-    // 🔥 CARA PALING AMAN UNTUK FB MOBILE
-    const success = document.execCommand("insertText", false, text);
+    el.dispatchEvent(
+      new InputEvent("beforeinput", {
+        inputType: "insertText",
+        data: text,
+        bubbles: true
+      })
+    );
 
-    // Trigger React render
-    el.dispatchEvent(new Event("input", { bubbles: true }));
-    el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.dispatchEvent(
+      new InputEvent("input", {
+        inputType: "insertText",
+        data: text,
+        bubbles: true
+      })
+    );
 
-    return success && el.innerText?.trim().length > 0;
-  }, box, caption);
+    return el.innerText?.trim() === text.trim();
+  }, selector, caption);
 
   if (!ok) {
-    throw new Error("❌ execCommand insertText gagal");
+    console.log("⚠️ beforeinput gagal → fallback keyboard");
+
+    await page.keyboard.type(caption, { delay: 80 });
+    await page.waitForTimeout(300);
   }
 
-  console.log("✅ Caption TERISI & TERLIHAT (React-safe)");
-  return true;
+  // 🔍 FINAL CHECK (ANTI DOBEL)
+  const finalText = await page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    return el?.innerText || "";
+  }, selector);
+
+  if (finalText.trim() !== caption.trim()) {
+    console.log("⚠️ Deteksi teks tidak sama → reset & isi ulang");
+
+    await page.evaluate((sel, text) => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      el.innerText = text;
+      el.dispatchEvent(new InputEvent("input", { bubbles: true }));
+    }, selector, caption);
+  }
+
+  console.log("✅ Caption TERISI (single, aman)");
 }
-
-
 
 //PARSE TANGGAL///
 function parseTanggalXLSX(tgl) {
