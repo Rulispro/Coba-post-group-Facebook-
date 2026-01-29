@@ -691,6 +691,54 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
 //SEMENTARA 
+//Helper isi caption status 
+async function typeCaptionSafe(page, caption) {
+  const selector =
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+
+  // ===============================
+  // 1️⃣ WAKE UP REACT COMPOSER
+  // ===============================
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(200);
+  await page.keyboard.press("Backspace");
+  await page.waitForTimeout(300);
+
+  // ===============================
+  // 2️⃣ PASTIKAN FOCUS KE TEXTBOX
+  // ===============================
+  await page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (el) el.focus();
+  }, selector);
+
+  await page.waitForTimeout(200);
+
+  // ===============================
+  // 3️⃣ INPUT PALING AMAN: KEYBOARD
+  // ===============================
+  await page.keyboard.type(caption, { delay: 90 });
+  await page.waitForTimeout(600);
+
+  // ===============================
+  // 4️⃣ VALIDASI REACT (BUKAN DOM PALSU)
+  // ===============================
+  const ok = await page.evaluate((sel, text) => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+
+    const value = el.textContent || el.innerText || "";
+    return value.includes(text.slice(0, 5));
+  }, selector, caption);
+
+  if (!ok) {
+    throw new Error("❌ Caption tidak diterima oleh React FB");
+  }
+
+  console.log("✅ Caption TERISI (React acknowledged)");
+}
+
+//PARSE TANGGAL///
 function parseTanggalXLSX(tgl) {
   if (!tgl) return null;
 
@@ -762,7 +810,7 @@ async function clickComposerStatus(page) {
 }
   
   // 3️⃣ TUNGGU TEXTBOX
-  
+  await page.waitForTimeout(2000);
 // 1️⃣ Klik placeholder composer
       await page.waitForSelector(
     'div[role="button"][data-mcomponent="ServerTextArea"]',
@@ -819,7 +867,8 @@ if (!box) {
   await page.keyboard.up("Control");
   await page.keyboard.press("Backspace");
 
-  await page.keyboard.type(caption, { delay: 90 });
+  // 🔥 PAKAI FUNGSI AMAN 
+  await typeCaptionSafe(page, caption);
 
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
@@ -827,8 +876,7 @@ if (!box) {
   console.log("✅ Caption diketik");
 
     
- await delay(3000); // kasih waktu 3 detik minimal
-
+ await delay(3000);
 
   // ===== 3️⃣ Download + upload media
  const today = process.env.DATE || new Date().toISOString().split("T")[0];
@@ -1587,7 +1635,25 @@ function delay(ms) {
       console.log(`\n🚀 Start akun: ${acc.account}`);
       const context = await browser.createIncognitoBrowserContext();
       const page = await context.newPage();
-
+      // ===== PATCH BUG userAgentData FACEBOOK (WAJIB)
+      await page.evaluateOnNewDocument(() => {
+        try {
+        if (navigator.userAgentData) {
+         navigator.userAgentData.getHighEntropyValues = () => {
+         return Promise.resolve({
+          architecture: "arm",
+          model: "",
+          platform: "Android",
+          platformVersion: "10",
+          uaFullVersion: "120.0.0.0"
+           });
+           };
+         }
+        } catch (e) {
+    // silent
+        }
+       });
+      
       await page.setBypassCSP(true);
 
       // 🔊 Monitor console
@@ -1749,11 +1815,11 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
       // ✅ LANGSUNG POSTGROUP PAKAI DATA
 for (const row of rowsForAccount) {
   await runAccount(page, row);
-}
+  }
       // POST STATUS (kalau ada)
-//for (const row of rowsStatusForAccount) {
-//  await runStatus(page, row);
-//}
+for (const row of rowsStatusForAccount) {
+  await runStatus(page, row);
+}
 
       // ===== Stop recorder
       await recorder.stop();
