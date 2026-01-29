@@ -536,7 +536,7 @@ console.log(`✅ Posting selesai untuk ${account}`);
   await page.goto(groupUrl, { waitUntil: "networkidle2" });
   console.log(" Mulai akan lakukan like postingan");
     
-  $let max = 10;        // jumlah like maksimal
+  let max = 10;        // jumlah like maksimal
   let delayMs = 3000;  // delay antar aksi (ms)
   let clicked = 0;
 
