@@ -81,7 +81,7 @@ async function clickComposerStatus(page) {
 }
   
   // 3️⃣ TUNGGU TEXTBOX
-  
+  await page.waitForTimeout(2000);
 // 1️⃣ Klik placeholder composer
       await page.waitForSelector(
     'div[role="button"][data-mcomponent="ServerTextArea"]',
@@ -1084,9 +1084,9 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     await page.reload({ waitUntil: "networkidle2" });
 
       // ✅ LANGSUNG POSTGROUP PAKAI DATA
-for (const row of rowsForAccount) {
-  await runAccount(page, row);
-}
+//$for (const row of rowsForAccount) {
+ //$ await runAccount(page, row);
+  //$}
       // POST STATUS (kalau ada)
 for (const row of rowsStatusForAccount) {
   await runStatus(page, row);
