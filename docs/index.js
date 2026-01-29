@@ -10,6 +10,107 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
 //SEMENTARA 
+//Helper isi caption status 
+async function typeCaptionSafe(page, caption) {
+  // cari textbox paling umum (FB mobile)
+  const getBox = () =>
+    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+    document.querySelector('div[contenteditable="true"]') ||
+    document.querySelector('textarea');
+
+  // ===== 1️⃣ CARA UTAMA (JANGAN DIHAPUS) =====
+  await page.keyboard.type(caption, { delay: 90 });
+  await page.waitForTimeout(300);
+
+  let ok = await page.evaluate(() => {
+    const el = document.querySelector('div[contenteditable="true"]');
+    return el && el.innerText && el.innerText.trim().length > 0;
+  });
+
+  // ===== 2️⃣ FALLBACK: beforeinput / input (React native) =====
+  if (!ok) {
+    console.log("⚠️ Keyboard gagal → fallback beforeinput");
+
+    ok = await page.evaluate(text => {
+      const el =
+        document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+        document.querySelector('div[contenteditable="true"]') ||
+        document.querySelector('textarea');
+
+      if (!el) return false;
+
+      el.focus();
+
+      el.dispatchEvent(
+        new InputEvent("beforeinput", {
+          inputType: "insertText",
+          data: text,
+          bubbles: true,
+          cancelable: true
+        })
+      );
+
+      el.dispatchEvent(
+        new InputEvent("input", {
+          inputType: "insertText",
+          data: text,
+          bubbles: true
+        })
+      );
+
+      return el.innerText?.trim().length > 0;
+    }, caption);
+  }
+
+  // ===== 3️⃣ FALLBACK: innerText + change =====
+  if (!ok) {
+    console.log("⚠️ beforeinput gagal → fallback innerText");
+
+    ok = await page.evaluate(text => {
+      const el =
+        document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+        document.querySelector('div[contenteditable="true"]') ||
+        document.querySelector('textarea');
+
+      if (!el) return false;
+
+      el.focus();
+      el.innerText = text;
+
+      el.dispatchEvent(new InputEvent("input", { bubbles: true }));
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+
+      return el.innerText?.trim().length > 0;
+    }, caption);
+  }
+
+  // ===== 4️⃣ FALLBACK TERAKHIR: clipboard paste =====
+  if (!ok) {
+    console.log("⚠️ innerText gagal → fallback clipboard");
+
+    try {
+      await page.evaluate(text => navigator.clipboard.writeText(text), caption);
+
+      await page.keyboard.down("Control");
+      await page.keyboard.press("V");
+      await page.keyboard.up("Control");
+
+      await page.waitForTimeout(300);
+
+      ok = await page.evaluate(() => {
+        const el = document.querySelector('div[contenteditable="true"]');
+        return el && el.innerText && el.innerText.trim().length > 0;
+      });
+    } catch {}
+  }
+
+  if (!ok) {
+    throw new Error("❌ Semua metode gagal → caption kosong");
+  }
+
+  console.log("✅ Caption TERISI (auto fallback sukses)");
+}
+
 function parseTanggalXLSX(tgl) {
   if (!tgl) return null;
 
