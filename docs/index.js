@@ -11,106 +11,77 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 puppeteer.use(StealthPlugin())
 //SEMENTARA 
 //Helper isi caption status 
-async function typeCaptionSafe(page, caption) {
-  // cari textbox paling umum (FB mobile)
-  const getBox = () =>
-    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-    document.querySelector('div[contenteditable="true"]') ||
-    document.querySelector('textarea');
+async function typeCaptionSafe(page, boxHandle, caption) {
+  const box = boxHandle.asElement();
+  if (!box) throw new Error("❌ Box handle invalid");
+
+  const checkFilled = async () => {
+    return await page.evaluate(el =>
+      el.innerText && el.innerText.trim().length > 0
+    , box);
+  };
 
   // ===== 1️⃣ CARA UTAMA (JANGAN DIHAPUS) =====
+  await box.focus();
   await page.keyboard.type(caption, { delay: 90 });
   await page.waitForTimeout(300);
 
-  let ok = await page.evaluate(() => {
-    const el = document.querySelector('div[contenteditable="true"]');
-    return el && el.innerText && el.innerText.trim().length > 0;
-  });
+  let ok = await checkFilled();
 
-  // ===== 2️⃣ FALLBACK: beforeinput / input (React native) =====
+  // ===== 2️⃣ beforeinput (React-safe) =====
   if (!ok) {
-    console.log("⚠️ Keyboard gagal → fallback beforeinput");
+    console.log("⚠️ Keyboard gagal → beforeinput");
 
-    ok = await page.evaluate(text => {
-      const el =
-        document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-        document.querySelector('div[contenteditable="true"]') ||
-        document.querySelector('textarea');
-
-      if (!el) return false;
-
+    ok = await page.evaluate((el, text) => {
       el.focus();
 
-      el.dispatchEvent(
-        new InputEvent("beforeinput", {
-          inputType: "insertText",
-          data: text,
-          bubbles: true,
-          cancelable: true
-        })
-      );
-
-      el.dispatchEvent(
-        new InputEvent("input", {
-          inputType: "insertText",
-          data: text,
-          bubbles: true
-        })
-      );
-
-      return el.innerText?.trim().length > 0;
-    }, caption);
-  }
-
-  // ===== 3️⃣ FALLBACK: innerText + change =====
-  if (!ok) {
-    console.log("⚠️ beforeinput gagal → fallback innerText");
-
-    ok = await page.evaluate(text => {
-      const el =
-        document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-        document.querySelector('div[contenteditable="true"]') ||
-        document.querySelector('textarea');
-
-      if (!el) return false;
-
-      el.focus();
-      el.innerText = text;
+      el.dispatchEvent(new InputEvent("beforeinput", {
+        inputType: "insertText",
+        data: text,
+        bubbles: true,
+        cancelable: true
+      }));
 
       el.dispatchEvent(new InputEvent("input", { bubbles: true }));
-      el.dispatchEvent(new Event("change", { bubbles: true }));
-
       return el.innerText?.trim().length > 0;
-    }, caption);
+    }, box, caption);
   }
 
-  // ===== 4️⃣ FALLBACK TERAKHIR: clipboard paste =====
+  // ===== 3️⃣ innerText TERIKAT =====
   if (!ok) {
-    console.log("⚠️ innerText gagal → fallback clipboard");
+    console.log("⚠️ beforeinput gagal → innerText");
 
-    try {
-      await page.evaluate(text => navigator.clipboard.writeText(text), caption);
+    ok = await page.evaluate((el, text) => {
+      el.focus();
+      el.innerText = text;
+      el.dispatchEvent(new InputEvent("input", { bubbles: true }));
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+      return el.innerText?.trim().length > 0;
+    }, box, caption);
+  }
 
-      await page.keyboard.down("Control");
-      await page.keyboard.press("V");
-      await page.keyboard.up("Control");
+  // ===== 4️⃣ Clipboard =====
+  if (!ok) {
+    console.log("⚠️ innerText gagal → clipboard");
 
-      await page.waitForTimeout(300);
+    await page.evaluate(text => navigator.clipboard.writeText(text), caption);
+    await box.focus();
+    await page.keyboard.down("Control");
+    await page.keyboard.press("V");
+    await page.keyboard.up("Control");
 
-      ok = await page.evaluate(() => {
-        const el = document.querySelector('div[contenteditable="true"]');
-        return el && el.innerText && el.innerText.trim().length > 0;
-      });
-    } catch {}
+    await page.waitForTimeout(300);
+    ok = await checkFilled();
   }
 
   if (!ok) {
     throw new Error("❌ Semua metode gagal → caption kosong");
   }
 
-  console.log("✅ Caption TERISI (auto fallback sukses)");
+  console.log("✅ Caption TERISI (BOX TERIKAT)");
 }
 
+//PARSE TANGGAL///
 function parseTanggalXLSX(tgl) {
   if (!tgl) return null;
 
@@ -240,7 +211,7 @@ if (!box) {
   await page.keyboard.press("Backspace");
 
   // 🔥 PAKAI FUNGSI AMAN
-  await typeCaptionSafe(page, caption);
+  await typeCaptionSafe(page, boxHandle, caption);
   
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
