@@ -11,73 +11,50 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 puppeteer.use(StealthPlugin())
 //SEMENTARA 
 //Helper isi caption status 
-
 async function typeCaptionSafe(page, caption) {
   const selector =
     'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
-  // 🔥 PASTIKAN KOSONG TOTAL
+  // ===============================
+  // 1️⃣ WAKE UP REACT COMPOSER
+  // ===============================
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(200);
+  await page.keyboard.press("Backspace");
+  await page.waitForTimeout(300);
+
+  // ===============================
+  // 2️⃣ PASTIKAN FOCUS KE TEXTBOX
+  // ===============================
   await page.evaluate(sel => {
     const el = document.querySelector(sel);
-    if (!el) return;
-    el.focus();
-    el.innerText = "";
-    el.dispatchEvent(new InputEvent("input", { bubbles: true }));
+    if (el) el.focus();
   }, selector);
 
   await page.waitForTimeout(200);
 
-  // === CARA UTAMA: beforeinput (React-friendly)
+  // ===============================
+  // 3️⃣ INPUT PALING AMAN: KEYBOARD
+  // ===============================
+  await page.keyboard.type(caption, { delay: 90 });
+  await page.waitForTimeout(600);
+
+  // ===============================
+  // 4️⃣ VALIDASI REACT (BUKAN DOM PALSU)
+  // ===============================
   const ok = await page.evaluate((sel, text) => {
     const el = document.querySelector(sel);
     if (!el) return false;
 
-    el.focus();
-
-    el.dispatchEvent(
-      new InputEvent("beforeinput", {
-        inputType: "insertText",
-        data: text,
-        bubbles: true
-      })
-    );
-
-    el.dispatchEvent(
-      new InputEvent("input", {
-        inputType: "insertText",
-        data: text,
-        bubbles: true
-      })
-    );
-
-    return el.innerText?.trim() === text.trim();
+    const value = el.textContent || el.innerText || "";
+    return value.includes(text.slice(0, 5));
   }, selector, caption);
 
   if (!ok) {
-    console.log("⚠️ beforeinput gagal → fallback keyboard");
-
-    await page.keyboard.type(caption, { delay: 80 });
-    await page.waitForTimeout(300);
+    throw new Error("❌ Caption tidak diterima oleh React FB");
   }
 
-  // 🔍 FINAL CHECK (ANTI DOBEL)
-  const finalText = await page.evaluate(sel => {
-    const el = document.querySelector(sel);
-    return el?.innerText || "";
-  }, selector);
-
-  if (finalText.trim() !== caption.trim()) {
-    console.log("⚠️ Deteksi teks tidak sama → reset & isi ulang");
-
-    await page.evaluate((sel, text) => {
-      const el = document.querySelector(sel);
-      if (!el) return;
-      el.innerText = text;
-      el.dispatchEvent(new InputEvent("input", { bubbles: true }));
-    }, selector, caption);
-  }
-
-  console.log("✅ Caption TERISI (single, aman)");
+  console.log("✅ Caption TERISI (React acknowledged)");
 }
 
 //PARSE TANGGAL///
@@ -154,10 +131,10 @@ async function clickComposerStatus(page) {
   // 3️⃣ TUNGGU TEXTBOX
   await page.waitForTimeout(2000);
 // 1️⃣ Klik placeholder composer
-   //   await page.waitForSelector(
-  //  'div[role="button"][data-mcomponent="ServerTextArea"]',
-  //  { timeout: 20000 }
-//  );
+      await page.waitForSelector(
+    'div[role="button"][data-mcomponent="ServerTextArea"]',
+    { timeout: 20000 }
+  );
 
   await page.evaluate(() => {
     const el = document.querySelector(
