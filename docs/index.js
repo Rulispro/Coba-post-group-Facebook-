@@ -11,6 +11,7 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 puppeteer.use(StealthPlugin())
 //SEMENTARA 
 //Helper isi caption status 
+
 async function typeCaptionSafe(page, caption) {
   const selector =
     'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
@@ -201,17 +202,23 @@ if (!box) {
   throw new Error("❌ Composer textbox tidak valid");
 }
 
-  // ✅ LANGSUNG PAKAI FUNGSI AMAN
-const ok = await typeCaptionSafe(page, boxHandle, caption);
+  await box.focus();
+    
+  await page.keyboard.down("Control");
+  await page.keyboard.press("A");
+  await page.keyboard.up("Control");
+  await page.keyboard.press("Backspace");
 
-if (!ok) {
-  throw new Error("❌ Caption gagal terisi");
-}
+  // 🔥 PAKAI FUNGSI AMAN 
+  await typeCaptionSafe(page, caption);
 
-console.log("✅ Caption diketik (via typeCaptionSafe)");
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
 
-  await delay(3000); // kasih waktu 3 detik minimal
+  console.log("✅ Caption diketik");
 
+    
+ await delay(3000);
 
   // ===== 3️⃣ Download + upload media
  const today = process.env.DATE || new Date().toISOString().split("T")[0];
