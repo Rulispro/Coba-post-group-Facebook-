@@ -407,24 +407,24 @@ await page.evaluate(() => {
 
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
-//   await page.waitForSelector(
-//    'div[role="button"][data-mcomponent="ServerTextArea"]',
-//    { timeout: 20000 }
-//  );
+   await page.waitForSelector(
+    'div[role="button"][data-mcomponent="ServerTextArea"]',
+    { timeout: 20000 }
+  );
 
-//$  await page.evaluate(() => {
-   //9 const el = document.querySelector(
-  //    'div[role="button"][data-mcomponent="ServerTextArea"]'
-  //  );
- //   if (!el) return;
+   await page.evaluate(() => {
+    const el = document.querySelector(
+     'div[role="button"][data-mcomponent="ServerTextArea"]'
+    );
+    if (!el) return;
 
- //   el.scrollIntoView({ block: "center" });
+    el.scrollIntoView({ block: "center" });
 
-  ///  ["touchstart","touchend","mousedown","mouseup","click"]
-  ///    .forEach(e =>
-  //      el.dispatchEvent(new Event(e, { bubbles: true }))
-//      );
-//  });
+    ["touchstart","touchend","mousedown","mouseup","click"]
+      .forEach(e =>
+        el.dispatchEvent(new Event(e, { bubbles: true }))
+     );
+  });
 
   
 await page.waitForFunction(() => {
