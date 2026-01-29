@@ -9,7 +9,7 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
-//SEMENTARA 
+
 //Helper isi caption status 
 async function typeCaptionSafe(page, caption) {
   const selector =
@@ -301,53 +301,7 @@ function urlExists(url) {
 }
 
 
-// BACA TEMPLATE XLSX GRUP LAMA BERHASIL 
-//function readTemplate(file) {
-  //console.log("📂 readTemplate dipanggil");
- // console.log("📄 File:", file);
 
- // if (!fs.existsSync(file)) {
-    //throw new Error("❌ File XLSX tidak ditemukan: " + file);
- // }
-
- //) console.log("📦 XLSX object:", typeof XLSX);
-
- // const wb = XLSX.readFile(file);
-
- /// console.log("📑 SheetNames:", wb.SheetNames);
-
- /// const targetSheet = wb.SheetNames.find(
-  //)  s => s.trim().toLowerCase() === "postGroup"
- //) );
-
- // if (!targetSheet) {
-   // throw new Error("❌ Sheet 'Lembar 1' tidak ditemukan");
-//  }
-
- // console.log("✅ Pakai sheet:", targetSheet);
-
-  //const sheet = wb.Sheets[targetSheet];
-
- // const rows = XLSX.utils.sheet_to_json(sheet, {
-  //  defval: "",
-   // raw: false
- /// });
-
-///  console.log("📊 Total row:", rows.length);
-//  console.log("🧪 Row[0]:", rows[0]);
-//  console.log("🧪 Keys row[0]:", Object.keys(rows[0] || {}));
-
- /// function normalizeRow(row) {
-  ///const clean = {};
-  ///for (const k in row) {
-    ///clean[k.trim()] =
-     /// typeof row[k] === "string" ? row[k].trim() : row[k];
- /// }
-///  return clean;
-//}
-
-////return rows.map(normalizeRow);
-//}
 //VERSI BARU BUAT TEST
 function readTemplate(file) {
   if (!fs.existsSync(file)) {
@@ -443,12 +397,7 @@ await page.evaluate(() => {
   );
 });
 
-    ///KLIK COMPOSER TRIGGER REACT///
-  //let writeClicked = await clickComposerGroup(page);
- // if (!writeClicked) {
-   //console.log("⚠️ Composer gagal dibuka, skip grup ini atau coba scan manual");
-    //skip grup ini jika tidak ketemu
- //   }
+
 
     // ===== 1️⃣ Klik composer / write something
   let writeClicked =
@@ -1003,19 +952,14 @@ function delay(ms) {
         Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
       });
 
-      // ================== FILTER DULU ==================
-//lama$const today = new Date().toISOString().slice(0, 10);
-//baru 
+
       const today = new Date(
   new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
 ).toISOString().slice(0, 10);
       console.log("📅 TODAY (WIB):", today);
 console.log("📋 Semua status rows:", statusRows);
      
-      //coba
-//const rowsForAccount = templateRows.filter(row => {
- // if (row.account !== acc.account) return false;
-//baru sementara 
+
       const rowsStatusForAccount = statusRows.filter(row => {
   if (row.account !== acc.account) return false;
 
@@ -1023,16 +967,7 @@ console.log("📋 Semua status rows:", statusRows);
   return rowDate === today;
 });
       
-  ///const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
-  ///return rowDate === today;
-///});
-      //versi grup baru 
-// const rowsForAccount = groupRows.filter(row => {
- // if (row.account !== acc.account) return false;
-   //baru 
-  // statusRows.forEach(r => {
- // console.log("STATUS XLSX:", `[${r.account}]`, r.tanggal);
-//});
+
 
       //coba baru filter grup 
      const rowsForAccount = groupRows.filter(row => {
@@ -1069,39 +1004,12 @@ console.log("📋 Semua status rows:", statusRows);
 
 console.log("ACCOUNT JSON:", `[${acc.account}]`);
    
-//Lama
- //  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
-  /// return rowDate === today;
-///});
+
 
 
 console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
 
-// ❌ JIKA TIDAK ADA DATA → JANGAN BUKA FACEBOOK
-//if (rowsForAccount.length === 0) {
- /// console.log("⏭️ Tidak ada jadwal posting hari ini");
-///  continue;
-//}
-      //UNTUK POST STATUS 
- //lama const rowsStatusForAccount = statusRows.filter(row => {
-  //if (row.account !== acc.account) return false;
 
-//lama  const rowDate = new Date(row.tanggal).toISOString().slice(0, 10);
-//  return rowDate === today;
-    
-      //baru sementara 
-    //const rowDate = parseTanggalXLSX(row.tanggal);
-///return rowDate === today;
-
-//});
-      
-//lamaconsole.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
-
-// ❌ JIKA TIDAK ADA DATA → JANGAN BUKA FACEBOOK
-//if (rowsForAccount.length === 0) {
- /// console.log("⏭️ Tidak ada jadwal posting hari ini");
- /// continue;
-//}
       //baru 
 console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
@@ -1132,9 +1040,9 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     await page.reload({ waitUntil: "networkidle2" });
 
       // ✅ LANGSUNG POSTGROUP PAKAI DATA
-//$for (const row of rowsForAccount) {
- //$ await runAccount(page, row);
-  //$}
+for (const row of rowsForAccount) {
+  await runAccount(page, row);
+  }
       // POST STATUS (kalau ada)
 for (const row of rowsStatusForAccount) {
   await runStatus(page, row);
