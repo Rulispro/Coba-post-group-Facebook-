@@ -561,14 +561,22 @@ async function runAccount(page, row) {
     await page.waitForTimeout(4000);
     // DEBUG SETELAH PAGE SIAP
 
-    await page.evaluate(() => {
-  console.log(
-    "SPAN:",
-    [...document.querySelectorAll("span")]
-      .map(e => e.textContent?.trim())
-      .filter(Boolean)
-      .slice(0, 20)
-  );
+  await page.evaluate(() => {
+  const matches = [];
+
+  document.querySelectorAll("span").forEach((e, i) => {
+    const t = e.textContent?.trim();
+    if (/write something|tulis sesuatu/i.test(t)) {
+      matches.push({
+        index: i,
+        text: t,
+        class: e.className,
+        parent: e.parentElement?.getAttribute("data-mcomponent")
+      });
+    }
+  });
+
+  console.log("SPAN_DEBUG:", JSON.stringify(matches));
 });
 
 //KLIK TULISAN WRITE SOMETHING SEBELUM KOTAK CAPTION//
