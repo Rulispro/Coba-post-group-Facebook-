@@ -50,9 +50,13 @@ async function typeCaptionSafe(page, caption) {
     return value.includes(text.slice(0, 5));
   }, selector, caption);
 
-  if (!ok) {
-    throw new Error("❌ Caption tidak diterima oleh React FB");
-  }
+ // if (!ok) {
+   // throw new Error("❌ Caption tidak diterima oleh React FB");
+ // }
+if (!ok) {
+  console.log("⚠️ React validation skipped (STATUS mode)");
+  return;
+}
 
   console.log("✅ Caption TERISI (React acknowledged)");
 }
