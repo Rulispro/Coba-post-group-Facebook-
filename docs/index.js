@@ -562,22 +562,18 @@ async function runAccount(page, row) {
     // DEBUG SETELAH PAGE SIAP
 
   await page.evaluate(() => {
-  const matches = [];
+  const hits = [];
 
-  document.querySelectorAll("span").forEach((e, i) => {
-    const t = e.textContent?.trim();
-    if (/write something|tulis sesuatu/i.test(t)) {
-      matches.push({
-        index: i,
-        text: t,
-        class: e.className,
-        parent: e.parentElement?.getAttribute("data-mcomponent")
-      });
+  document.querySelectorAll("span").forEach(s => {
+    const t = s.textContent?.trim();
+    if (t && /write|tulis|pikirkan|mind|status/i.test(t)) {
+      hits.push(t);
     }
   });
 
-  console.log("SPAN_DEBUG:", JSON.stringify(matches));
+  console.log("SPAN_HITS:", JSON.stringify(hits));
 });
+
 
 //KLIK TULISAN WRITE SOMETHING SEBELUM KOTAK CAPTION//
 async function openComposer(page) {
