@@ -578,7 +578,7 @@ async function runAccount(page, row) {
 //KLIK TULISAN WRITE SOMETHING SEBELUM KOTAK CAPTION//
 async function openComposer(page) {
   const opened = await page.evaluate(() => {
-    const span = [...document.querySelectorAll("span.f1")]
+    const span = [...document.querySelectorAll("span")]
       .find(s =>
         /write something|tulis sesuatu/i
           .test(s.textContent || "")
@@ -757,36 +757,36 @@ console.log(`✅ Posting selesai untuk ${account}`);
     
   //----FUNGSI MELAKUKAN LIKE POSTINGAN DI LINK GRUP ---////
     
-  await page.goto(groupUrl, { waitUntil: "networkidle2" });
-  console.log(" Mulai akan lakukan like postingan");
+ // await page.goto(groupUrl, { waitUntil: "networkidle2" });
+  //console.log(" Mulai akan lakukan like postingan");
     
-  let max = 10;        // jumlah like maksimal
-  let delayMs = 3000;  // delay antar aksi (ms)
-  let clicked = 0;
+  //let max = 10;        // jumlah like maksimal
+  //let delayMs = 3000;  // delay antar aksi (ms)
+  //let clicked = 0;
 
-  async function delay(ms) {
-    return new Promise(res => setTimeout(res, ms));
-  }
+ // async function delay(ms) {
+   // return new Promise(res => setTimeout(res, ms));
+ // }
 
-  while (clicked < max) {
-    const button = await page.$(
-      'div[role="button"][aria-label*="Like"],div[role="button"][aria-label*="like"], div[role="button"][aria-label*="Suka"]'
-   );
+ // while (clicked < max) {
+    //const button = await page.$(
+      //'div[role="button"][aria-label*="Like"],div[role="button"][aria-label*="like"], div[role="button"][aria-label*="Suka"]'
+  // );
 
-  if (button) {
-      await button.tap(); // ✅ simulate tap (touchscreen)
-      clicked++;
-      console.log(`👍 Klik tombol Like ke-${clicked}`);
-    } else {
-      console.log("🔄 Tidak ada tombol Like, scroll...");
-    }
+  //if (button) {
+     // await button.tap(); // ✅ simulate tap (touchscreen)
+      //clicked++;
+    //  console.log(`👍 Klik tombol Like ke-${clicked}`);
+    //} else {
+      //console.log("🔄 Tidak ada tombol Like, scroll...");
+   // }
 
     // Scroll sedikit biar postingan baru muncul
-    await page.evaluate(() => window.scrollBy(0, 500));
-   await delay(delayMs);
- }
+    //await page.evaluate(() => window.scrollBy(0, 500));
+  // await delay(delayMs);
+ //}
 
- console.log(`🎉 Selesai! ${clicked} tombol Like sudah diklik.`);
+ //console.log(`🎉 Selesai! ${clicked} tombol Like sudah diklik.`);
 
 
 
