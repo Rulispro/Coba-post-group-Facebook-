@@ -560,7 +560,8 @@ async function runAccount(page, row) {
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
     // DEBUG SETELAH PAGE SIAP
-await page.evaluate(() => {
+
+    await page.evaluate(() => {
   console.log(
     "SPAN:",
     [...document.querySelectorAll("span")]
@@ -573,9 +574,9 @@ await page.evaluate(() => {
 //KLIK TULISAN WRITE SOMETHING SEBELUM KOTAK CAPTION//
 async function openComposer(page) {
   const opened = await page.evaluate(() => {
-    const span = [...document.querySelectorAll("span")]
+    const span = [...document.querySelectorAll("span.f1")]
       .find(s =>
-        /write something|tulis sesuatu|apa yang anda pikirkan/i
+        /write something|tulis sesuatu
           .test(s.textContent || "")
       );
 
@@ -624,26 +625,26 @@ async function openComposer(page) {
   
 
 
-    //await page.waitForTimeout(2000);
+    await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
- ///  await page.waitForSelector(
-  //  'div[role="button"][data-mcomponent="ServerTextArea"]',
- //   { timeout: 7000 }
-//  );
+     await page.waitForSelector(
+     'div[role="button"][data-mcomponent="ServerTextArea"]',
+      { timeout: 7000 }
+   );
 
-  // await page.evaluate(() => {
-   // const el = document.querySelector(
-  //   'div[role="button"][data-mcomponent="ServerTextArea"]'
-   // );
-   // if (!el) return;
-//
-   // el.scrollIntoView({ block: "center" });
+    await page.evaluate(() => {
+     const el = document.querySelector(
+       'div[role="button"][data-mcomponent="ServerTextArea"]'
+      );
+      if (!el) return;
 
-  //  ["touchstart","touchend","mousedown","mouseup","click"]
-    //  .forEach(e =>
-       // el.dispatchEvent(new Event(e, { bubbles: true }))
-   //  );
-//  });
+    el.scrollIntoView({ block: "center" });
+
+       ["touchstart","touchend","mousedown","mouseup","click"]
+        .forEach(e =>
+          el.dispatchEvent(new Event(e, { bubbles: true }))
+       );
+       });
 
   
 await page.waitForFunction(() => {
