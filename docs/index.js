@@ -9,6 +9,167 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
+//Validasinya 
+async function validateCaption(page, caption) {
+  return await page.evaluate(text => {
+    const el =
+       'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+    if (!el) return false;
+    const val = el.textContent || el.innerText || "";
+    return val.includes(text.slice(0, 5));
+  }, caption);
+}
+//caption keyboard 
+async function typeByKeyboard(page, caption) {
+  const selector =
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+  await page.click(selector);
+  await page.waitForTimeout(200);
+  await page.keyboard.type(caption, { delay: 80 });
+}
+//caption human like 
+async function typeByExecCommand(page, caption) {
+  await page.evaluate(text => {
+    const el =
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+    if (!el) return;
+
+    el.focus();
+    document.execCommand("insertText", false, text);
+  }, caption);
+}
+//caption input event 
+async function typeByInputEvent(page, caption) {
+  await page.evaluate(text => {
+    const el =
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+    if (!el) return;
+
+    el.focus();
+    el.textContent = "";
+
+    el.dispatchEvent(new InputEvent("input", {
+      bubbles: true,
+      data: text,
+      inputType: "insertText"
+    }));
+
+    el.textContent = text;
+  }, caption);
+}
+//caption force
+async function typeByForceReact(page, caption) {
+  await page.evaluate(text => {
+    const el =
+       'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+    if (!el) return false;
+
+    el.focus();
+    el.innerText = text;
+
+    ["input", "change", "keydown", "keyup", "blur"].forEach(evt =>
+      el.dispatchEvent(new Event(evt, { bubbles: true }))
+    );
+
+    return true;
+  }, caption);
+}
+
+//HELPER ISI CAPTION 
+async function typeByKeyboard(page, caption) {
+  await page.keyboard.type(caption, { delay: 80 });
+}
+
+async function typeByExecCommand(page, caption) {
+  await page.evaluate(text => {
+    document.execCommand("insertText", false, text);
+  }, caption);
+}
+
+async function typeByInputEvent(page, caption) {
+  await page.evaluate(text => {
+    const el =
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+    if (!el) return false;
+
+    el.focus();
+
+    el.dispatchEvent(new InputEvent("beforeinput", {
+      inputType: "insertText",
+      data: text,
+      bubbles: true,
+      cancelable: true
+    }));
+
+    el.textContent = text;
+
+    el.dispatchEvent(new InputEvent("input", {
+      inputType: "insertText",
+      data: text,
+      bubbles: true
+    }));
+
+    return true;
+  }, caption);
+}
+
+async function typeByForceReact(page, caption) {
+  await page.evaluate(text => {
+    const el =
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+    if (!el) return false;
+
+    el.focus();
+    el.innerText = text;
+
+    ["input","change","keydown","keyup","blur"].forEach(evt =>
+      el.dispatchEvent(new Event(evt, { bubbles: true }))
+    );
+    return true;
+  }, caption);
+}
+
+//isi caption tambahan cara 
+async function typeCaptionUltimate(page, caption) {
+  console.log("🧠 Try typeCaptionSafe (legacy)");
+
+  try {
+    await typeCaptionSafe(page, caption);
+    await page.waitForTimeout(400);
+
+    if (await validateCaption(page, caption)) {
+      console.log("✅ typeCaptionSafe OK");
+      return;
+    }
+  } catch (e) {
+    console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
+  }
+
+  const methods = [
+    { name: "Keyboard", fn: typeByKeyboard },
+    { name: "ExecCommand", fn: typeByExecCommand },
+    { name: "InputEvent", fn: typeByInputEvent },
+    { name: "ForceReact", fn: typeByForceReact }
+  ];
+
+  for (const m of methods) {
+    console.log(`✍️ Try ${m.name}...`);
+
+    await m.fn(page, caption);
+    await page.waitForTimeout(500);
+
+    // trigger commit React
+    await page.keyboard.press("Space");
+    await page.keyboard.press("Backspace");
+
+    if (await validateCaption(page, caption)) {
+      console.log(`✅ ${m.name} OK`);
+      return;
+    }
+  }
+
+  throw new Error("❌ Semua metode input caption gagal (akun keras / FB update)");
+}
 
 //Helper isi caption status 
 async function typeCaptionSafe(page, caption) {
@@ -191,10 +352,10 @@ if (!box) {
   await page.keyboard.press("Backspace");
 
   // 🔥 PAKAI FUNGSI AMAN 
-  await typeCaptionSafe(page, caption);
+  await typeCaptionUltimate(page, caption);
 
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
+  //await page.keyboard.press("Space");
+ // await page.keyboard.press("Backspace");
 
   console.log("✅ Caption diketik");
 
