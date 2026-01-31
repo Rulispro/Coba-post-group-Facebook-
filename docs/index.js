@@ -1307,10 +1307,25 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
       await context.close();
       console.log(`✅ Posting selesai untuk ${acc.account}`);
     //await delay(6000); // jeda aman antar akun
-     const delayAkun = Number(rowsForAccount[0]?.delay_akun) || 60000;
-     console.log(`⏳ Delay antar akun: ${delayAkun} ms`);
-     await delay(delayAkun);   
-    
+     const delayRow = rowsForAccount.find(r => r.delay_akun);
+    const delayAkun = Number(delayRow?.delay_akun) || 60000;
+   console.log(
+  "🕒 Delay dari row tanggal:",
+  delayRow?.delay_akun,
+  "→ dipakai:",
+  delayAkun
+);
+
+await delay(delayAkun);
+console.log(
+  "DEBUG tanggal:",
+  rowsForAccount.map(r => ({
+    tanggal_raw: r.tanggal,
+    tanggal_parse: parseTanggalXLSX(r.tanggal),
+    delay_akun: r.delay_akun
+  }))
+);
+      
     }
 
     await browser.close();
