@@ -397,13 +397,43 @@ await page.evaluate(() => {
   );
 });
 
+//KLIK TULISAN WRITE SOMETHING SEBELUM KOTAK CAPTION//
+async function triggerReactComposer(page) {
+  await page.evaluate(() => {
+    const el =
+      document.querySelector('[data-mcomponent="ServerTextArea"]') ||
+      [...document.querySelectorAll("span")]
+        .find(s => /write something|tulis sesuatu|apa yang anda pikirkan/i.test(s.textContent))
+        ?.closest("div");
 
+    if (!el) throw "Composer trigger tidak ditemukan";
+
+    el.scrollIntoView({ block: "center" });
+
+    const events = [
+      "pointerdown",
+      "touchstart",
+      "mousedown",
+      "mouseup",
+      "touchend",
+      "click"
+    ];
+
+    for (const e of events) {
+      el.dispatchEvent(
+        new Event(e, { bubbles: true, cancelable: true })
+      );
+    }
+  });
+
+  console.log("✅ React composer TRIGGERED");
+}
 
     // ===== 1️⃣ Klik composer / write something
-  let writeClicked =
-  await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
-  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
-  await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+ // let writeClicked =
+ // await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+ // await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+ // await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
 
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
@@ -600,17 +630,17 @@ async function safeClickEl(el) {
 
 
 // ===== Fungsi klik by XPath
-async function safeClickXpath(page, xpath, desc = "elemen") {
-  try {
-    const el = await page.waitForXPath(xpath, { visible: true, timeout: 8000 });
-    await el.click();
-    console.log(`✅ Klik ${desc}`);
-    return true;
-  } catch (e) {
-    console.log(`❌ Gagal klik ${desc}:`, e.message);
-    return false;
-  }
-}
+//async function safeClickXpath(page, xpath, desc = "elemen") {
+//  try {
+   // const el = await page.waitForXPath(xpath, { visible: true, timeout: 8000 });
+  //  await el.click();
+  //  console.log(`✅ Klik ${desc}`);
+  //  return true;
+//  } catch (e) {
+  //  console.log(`❌ Gagal klik ${desc}:`, e.message);
+   // return false;
+//  }
+//}
 
 // ===== Fungsi scan elemen verbose
 async function scanAllElementsVerbose(page, label = "Scan") {
