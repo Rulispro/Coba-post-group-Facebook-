@@ -12,30 +12,30 @@ puppeteer.use(StealthPlugin())
 //Validasinya 
 async function validateCaption(page, caption) {
   return await page.evaluate(text => {
-    const el =
-       'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-      );
-    if (!el) return false;
+    const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+  if (!el) return false;
     const val = el.textContent || el.innerText || "";
     return val.includes(text.slice(0, 5));
   }, caption);
 }
 //caption keyboard 
 async function typeByKeyboard(page, caption) {
-  const selector =
-    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-    );
-  await page.click(selector);
+  const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+ await page.click(selector);
   await page.waitForTimeout(200);
   await page.keyboard.type(caption, { delay: 80 });
 }
 //caption human like 
 async function typeByExecCommand(page, caption) {
   await page.evaluate(text => {
-    const el =
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-      );
-    if (!el) return;
+    const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+  if (!el) return;
 
     el.focus();
     document.execCommand("insertText", false, text);
@@ -44,10 +44,10 @@ async function typeByExecCommand(page, caption) {
 //caption input event 
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
-    const el =
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-      );
-    if (!el) return;
+     const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+  if (!el) return;
 
     el.focus();
     el.textContent = "";
@@ -64,10 +64,10 @@ async function typeByInputEvent(page, caption) {
 //caption force
 async function typeByForceReact(page, caption) {
   await page.evaluate(text => {
-    const el =
-       'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-      );
-    if (!el) return false;
+     const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+ if (!el) return false;
 
     el.focus();
     el.innerText = text;
@@ -93,10 +93,10 @@ async function typeByExecCommand(page, caption) {
 
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
-    const el =
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-      );
-    if (!el) return false;
+      const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+  if (!el) return false;
 
     el.focus();
 
@@ -121,9 +121,10 @@ async function typeByInputEvent(page, caption) {
 
 async function typeByForceReact(page, caption) {
   await page.evaluate(text => {
-    const el =
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-      );
+      const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+
     if (!el) return false;
 
     el.focus();
