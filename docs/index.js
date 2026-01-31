@@ -362,8 +362,8 @@ if (!box) {
   // 🔥 PAKAI FUNGSI AMAN 
   await typeCaptionUltimate(page, caption);
 
-  //await page.keyboard.press("Space");
- // await page.keyboard.press("Backspace");
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
 
   console.log("✅ Caption diketik");
 
