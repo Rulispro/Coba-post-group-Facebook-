@@ -584,7 +584,7 @@ async function openComposer(page) {
   const opened = await page.evaluate(() => {
     const span = [...document.querySelectorAll("span.f1")]
       .find(s =>
-        /write something|tulis sesuatu
+        /write something|tulis sesuatu/i
           .test(s.textContent || "")
       );
 
