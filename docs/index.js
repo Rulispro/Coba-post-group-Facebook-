@@ -611,11 +611,11 @@ async function triggerReactComposer(page) {
     
     async function openComposer(page) {
   // STEP 0 — pastikan mobile mode
-  await page.setViewport({ width: 390, height: 844, isMobile: true });
+  
 
   // STEP 1 — cari via innerText (AMAN update)
   const found = await page.evaluate(() => {
-    const span = [...document.querySelectorAll("span")]
+    const span = [...document.querySelectorAll("span.f1")]
       .find(e =>
         e.innerText &&
         (
@@ -679,7 +679,7 @@ async function triggerReactComposer(page) {
    // 1️⃣ Klik placeholder composer
    await page.waitForSelector(
     'div[role="button"][data-mcomponent="ServerTextArea"]',
-    { timeout: 20000 }
+    { timeout: 7000 }
   );
 
    await page.evaluate(() => {
