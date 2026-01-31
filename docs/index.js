@@ -576,59 +576,52 @@ async function runAccount(page, row) {
 
 
 //KLIK TULISAN WRITE SOMETHING SEBELUM KOTAK CAPTION//
-async function openComposer(page) {
-  const opened = await page.evaluate(() => {
-    const span = [...document.querySelectorAll("span")]
-      .find(s =>
-        /write something|tulis sesuatu/i
-          .test(s.textContent || "")
-      );
+//async function openComposer(page) {
+  //const opened = await page.evaluate(() => {
+    //const span = [...document.querySelectorAll("span")]
+      //.find(s =>
+        //$/write something|tulis sesuatu/i
+        //  .test(s.textContent || "")
+     // );
 
-    if (!span) return false;
+    //if (!span) return false;
 
-    const container =
-      span.closest('[data-mcomponent="MContainer"]') ||
-      span.closest("div");
+    //const container =
+      //span.closest('[data-mcomponent="MContainer"]') ||
+      //span.closest("div");
 
-    if (!container) return false;
+    //if (!container) return false;
 
-    container.scrollIntoView({ block: "center" });
+    //container.scrollIntoView({ block: "center" });
 
-    [
-      "pointerdown",
-      "touchstart",
-      "mousedown",
-      "mouseup",
-      "touchend",
-      "click"
-    ].forEach(e =>
-      container.dispatchEvent(
-        new Event(e, { bubbles: true, cancelable: true })
-      )
-    );
+   // [
+     // "pointerdown",
+      //"touchstart",
+     // "mousedown",
+    //  "mouseup",
+     // "touchend",
+     // "click"
+   // ].forEach(e =>
+      //container.dispatchEvent(
+      //  new Event(e, { bubbles: true, cancelable: true })
+     // )
+  //  );
 
-    container.focus?.();
-    return true;
-  });
+    //container.focus?.();
+   // return true;
+  //});
 
-  if (!opened) throw new Error("❌ Composer tidak berhasil diklik");
-  console.log("✅ Composer trigger sukses");
-}
+ // if (!opened) throw new Error("❌ Composer tidak berhasil diklik");
+  //console.log("✅ Composer trigger sukses");
+//}
 
 
     // ===== 1️⃣ Klik composer / write something
- // let writeClicked =
- // await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
- // await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
- // await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
-
+    let writeClicked =
+    await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+    await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+    await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
     
-    
-
-  
-  
-
-
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
      await page.waitForSelector(
@@ -824,17 +817,17 @@ async function safeClickEl(el) {
 
 
 // ===== Fungsi klik by XPath
-//async function safeClickXpath(page, xpath, desc = "elemen") {
-//  try {
-   // const el = await page.waitForXPath(xpath, { visible: true, timeout: 8000 });
-  //  await el.click();
-  //  console.log(`✅ Klik ${desc}`);
-  //  return true;
-//  } catch (e) {
-  //  console.log(`❌ Gagal klik ${desc}:`, e.message);
-   // return false;
-//  }
-//}
+  async function safeClickXpath(page, xpath, desc = "elemen") {
+    try {
+      const el = await page.waitForXPath(xpath, { visible: true, timeout: 8000 });
+     await el.click();
+      console.log(`✅ Klik ${desc}`);
+     return true;
+    } catch (e) {
+     console.log(`❌ Gagal klik ${desc}:`, e.message);
+      return false;
+    }
+  }
 
 // ===== Fungsi scan elemen verbose
 async function scanAllElementsVerbose(page, label = "Scan") {
