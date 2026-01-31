@@ -618,70 +618,10 @@ async function openComposer(page) {
  // await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
 
     
-    async function openComposer(page) {
-  // STEP 0 — pastikan mobile mode
+    
+
   
-
-  // STEP 1 — cari via innerText (AMAN update)
-  const found = await page.evaluate(() => {
-    const span = [...document.querySelectorAll("span.f1")]
-      .find(e =>
-        e.innerText &&
-        (
-          e.innerText.toLowerCase().includes("write something") ||
-          e.innerText.toLowerCase().includes("tulis sesuatu")
-        )
-      );
-
-    if (!span) return false;
-
-    const el =
-      span.closest("div[data-mcomponent='MContainer']") ||
-      span.closest("div[data-mcomponent='ServerTextArea']") ||
-      span.parentElement;
-
-    if (!el) return false;
-
-    el.scrollIntoView({ block: "center", behavior: "instant" });
-
-    // EVENT CHAIN (React-friendly)
-    [
-      new PointerEvent("pointerdown", { bubbles: true, pointerType: "touch" }),
-      new PointerEvent("pointerup",   { bubbles: true, pointerType: "touch" }),
-      new MouseEvent("mousedown", { bubbles: true }),
-      new MouseEvent("mouseup",   { bubbles: true }),
-      new MouseEvent("click",     { bubbles: true })
-    ].forEach(e => el.dispatchEvent(e));
-
-    el.focus();
-    return true;
-  });
-
-  if (found) {
-    console.log("✅ Composer opened via innerText + event");
-    return true;
-  }
-
-  // STEP 2 — FALLBACK TAP (pakai innerText juga)
-  const spanHandle = await page.evaluateHandle(() => {
-    return [...document.querySelectorAll("span")]
-      .find(e =>
-        e.innerText &&
-        (
-          e.innerText.toLowerCase().includes("write something") ||
-          e.innerText.toLowerCase().includes("tulis sesuatu")
-        )
-      ) || null;
-  });
-
-  if (!spanHandle) throw new Error("Composer span not found (tap fallback)");
-
-  const box = await spanHandle.boundingBox();
-  await page.touchscreen.tap(box.x + 6, box.y + 6);
-
-  console.log("✅ Composer opened via TAP fallback");
-  return true;
-}
+  
 
 
     //await page.waitForTimeout(2000);
