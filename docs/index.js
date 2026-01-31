@@ -571,36 +571,45 @@ await page.evaluate(() => {
 });
 
 //KLIK TULISAN WRITE SOMETHING SEBELUM KOTAK CAPTION//
-async function triggerReactComposer(page) {
-  await page.evaluate(() => {
-    const el =
-      document.querySelector('[data-mcomponent="ServerTextArea"]') ||
-      [...document.querySelectorAll("span")]
-        .find(s => /write something|tulis sesuatu|apa yang anda pikirkan/i.test(s.textContent))
-        ?.closest("div");
+async function openComposer(page) {
+  const opened = await page.evaluate(() => {
+    const span = [...document.querySelectorAll("span")]
+      .find(s =>
+        /write something|tulis sesuatu|apa yang anda pikirkan/i
+          .test(s.textContent || "")
+      );
 
-    if (!el) throw "Composer trigger tidak ditemukan";
+    if (!span) return false;
 
-    el.scrollIntoView({ block: "center" });
+    const container =
+      span.closest('[data-mcomponent="MContainer"]') ||
+      span.closest("div");
 
-    const events = [
+    if (!container) return false;
+
+    container.scrollIntoView({ block: "center" });
+
+    [
       "pointerdown",
       "touchstart",
       "mousedown",
       "mouseup",
       "touchend",
       "click"
-    ];
-
-    for (const e of events) {
-      el.dispatchEvent(
+    ].forEach(e =>
+      container.dispatchEvent(
         new Event(e, { bubbles: true, cancelable: true })
-      );
-    }
+      )
+    );
+
+    container.focus?.();
+    return true;
   });
 
-  console.log("✅ React composer TRIGGERED");
+  if (!opened) throw new Error("❌ Composer tidak berhasil diklik");
+  console.log("✅ Composer trigger sukses");
 }
+
 
     // ===== 1️⃣ Klik composer / write something
  // let writeClicked =
@@ -675,26 +684,26 @@ async function triggerReactComposer(page) {
 }
 
 
-    await page.waitForTimeout(2000);
+    //await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
-   await page.waitForSelector(
-    'div[role="button"][data-mcomponent="ServerTextArea"]',
-    { timeout: 7000 }
-  );
+ ///  await page.waitForSelector(
+  //  'div[role="button"][data-mcomponent="ServerTextArea"]',
+ //   { timeout: 7000 }
+//  );
 
-   await page.evaluate(() => {
-    const el = document.querySelector(
-     'div[role="button"][data-mcomponent="ServerTextArea"]'
-    );
-    if (!el) return;
+  // await page.evaluate(() => {
+   // const el = document.querySelector(
+  //   'div[role="button"][data-mcomponent="ServerTextArea"]'
+   // );
+   // if (!el) return;
+//
+   // el.scrollIntoView({ block: "center" });
 
-    el.scrollIntoView({ block: "center" });
-
-    ["touchstart","touchend","mousedown","mouseup","click"]
-      .forEach(e =>
-        el.dispatchEvent(new Event(e, { bubbles: true }))
-     );
-  });
+  //  ["touchstart","touchend","mousedown","mouseup","click"]
+    //  .forEach(e =>
+       // el.dispatchEvent(new Event(e, { bubbles: true }))
+   //  );
+//  });
 
   
 await page.waitForFunction(() => {
