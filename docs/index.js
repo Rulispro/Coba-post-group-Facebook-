@@ -232,15 +232,11 @@ async function typeByForceReact(page, caption) {
 
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
-    const el = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
-  console.log("🧠 Activate composer + fill caption (combo)");
-
+    console.log("🧠 Activate composer + fill caption (combo)");
   const comboResult = await activateComposerAndFillCaption(page, caption);
   console.log("COMBO:", comboResult);
 
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(2000);
 
   if (comboResult?.ok && await validateCaption(page, caption)) {
     console.log("✅ Caption OK via combo helper");
