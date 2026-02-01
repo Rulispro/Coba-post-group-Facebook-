@@ -20,16 +20,59 @@ async function validateCaption(page, caption) {
     return val.includes(text.slice(0, 5));
   }, caption);
 }
-//ISI CAPTION CLIPBOARD 
-async function typeByClipboard(page, caption) {
-  await page.evaluate(async text => {
-    await navigator.clipboard.writeText(text);
-  }, caption);
+//ISI CAPTION type manusia tahan update 
+async function typeCaptionStable(page, caption) {
+  const selector =
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+
+  // 1️⃣ pastikan textbox ada & fokus
+  await page.waitForSelector(selector, { timeout: 15000 });
+  await page.evaluate(sel => {
+    document.querySelector(sel)?.focus();
+  }, selector);
+
+  // 2️⃣ clear aman (React friendly)
+  await page.keyboard.down("Control");
+  await page.keyboard.press("A");
+  await page.keyboard.up("Control");
+  await page.keyboard.press("Backspace");
+  await page.waitForTimeout(300);
+
+  // 3️⃣ typing manusia
+  await page.keyboard.type(caption, {
+    delay: 150 + Math.random() * 100
+  });
+
+  // 4️⃣ commit React
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  // 5️⃣ VALIDASI
+  if (await validateCaption(page, caption)) {
+    console.log("✅ Caption OK (Stable Keyboard)");
+    return true;
+  }
+
+  // 6️⃣ SELF-HEALING (retry sekali)
+  console.log("⚠️ Caption berubah, retry human typing");
+
+  await page.waitForTimeout(800);
 
   await page.keyboard.down("Control");
-  await page.keyboard.press("V");
+  await page.keyboard.press("A");
   await page.keyboard.up("Control");
+  await page.keyboard.press("Backspace");
+
+  await page.keyboard.type(caption, {
+    delay: 150 + Math.random() * 120
+  });
+
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  return await validateCaption(page, caption);
 }
+
 
 //isi caption klik placeholder 
 async function activateComposerAndFillCaption(page, caption) {
@@ -230,7 +273,12 @@ async function typeByForceReact(page, caption) {
 
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
-    console.log("🧠 Activate composer + fill caption (combo)");
+    console.log("🧠 typeCaptionUltimate start");
+   
+  if (await typeCaptionStable(page, caption)) {
+    return;
+    }
+  console.log("🧠 Activate composer + fill caption (combo)");
   const comboResult = await activateComposerAndFillCaption(page, caption);
   console.log("COMBO:", comboResult);
 
