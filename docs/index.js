@@ -67,10 +67,11 @@ async function activateComposerAndFillCaption(page, caption) {
     // ===============================
     // 2️⃣ FIND & FILL TEXTBOX
     // ===============================
-    const selectors = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
-
+    const selectors = [
+  "div[contenteditable='true'][role='textbox']",
+  "div[contenteditable='true']",
+  "textarea"
+];
     for (const s of selectors) {
       const tb = document.querySelector(s);
       if (!tb) continue;
