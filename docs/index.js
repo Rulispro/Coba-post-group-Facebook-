@@ -23,6 +23,17 @@ async function validateCaption(page, caption) {
 
 //ISI CAPTION type manusia tahan update 
 async function typeCaptionStable(page, caption) {
+  // 🔥 1️⃣ WAKE REACT COMPOSER (gabungan wakeComposer)
+  await page.mouse.move(300, 300);
+  await page.mouse.down();
+  await page.mouse.up();
+
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  await page.waitForTimeout(600);
+
+  // 🔥 2️⃣ CARI TEXTBOX + FOCUS + CLEAR
   const ok = await page.evaluate(() => {
     const el = document.querySelector(
       'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
@@ -35,21 +46,28 @@ async function typeCaptionStable(page, caption) {
   });
 
   if (!ok) {
-    console.log("❌ Textbox tidak ada");
+    console.log("❌ Textbox tidak ada setelah wake");
     return false;
   }
 
-  // ✅ TYPING MANUSIA SESUNGGUHNYA
+  // 🔥 3️⃣ TYPING MANUSIA SESUNGGUHNYA
   await page.keyboard.type(caption, {
     delay: 120 + Math.random() * 120
   });
 
-  // commit React
+  // 🔥 4️⃣ COMMIT REACT
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
 
-  return await validateCaption(page, caption);
-}
+  // 🔥 5️⃣ VALIDASI
+  if (await validateCaption(page, caption)) {
+    console.log("✅ Caption OK (Human Typing)");
+    return true;
+  }
+
+  console.log("⚠️ Caption tidak tervalidasi");
+  return false;
+    }
 
 
 //isi caption klik placeholder 
