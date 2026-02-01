@@ -24,8 +24,6 @@ async function validateCaption(page, caption) {
 //ISI CAPTION type manusia tahan update 
 
 async function typeCaptionStable(page, caption) {
-  console.log("🧠 typeCaptionUltimate start");
-
   // 1️⃣ AKTIFKAN COMPOSER (WAJIB KLIK)
   await page.evaluate(() => {
     // klik area composer (placeholder / container)
@@ -48,24 +46,21 @@ async function typeCaptionStable(page, caption) {
     return false;
   });
 
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(2000);
 
-  // 2️⃣ AMBIL TEXTBOX (SETELAH KLIK)
-  const ok = await page.evaluate(() => {
+    // 2️⃣ PASTIKAN FOCUS (TANPA SET textContent)
+  const focused = await page.evaluate(() => {
     const el = document.querySelector(
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"],textarea'
     );
-
     if (!el) return false;
-
     el.focus();
-    el.textContent = "";
     return true;
   });
 
-  if (!ok) {
-    console.log("❌ Textbox masih belum muncul setelah activate");
-    return { ok: false, step: "textbox_not_found" };
+  if (!focused) {
+    console.log("❌ Textbox tidak fokus");
+    return { ok: false, step: "textbox_not_focus" };
   }
 
   // 3️⃣ TYPING MANUSIA
