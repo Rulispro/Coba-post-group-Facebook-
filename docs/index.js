@@ -66,7 +66,12 @@ const focused = await page.evaluate(() => {
   }
   return false;
 });
-  
+
+  //ketik caption 
+  // 3️⃣ TYPE CAPTION (WAJIB)
+await page.keyboard.type(caption, { delay: 80 });
+await page.waitForTimeout(600);
+
   
   // 4️⃣ COMMIT REACT
   await page.keyboard.press("Space");
