@@ -20,48 +20,53 @@ async function validateCaption(page, caption) {
     return val.includes(text.slice(0, 5));
   }, caption);
 }
+
 //ISI CAPTION type manusia tahan update 
 async function typeCaptionStable(page, caption) {
-  const selector =
-    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+  // 1️⃣ textbox ada + fokus + clear
+  await page.waitForFunction(() => {
+    return document.querySelector(
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+    );
+  }, { timeout: 15000 });
 
-  // 1️⃣ pastikan textbox ada & fokus
-  await page.waitForSelector(selector, { timeout: 15000 });
-  await page.evaluate(sel => {
-    document.querySelector(sel)?.focus();
-  }, selector);
+  await page.evaluate(() => {
+    const el = document.querySelector(
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+    );
+    if (!el) return;
 
-  // 2️⃣ clear aman (React friendly)
-  await page.keyboard.down("Control");
-  await page.keyboard.press("A");
-  await page.keyboard.up("Control");
-  await page.keyboard.press("Backspace");
-  await page.waitForTimeout(300);
+    el.focus();
+    el.textContent = "";
+  });
 
-  // 3️⃣ typing manusia
+  // 2️⃣ typing manusia (keyboard tetap dipakai)
   await page.keyboard.type(caption, {
     delay: 150 + Math.random() * 100
   });
 
-  // 4️⃣ commit React
+  // 3️⃣ commit React
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
 
-  // 5️⃣ VALIDASI
+  // 4️⃣ VALIDASI
   if (await validateCaption(page, caption)) {
     console.log("✅ Caption OK (Stable Keyboard)");
     return true;
   }
 
-  // 6️⃣ SELF-HEALING (retry sekali)
-  console.log("⚠️ Caption berubah, retry human typing");
+  // 5️⃣ retry sekali
+  console.log("⚠️ Caption berubah, retry");
 
-  await page.waitForTimeout(800);
+  await page.evaluate(() => {
+    const el = document.querySelector(
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+    );
+    if (!el) return;
 
-  await page.keyboard.down("Control");
-  await page.keyboard.press("A");
-  await page.keyboard.up("Control");
-  await page.keyboard.press("Backspace");
+    el.focus();
+    el.textContent = "";
+  });
 
   await page.keyboard.type(caption, {
     delay: 150 + Math.random() * 120
