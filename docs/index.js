@@ -49,25 +49,25 @@ async function typeCaptionStable(page, caption) {
   await page.waitForTimeout(2000);
 
     // 2️⃣ PASTIKAN FOCUS (TANPA SET textContent)
-  const focused = await page.evaluate(() => {
-    const el = document.querySelector(
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"],textarea'
-    );
-    if (!el) return false;
+const focused = await page.evaluate(() => {
+  const candidates = Array.from(
+    document.querySelectorAll(
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+    )
+  );
+
+  for (const el of candidates) {
+    el.click();
     el.focus();
-    return true;
-  });
 
-  if (!focused) {
-    console.log("❌ Textbox tidak fokus");
-    return { ok: false, step: "textbox_not_focus" };
+    if (document.activeElement === el) {
+      return true;
+    }
   }
-
-  // 3️⃣ TYPING MANUSIA
-  await page.keyboard.type(caption, {
-    delay: 120 + Math.random() * 120
-  });
-
+  return false;
+});
+  
+  
   // 4️⃣ COMMIT REACT
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
