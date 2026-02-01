@@ -23,8 +23,7 @@ async function validateCaption(page, caption) {
 
 //ISI CAPTION type manusia tahan update 
 
-async function typeCaptionStable(page, caption)
- (page, caption) {
+async function typeCaptionStable(page, caption) {
   console.log("🧠 typeCaptionUltimate start");
 
   // 1️⃣ AKTIFKAN COMPOSER (WAJIB KLIK)
