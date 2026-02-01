@@ -92,13 +92,16 @@ await page.waitForTimeout(600);
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
 
-  // 5️⃣ VALIDASI
-const stable = await typeCaptionStable(page, caption);
+// 5️⃣ VALIDASI
+const ok = await validateCaption(page, caption);
 
-if (stable?.ok) {
-  console.log("✅ Caption OK via Stable");
-  return;
+if (ok) {
+  return { ok: true, step: "stable_ok" };
 }
+
+console.log("⚠️ Caption tidak tervalidasi");
+return { ok: false, step: "validation_failed" };
+                             
 
 
   console.log("⚠️ Caption tidak tervalidasi");
