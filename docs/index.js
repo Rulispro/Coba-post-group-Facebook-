@@ -32,7 +32,7 @@ async function typeCaptionStable(page, caption) {
     const candidates = [
       '[role="textbox"]',
       '[role="combobox"]',
-      '["textarea"]',
+      'textarea',
       'div[contenteditable="true"]',
       '[aria-label*="Tulis sesuatu"]',
       '[aria-label*="Write something"]'
