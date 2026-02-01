@@ -307,10 +307,14 @@ async function typeByForceReact(page, caption) {
 async function typeCaptionUltimate(page, caption) {
     console.log("🧠 typeCaptionUltimate start");
    
-    if (await typeCaptionStable(page, caption)) {
+    const stable = await typeCaptionStable(page, caption);
+  if (stable?.ok) {
     console.log("✅ Caption OK via Stable");
     return;
   }
+
+  console.log("🧠 Stable gagal → Combo helper");
+
   
   console.log("🧠 Activate composer + fill caption (combo)");
   const comboResult = await activateComposerAndFillCaption(page, caption);
