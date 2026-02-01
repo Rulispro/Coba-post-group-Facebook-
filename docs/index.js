@@ -12,14 +12,29 @@ puppeteer.use(StealthPlugin())
 //Validasinya 
 async function validateCaption(page, caption) {
   return await page.evaluate(text => {
-    const el = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
-  if (!el) return false;
-    const val = el.textContent || el.innerText || "";
-    return val.includes(text.slice(0, 5));
+    const el =
+      document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+      document.querySelector('div[contenteditable="true"]') ||
+      document.querySelector('textarea');
+
+    if (!el) return false;
+
+    const domVal =
+      el.textContent ||
+      el.innerText ||
+      el.value ||
+      "";
+
+    // fallback React internal (FB pakai data-text)
+    const dataText = el.getAttribute("data-text") || "";
+
+    return (
+      domVal.includes(text.slice(0, 3)) ||
+      dataText.includes(text.slice(0, 3))
+    );
   }, caption);
 }
+
 
 //ISI CAPTION type manusia tahan update 
 
@@ -78,10 +93,13 @@ await page.waitForTimeout(600);
   await page.keyboard.press("Backspace");
 
   // 5️⃣ VALIDASI
-  if (await validateCaption(page, caption)) {
-    console.log("✅ Caption OK (Ultimate)");
-    return { ok: true };
-  }
+const stable = await typeCaptionStable(page, caption);
+
+if (stable?.ok) {
+  console.log("✅ Caption OK via Stable");
+  return;
+}
+
 
   console.log("⚠️ Caption tidak tervalidasi");
   return { ok: false, step: "validation_failed" };
