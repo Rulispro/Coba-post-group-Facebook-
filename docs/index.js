@@ -23,14 +23,7 @@ async function validateCaption(page, caption) {
 
 //ISI CAPTION type manusia tahan update 
 async function typeCaptionStable(page, caption) {
-  // 1️⃣ textbox ada + fokus + clear
-  await page.waitForFunction(() => {
-    return document.querySelector(
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-    );
-  }, { timeout: 15000 });
-
-  await page.evaluate(() => {
+   await page.evaluate(() => {
     const el = document.querySelector(
       'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
     );
