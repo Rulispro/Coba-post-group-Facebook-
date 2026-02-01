@@ -47,6 +47,10 @@ async function typeCaptionStable(page, caption) {
       '[role="combobox"]',
       'textarea',
       'div[contenteditable="true"]',
+      '[aria-label*="Buat postingan publik"]',
+      '[aria-label*="Create a public post"]',
+      '[aria-label*="Submit a post for admin"]',
+      '[aria-label*="Kirim postingan untuk persetujuan admin"]',
       '[aria-label*="Tulis sesuatu"]',
       '[aria-label*="Write something"]'
     ];
@@ -84,7 +88,7 @@ const focused = await page.evaluate(() => {
 
   //ketik caption 
   // 3️⃣ TYPE CAPTION (WAJIB)
-await page.keyboard.type(caption, { delay: 80 });
+await page.keyboard.type(caption, { delay: 120 });
 await page.waitForTimeout(600);
 
   
