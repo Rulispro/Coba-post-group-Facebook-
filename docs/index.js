@@ -20,6 +20,99 @@ async function validateCaption(page, caption) {
     return val.includes(text.slice(0, 5));
   }, caption);
 }
+//ISI CAPTION CLIPBOARD 
+async function typeByClipboard(page, caption) {
+  await page.evaluate(async text => {
+    await navigator.clipboard.writeText(text);
+  }, caption);
+
+  await page.keyboard.down("Control");
+  await page.keyboard.press("V");
+  await page.keyboard.up("Control");
+}
+
+//isi caption klik placeholder 
+async function activateComposerAndFillCaption(page, caption) {
+  return await page.evaluate((text) => {
+    const placeholderKeywords = [
+      "write something",
+      "tulis sesuatu",
+      "buat postingan publik",
+      "create a public post",
+      "kirim postingan buat persetujuan admin",
+      "submit a post for admin"
+    ];
+
+    // ===============================
+    // 1️⃣ CLICK PLACEHOLDER (DOM BUTTON)
+    // ===============================
+    const btn = [...document.querySelectorAll("div[role='button']")]
+      .find(el => {
+        const t = (el.innerText || "").toLowerCase();
+        return placeholderKeywords.some(k => t.includes(k));
+      });
+
+    if (btn) {
+      ["mousedown", "mouseup", "click"].forEach(type =>
+        btn.dispatchEvent(
+          new MouseEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          })
+        )
+      );
+    }
+
+    // ===============================
+    // 2️⃣ FIND & FILL TEXTBOX
+    // ===============================
+    const selectors = [
+      "textarea[name='xc_message']",
+      "textarea",
+      "div[role='textbox'][contenteditable='true']",
+      "div[contenteditable='true']"
+    ];
+
+    for (const s of selectors) {
+      const tb = document.querySelector(s);
+      if (!tb) continue;
+
+      tb.focus();
+
+      // clear dulu (penting buat React)
+      if ("value" in tb) {
+        tb.value = "";
+      } else {
+        tb.innerText = "";
+        tb.textContent = "";
+      }
+
+      // isi caption
+      if ("value" in tb) {
+        tb.value = text;
+        tb.dispatchEvent(new Event("input", { bubbles: true }));
+        tb.dispatchEvent(new Event("change", { bubbles: true }));
+      } else {
+        tb.innerText = text;
+        tb.dispatchEvent(new InputEvent("input", { bubbles: true }));
+        tb.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+
+      return {
+        ok: true,
+        step: "activate+fill",
+        selector: s
+      };
+    }
+
+    return {
+      ok: false,
+      step: "textbox_not_found"
+    };
+  }, caption);
+}
+
 //caption keyboard 
 async function typeByKeyboard(page, caption) {
   const el = document.querySelector(
@@ -27,7 +120,7 @@ async function typeByKeyboard(page, caption) {
 );
  await page.click(selector);
   await page.waitForTimeout(200);
-  await page.keyboard.type(caption, { delay: 80 });
+  await page.keyboard.type(caption, { delay: 100 });
 }
 //caption human like 
 async function typeByExecCommand(page, caption) {
@@ -139,6 +232,21 @@ async function typeByForceReact(page, caption) {
 
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
+    const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+  console.log("🧠 Activate composer + fill caption (combo)");
+
+  const comboResult = await activateComposerAndFillCaption(page, caption);
+  console.log("COMBO:", comboResult);
+
+  await page.waitForTimeout(800);
+
+  if (comboResult?.ok && await validateCaption(page, caption)) {
+    console.log("✅ Caption OK via combo helper");
+    return;
+  }
+  
   console.log("🧠 Try typeCaptionSafe (legacy)");
 
   try {
@@ -156,6 +264,7 @@ async function typeCaptionUltimate(page, caption) {
   const methods = [
     { name: "Keyboard", fn: typeByKeyboard },
     { name: "ExecCommand", fn: typeByExecCommand },
+    { name: "Clipboard", fn: typeByClipboard },
     { name: "InputEvent", fn: typeByInputEvent },
     { name: "ForceReact", fn: typeByForceReact }
   ];
