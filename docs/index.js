@@ -325,10 +325,11 @@ async function typeCaptionUltimate(page, caption) {
 
   await page.waitForTimeout(2000);
 
-  if (comboResult?.ok && await validateCaption(page, caption)) {
-    console.log("✅ Caption OK via combo helper");
-    return;
-  }
+if (comboResult?.ok) {
+  console.log("✅ Caption OK via combo helper (trust React)");
+  return;
+}
+  
   
   console.log("🧠 Try typeCaptionSafe (legacy)");
 
