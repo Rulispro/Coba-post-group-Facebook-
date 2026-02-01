@@ -23,48 +23,28 @@ async function validateCaption(page, caption) {
 
 //ISI CAPTION type manusia tahan update 
 async function typeCaptionStable(page, caption) {
-   await page.evaluate(() => {
+  const ok = await page.evaluate(() => {
     const el = document.querySelector(
       'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
     );
-    if (!el) return;
+    if (!el) return false;
 
     el.focus();
     el.textContent = "";
-  });
-
-  // 2️⃣ typing manusia (keyboard tetap dipakai)
-  await page.keyboard.type(caption, {
-    delay: 150 + Math.random() * 100
-  });
-
-  // 3️⃣ commit React
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
-
-  // 4️⃣ VALIDASI
-  if (await validateCaption(page, caption)) {
-    console.log("✅ Caption OK (Stable Keyboard)");
     return true;
+  });
+
+  if (!ok) {
+    console.log("❌ Textbox tidak ada");
+    return false;
   }
 
-  // 5️⃣ retry sekali
-  console.log("⚠️ Caption berubah, retry");
-
-  await page.evaluate(() => {
-    const el = document.querySelector(
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-    );
-    if (!el) return;
-
-    el.focus();
-    el.textContent = "";
-  });
-
+  // ✅ TYPING MANUSIA SESUNGGUHNYA
   await page.keyboard.type(caption, {
-    delay: 150 + Math.random() * 120
+    delay: 120 + Math.random() * 120
   });
 
+  // commit React
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
 
