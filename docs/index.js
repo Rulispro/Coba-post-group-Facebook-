@@ -22,22 +22,40 @@ async function validateCaption(page, caption) {
 }
 
 //ISI CAPTION type manusia tahan update 
-async function typeCaptionStable(page, caption) {
-  // 🔥 1️⃣ WAKE REACT COMPOSER (gabungan wakeComposer)
-  await page.mouse.move(300, 300);
-  await page.mouse.down();
-  await page.mouse.up();
 
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
+async function typeCaptionUltimate(page, caption) {
+  console.log("🧠 typeCaptionUltimate start");
 
-  await page.waitForTimeout(600);
+  // 1️⃣ AKTIFKAN COMPOSER (WAJIB KLIK)
+  await page.evaluate(() => {
+    // klik area composer (placeholder / container)
+    const candidates = [
+      '[role="textbox"]',
+      '[role="combobox"]',
+      '["textarea"]',
+      'div[contenteditable="true"]',
+      '[aria-label*="Tulis sesuatu"]',
+      '[aria-label*="Write something"]'
+    ];
 
-  // 🔥 2️⃣ CARI TEXTBOX + FOCUS + CLEAR
+    for (const sel of candidates) {
+      const el = document.querySelector(sel);
+      if (el) {
+        el.click();
+        return true;
+      }
+    }
+    return false;
+  });
+
+  await page.waitForTimeout(800);
+
+  // 2️⃣ AMBIL TEXTBOX (SETELAH KLIK)
   const ok = await page.evaluate(() => {
     const el = document.querySelector(
       'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
     );
+
     if (!el) return false;
 
     el.focus();
@@ -46,28 +64,28 @@ async function typeCaptionStable(page, caption) {
   });
 
   if (!ok) {
-    console.log("❌ Textbox tidak ada setelah wake");
-    return false;
+    console.log("❌ Textbox masih belum muncul setelah activate");
+    return { ok: false, step: "textbox_not_found" };
   }
 
-  // 🔥 3️⃣ TYPING MANUSIA SESUNGGUHNYA
+  // 3️⃣ TYPING MANUSIA
   await page.keyboard.type(caption, {
     delay: 120 + Math.random() * 120
   });
 
-  // 🔥 4️⃣ COMMIT REACT
+  // 4️⃣ COMMIT REACT
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
 
-  // 🔥 5️⃣ VALIDASI
+  // 5️⃣ VALIDASI
   if (await validateCaption(page, caption)) {
-    console.log("✅ Caption OK (Human Typing)");
-    return true;
+    console.log("✅ Caption OK (Ultimate)");
+    return { ok: true };
   }
 
   console.log("⚠️ Caption tidak tervalidasi");
-  return false;
-    }
+  return { ok: false, step: "validation_failed" };
+}
 
 
 //isi caption klik placeholder 
