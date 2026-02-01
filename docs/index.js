@@ -258,7 +258,6 @@ async function typeCaptionUltimate(page, caption) {
   const methods = [
     { name: "Keyboard", fn: typeByKeyboard },
     { name: "ExecCommand", fn: typeByExecCommand },
-    { name: "Clipboard", fn: typeByClipboard },
     { name: "InputEvent", fn: typeByInputEvent },
     { name: "ForceReact", fn: typeByForceReact }
   ];
