@@ -88,8 +88,17 @@ const focused = await page.evaluate(() => {
 
   //ketik caption 
   // 3️⃣ TYPE CAPTION (WAJIB)
-await page.keyboard.type(caption, { delay: 120 });
-await page.waitForTimeout(600);
+  // 3️⃣ TYPE CAPTION (HUMAN-LIKE + RANDOM)
+  for (const char of caption) {
+    const delay = 80 + Math.random() * 100; // 80–200 ms
+    await page.keyboard.type(char, { delay });
+
+    // jeda mikir kecil (±5%)
+    if (Math.random() < 0.05) {
+      await page.waitForTimeout(300 + Math.random() * 700);
+    }
+  }
+  await page.waitForTimeout(1000);
 
   
   // 4️⃣ COMMIT REACT
@@ -199,9 +208,21 @@ async function typeByKeyboard(page, caption) {
   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
 );
  await page.click(selector);
-  await page.waitForTimeout(200);
-  await page.keyboard.type(caption, { delay: 100 });
-}
+  await page.waitForTimeout(1000);
+    // 3️⃣ TYPE CAPTION (HUMAN-LIKE + RANDOM)
+  for (const char of caption) {
+    const delay = 80 + Math.random() * 120; // 80–200 ms
+    await page.keyboard.type(char, { delay });
+
+    // jeda mikir kecil (±5%)
+    if (Math.random() < 0.05) {
+      await page.waitForTimeout(300 + Math.random() * 700);
+    }
+  }
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+  }
+
 //caption human like 
 async function typeByExecCommand(page, caption) {
   await page.evaluate(text => {
@@ -234,23 +255,86 @@ async function typeByInputEvent(page, caption) {
     el.textContent = text;
   }, caption);
 }
+
 //caption force
+//async function typeByForceReact(page, caption) {
+ // await page.evaluate(text => {
+  //   const el = document.querySelector(
+  //'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+//);
+// if (!el) return false;
+
+//    el.focus();
+   // el.innerText = text;
+
+  //  ["input", "change", "keydown", "keyup", "blur"].forEach(evt =>
+  //    el.dispatchEvent(new Event(evt, { bubbles: true }))
+  //  );
+
+ //   return true;
+//  }, caption);
+//}
+
 async function typeByForceReact(page, caption) {
-  await page.evaluate(text => {
-     const el = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
- if (!el) return false;
+  const selector =
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+
+  // 1️⃣ FOKUS COMPOSER
+  const focused = await page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+    el.click();
+    el.focus();
+    return document.activeElement === el;
+  }, selector);
+
+  if (!focused) {
+    console.log("❌ Composer tidak fokus");
+    return { ok: false, step: "focus_failed" };
+  }
+
+  await page.waitForTimeout(300);
+
+  // 2️⃣ TYPE HUMAN-LIKE (ACAK)
+  for (const char of caption) {
+    const delay = 80 + Math.random() * 120; // 80–200 ms
+    await page.keyboard.type(char, { delay });
+
+    if (Math.random() < 0.05) {
+      await page.waitForTimeout(300 + Math.random() * 700);
+    }
+  }
+
+  // 3️⃣ COMMIT REACT
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  // 4️⃣ VALIDASI
+  const ok = await validateCaption(page, caption);
+  if (ok) {
+    return { ok: true, step: "typed_human" };
+  }
+
+  // 5️⃣ FALLBACK: FORCE REACT (KALAU GAGAL)
+  console.log("⚠️ Human typing gagal, pakai force React");
+
+  const forced = await page.evaluate((text, sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
 
     el.focus();
     el.innerText = text;
 
-    ["input", "change", "keydown", "keyup", "blur"].forEach(evt =>
+    ["input", "change"].forEach(evt =>
       el.dispatchEvent(new Event(evt, { bubbles: true }))
     );
 
     return true;
-  }, caption);
+  }, caption, selector);
+
+  return forced
+    ? { ok: true, step: "forced_react" }
+    : { ok: false, step: "all_failed" };
 }
 
 //HELPER ISI CAPTION 
