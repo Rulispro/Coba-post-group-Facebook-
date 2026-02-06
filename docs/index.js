@@ -380,8 +380,8 @@ async function typeByInputEvent(page, caption) {
   const selector ='div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
  
   await page.waitForSelector(selector, { timeout: 5000 });
-   await page.click(selector, { delay: 1000 });
-  await page.waitForTimeout(1000);
+  // await page.click(selector, { delay: 1000 });
+ // await page.waitForTimeout(1000);
 
   // wake react
   await page.keyboard.press("Space");
