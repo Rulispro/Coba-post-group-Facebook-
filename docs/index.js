@@ -745,18 +745,6 @@ async function clickComposerStatus(page) {
   
   await debugComposerAll(page);
 
-const boxHandle = await page.evaluateHandle(() => {
-  return (
-    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-    document.querySelector('div[contenteditable="true"]') ||
-    document.querySelector('textarea') ||
-    document.querySelector('textarea[role="combobox"]') ||
-    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
-    document.querySelector('[aria-label]')
-  );
-});
-  
-
   const boxHandle = await page.evaluateHandle(() => {
   return (
     document.querySelector('div[contenteditable="true"][role="textbox"]') ||
