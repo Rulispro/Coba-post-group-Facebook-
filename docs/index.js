@@ -377,84 +377,50 @@ async function typeByExecCommand(page, caption) {
 //}
 
 async function typeByInputEvent(page, caption) {
-  console.log("✍️ Mengisi caption via activeElement (FIX)");
+  console.log("✍️ Isi caption via ACTIVE keyboard");
 
-  const ok = await page.evaluate(async (text) => {
-    // tunggu editor benar-benar aktif
-    let el = null;
+  // 1️⃣ pastikan editor benar-benar aktif
+  await page.waitForFunction(() => {
+    const el = document.activeElement;
+    return (
+      el &&
+      (
+        el.isContentEditable ||
+        el.tagName === "TEXTAREA" ||
+        el.getAttribute("role") === "textbox"
+      )
+    );
+  }, { timeout: 20000 });
 
-    for (let i = 0; i < 20; i++) {
-      el = document.activeElement;
-      if (
-        el &&
-        (
-          el.isContentEditable ||
-          el.tagName === "TEXTAREA" ||
-          el.getAttribute("role") === "textbox"
-        )
-      ) {
-        break;
-      }
-      await new Promise(r => setTimeout(r, 300));
-    }
+  // 2️⃣ bangunin editor (INI PENTING)
+  await page.keyboard.type(" ");
+  await page.keyboard.press("Backspace");
 
+  // 3️⃣ ketik caption (human-like)
+  for (const c of caption) {
+    await page.keyboard.type(c, {
+      delay: 90 + Math.random() * 80
+    });
+  }
+
+  // 4️⃣ validasi (bukan selector)
+  const ok = await page.evaluate(() => {
+    const el = document.activeElement;
     if (!el) return false;
-
-    // bersihkan isi lama
-    if (el.isContentEditable) {
-      el.innerHTML = "";
-    } else if (el.tagName === "TEXTAREA") {
-      el.value = "";
-    }
-
-    // ISI CAPTION SESUAI JENIS ELEMENT
-    if (el.isContentEditable) {
-      document.execCommand("insertText", false, text);
-    } else if (el.tagName === "TEXTAREA") {
-      el.value = text;
-    } else {
-      return false;
-    }
-
-    // trigger event yang FB percaya
-    el.dispatchEvent(new InputEvent("input", { bubbles: true }));
-    el.dispatchEvent(new Event("change", { bubbles: true }));
-    el.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
-
     return (
       el.innerText?.trim().length > 0 ||
       el.value?.trim().length > 0
     );
-  }, caption);
+  });
 
   if (!ok) {
-    throw new Error("❌ Gagal mengisi caption (activeElement FIX)");
+    throw new Error("❌ Gagal mengisi caption (keyboard)");
   }
 
   console.log("✅ Caption berhasil diisi");
-  console.log("ACTIVE TAG:", el.tagName, "CONTENTEDITABLE:", el.isContentEditable);
   return true;
 }
 
-
-
-async function typeByForceReact(page, caption) {
-  await page.evaluate(text => {
-      const el = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
-
-    if (!el) return false;
-
-    el.focus();
-    el.innerText = text;
-
-    ["input","change","keydown","keyup","blur"].forEach(evt =>
-      el.dispatchEvent(new Event(evt, { bubbles: true }))
-    );
-    return true;
-  }, caption);
-}
 
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
