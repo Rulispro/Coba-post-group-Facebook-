@@ -274,41 +274,37 @@ async function typeByExecCommand(page, caption) {
  //   return true;
 //  }, caption);
 //}
+
 async function typeCaptionFinal(page, caption) {
   console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
 
-  // 1️⃣ Cari editor FB yang BENAR-BENAR bisa diketik
-  const editorHandle = await page.waitForFunction(() => {
-    const el =
-      document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-      document.querySelector('div[contenteditable="true"]') ||
-      document.querySelector('textarea');
+  // 1️⃣ Tunggu editor muncul (JANGAN pakai waitForFunction)
+  const editor = await page.waitForSelector(
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea',
+    { timeout: 10000, visible: true }
+  );
 
-    if (!el) return null;
-
-    const rect = el.getBoundingClientRect();
-    if (rect.width < 100 || rect.height < 50) return null;
-
-    return el;
-  }, { timeout: 20000 });
-
-  const editor = editorHandle.asElement();
   if (!editor) {
     throw new Error("❌ Editor FB tidak ditemukan");
   }
 
-  // 2️⃣ Isi caption pakai InputEvent (DITERIMA FB)
+  // 2️⃣ Pastikan editor AKTIF (FB WAJIB klik)
+  await editor.click({ delay: 50 });
+  await page.waitForTimeout(300);
+
+  // 3️⃣ Isi caption via InputEvent (cara FB-friendly)
   await page.evaluate((el, text) => {
     el.focus();
 
-    // bersihkan isi
-    el.innerHTML = "";
+    // clear isi
+    if (el.innerHTML !== undefined) el.innerHTML = "";
+    if (el.value !== undefined) el.value = "";
+
     el.dispatchEvent(new InputEvent("input", {
       bubbles: true,
       inputType: "deleteContentBackward"
     }));
 
-    // masukkan teks (char by char)
     for (const ch of text) {
       el.dispatchEvent(new InputEvent("beforeinput", {
         bubbles: true,
@@ -323,11 +319,11 @@ async function typeCaptionFinal(page, caption) {
     }
   }, editor, caption);
 
-  // 3️⃣ Validasi isi (WAJIB)
+  // 4️⃣ VALIDASI (WAJIB)
   const ok = await page.evaluate(el => {
     return (
-      el.innerText?.trim().length > 0 ||
-      el.value?.trim().length > 0
+      (el.innerText && el.innerText.trim().length > 0) ||
+      (el.value && el.value.trim().length > 0)
     );
   }, editor);
 
@@ -337,7 +333,8 @@ async function typeCaptionFinal(page, caption) {
 
   console.log("✅ Caption BERHASIL diisi (FINAL)");
   return true;
-}
+        }
+       
 
 
 async function typeByForceReact(page, caption) {
