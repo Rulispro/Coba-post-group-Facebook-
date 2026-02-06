@@ -236,25 +236,25 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 //caption input event 
-async function typeByInputEvent(page, caption) {
-  await page.evaluate(text => {
-     const el = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
-  if (!el) return;
+//async function typeByInputEvent(page, caption) {
+//  await page.evaluate(text => {
+    // const el = document.querySelector(
+ // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+//);
+ // if (!el) return;
 
-    el.focus();
-    el.textContent = "";
+   // el.focus();
+  ///  el.textContent = "";
 
-    el.dispatchEvent(new InputEvent("input", {
-      bubbles: true,
-      data: text,
-      inputType: "insertText"
-    }));
+  ///  el.dispatchEvent(new InputEvent("input", {
+   ///   bubbles: true,
+   ///   data: text,
+   ///   inputType: "insertText"
+  ///  }));
 
-    el.textContent = text;
-  }, caption);
-}
+ //   el.textContent = text;
+ /// }, caption);
+///}
 
 //caption force
 //async function typeByForceReact(page, caption) {
@@ -376,13 +376,11 @@ async function typeByExecCommand(page, caption) {
 //  }, caption);
 //}
 
-async function typeByInputEvent(pages, caption) {
-  const selector = 'document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-); ';
+async function typeByInputEvent(page, caption) {
+  const selector ='div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
-  await page.click(selector, { delay: 50 });
-  await page.waitForTimeout(400);
+  await page.click(selector, { delay: 1000 });
+  await page.waitForTimeout(1000);
 
   // wake react
   await page.keyboard.press("Space");
@@ -398,11 +396,9 @@ async function typeByInputEvent(pages, caption) {
   await page.keyboard.press("Backspace");
 
   // VALIDASI PALING AMAN
-  return await page.evaluate(() => {
-    const el =document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
-    return el && el.innerText.trim().length > 0;
+  return await page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+   return el && el.innerText.trim().length > 0;
   });
 }
 
