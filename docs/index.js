@@ -379,21 +379,9 @@ async function typeByExecCommand(page, caption) {
 
 
 
+  
   async function typeByInputEvent(page, caption) {
-  console.log("✍️ Isi caption via ACTIVE keyboard");
-    await page.evaluate(() => {
-  console.log("ACTIVE:", document.activeElement);
-});
-
-
-  await page.waitForFunction(() => {
-    const el = document.activeElement;
-    return el && (
-      el.isContentEditable ||
-      el.tagName === "textArea" ||
-      el.getAttribute("role") === "textbox"
-    );
-  }, { timeout: 20000 });
+  console.log("✍️ Isi caption via keyboard (NO activeElement wait)");
 
   // bangunin editor
   await page.keyboard.type(" ");
@@ -406,7 +394,9 @@ async function typeByExecCommand(page, caption) {
   }
 
   const ok = await page.evaluate(() => {
-    const el = document.activeElement;
+    const el = document.querySelector(
+      'div[contenteditable="true"], textarea'
+    );
     return el &&
       (
         el.innerText?.trim().length > 0 ||
@@ -414,12 +404,10 @@ async function typeByExecCommand(page, caption) {
       );
   });
 
-  if (!ok) {
-    throw new Error("❌ Caption tidak masuk");
-  }
+  if (!ok) throw new Error("❌ Caption tidak masuk");
 
   console.log("✅ Caption berhasil diketik");
-}
+  }
 
 
 
@@ -651,27 +639,19 @@ async function clickComposerStatus(page) {
 
  //console.log("✅ Composer textbox terdeteksi");
   await page.waitForSelector(
-  'div[role="button"][data-mcomponent="ServerTextArea"]',
+  'div[contenteditable="true"], textarea, div[aria-label]',
   { timeout: 20000 }
 );
 
-const el = await page.$(
-  'div[role="button"][data-mcomponent="ServerTextArea"]'
+const editor = await page.$(
+  'div[contenteditable="true"], textarea, div[aria-label]'
 );
 
-if (!el) throw new Error("❌ Placeholder tidak ditemukan");
+if (!editor) throw new Error("❌ Editor isi tidak ditemukan");
 
-// 🔥 INI YANG BENAR
-await el.click({ delay: 150 });
-
-await page.waitForTimeout(1500);
-
-console.log("✅ Placeholder composer diklik (REAL CLICK)");
-// 🔥 PAKSA FOCUS VIA KEYBOARD (INI YANG KAMU TANYAKAN)
-await page.keyboard.press("Tab");
-await page.waitForTimeout(400);
-await page.keyboard.press("Tab");
-await page.waitForTimeout(400);
+// 🔥 CLICK LANGSUNG KE AREA ISI
+await editor.click({ delay: 150 });
+await page.waitForTimeout(600);
 
 
   const boxHandle = await page.evaluateHandle(() => {
