@@ -375,38 +375,48 @@ async function typeByExecCommand(page, caption) {
    // return true;
 //  }, caption);
 //}
+
 async function typeByInputEvent(page, caption) {
-  console.log("=== LIST IFRAME ===");
-  page.frames().forEach((frame, i) => {
-    console.log(i, frame.url());
-  });
+  console.log("✍️ Mengisi caption via InputEvent");
 
-  // 🔥 GANTI DARI SINI
-  const selector = 'textarea, div[contenteditable="true"]';
+  const success = await page.evaluate((text) => {
+    const el =
+      document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+      document.querySelector('div[contenteditable="true"]') ||
+      document.querySelector('textarea');
 
-  await page.waitForSelector(selector, { timeout: 15000 });
-  const el = await page.$(selector);
+    if (!el) return false;
 
-  if (!el) throw new Error("❌ Textbox caption tidak ditemukan");
+    el.focus();
 
-  // WAJIB click, bukan focus
-  await el.click({ delay: 500 });
+    // bersihin dulu
+    if (el.isContentEditable) {
+      el.innerHTML = "";
+    } else {
+      el.value = "";
+    }
 
-  // bangunin FB editor
-  await page.keyboard.type(" ");
-  await page.keyboard.press("Backspace");
+    // isi text
+    if (el.isContentEditable) {
+      document.execCommand("insertText", false, text);
+    } else {
+      el.value = text;
+    }
 
-  // ketik caption
-  for (const c of caption) {
-    await page.keyboard.type(c, {
-      delay: 80 + Math.random() * 60
-    });
+    // trigger event yg dipercaya FB
+    el.dispatchEvent(new InputEvent("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
+
+    return true;
+  }, caption);
+
+  if (!success) {
+    throw new Error("❌ Gagal mengisi caption (InputEvent)");
   }
 
-  console.log("✅ Caption berhasil diketik");
-  return true;
+  console.log("✅ Caption berhasil diisi");
 }
-
 
 
 async function typeByForceReact(page, caption) {
