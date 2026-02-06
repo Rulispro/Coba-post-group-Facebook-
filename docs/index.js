@@ -662,6 +662,11 @@ await el.click({ delay: 150 });
 await page.waitForTimeout(1500);
 
 console.log("✅ Placeholder composer diklik (REAL CLICK)");
+// 🔥 PAKSA FOCUS VIA KEYBOARD (INI YANG KAMU TANYAKAN)
+await page.keyboard.press("Tab");
+await page.waitForTimeout(400);
+await page.keyboard.press("Tab");
+await page.waitForTimeout(400);
 
 
   const boxHandle = await page.evaluateHandle(() => {
