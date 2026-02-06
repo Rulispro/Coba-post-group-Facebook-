@@ -9,6 +9,40 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
+async function debugComposer(page, label = "DEBUG COMPOSER") {
+  console.log(`\n🔎 ${label}`);
+
+  const result = await page.evaluate(() => {
+    const out = [];
+
+    document.querySelectorAll("*").forEach(el => {
+      const editable =
+        el.isContentEditable ||
+        el.getAttribute("contenteditable") === "true" ||
+        el.tagName === "TEXTAREA";
+
+      if (!editable) return;
+
+      const r = el.getBoundingClientRect();
+      if (r.width < 80 || r.height < 40) return;
+
+      out.push({
+        tag: el.tagName,
+        role: el.getAttribute("role"),
+        aria: el.getAttribute("aria-label"),
+        contenteditable: el.getAttribute("contenteditable"),
+        testid: el.getAttribute("data-testid"),
+        class: (el.className || "").toString().slice(0, 60),
+        preview: (el.innerText || el.value || "").slice(0, 30)
+      });
+    });
+
+    return out;
+  });
+
+  console.log("🧪 EDITOR CANDIDATES:", JSON.stringify(result, null, 2));
+}
+
 //Validasinya 
 async function validateCaption(page, caption) {
   return await page.evaluate(text => {
@@ -701,6 +735,8 @@ async function clickComposerStatus(page) {
   }, { timeout: 30000 });
 
   console.log("✅ Composer textbox terdeteksi");
+  
+  await debugComposer(page, "STATUS COMPOSER");
   
 
   const boxHandle = await page.evaluateHandle(() => {
