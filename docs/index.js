@@ -378,8 +378,9 @@ async function typeByExecCommand(page, caption) {
 
 async function typeByInputEvent(page, caption) {
   const selector ='div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
-
-  await page.click(selector, { delay: 1000 });
+ 
+  await page.waitForSelector(selector, { timeout: 5000 });
+   await page.click(selector, { delay: 1000 });
   await page.waitForTimeout(1000);
 
   // wake react
@@ -396,10 +397,10 @@ async function typeByInputEvent(page, caption) {
   await page.keyboard.press("Backspace");
 
   // VALIDASI PALING AMAN
-  return await page.evaluate((sel) => {
+  return await page.evaluate(sel => {
     const el = document.querySelector(sel);
-   return el && el.innerText.trim().length > 0;
-  });
+    return el && el.innerText.trim().length > 0;
+  }, selector);
 }
 
 
