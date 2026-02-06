@@ -377,19 +377,21 @@ async function typeByExecCommand(page, caption) {
 //}
 
 async function typeByInputEvent(page, caption) {
-  console.log("✍️ Mengisi caption via activeElement");
+  console.log("✍️ Mengisi caption via activeElement (FIX)");
 
   const ok = await page.evaluate(async (text) => {
-    // tunggu sampai FB benar-benar kasih editor aktif
-    let el = document.activeElement;
+    // tunggu editor benar-benar aktif
+    let el = null;
 
     for (let i = 0; i < 20; i++) {
       el = document.activeElement;
       if (
         el &&
-        (el.isContentEditable ||
+        (
+          el.isContentEditable ||
           el.tagName === "TEXTAREA" ||
-          el.getAttribute("role") === "textbox")
+          el.getAttribute("role") === "textbox"
+        )
       ) {
         break;
       }
@@ -398,21 +400,23 @@ async function typeByInputEvent(page, caption) {
 
     if (!el) return false;
 
-    // clear dulu
+    // bersihkan isi lama
     if (el.isContentEditable) {
       el.innerHTML = "";
-    } else {
+    } else if (el.tagName === "TEXTAREA") {
       el.value = "";
     }
 
-    // isi caption (cara yg dipercaya FB)
+    // ISI CAPTION SESUAI JENIS ELEMENT
     if (el.isContentEditable) {
       document.execCommand("insertText", false, text);
+    } else if (el.tagName === "TEXTAREA") {
+      el.value = text;
     } else {
-      el.setRangeText(text);
+      return false;
     }
 
-    // trigger event WAJIB
+    // trigger event yang FB percaya
     el.dispatchEvent(new InputEvent("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
     el.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
@@ -424,13 +428,14 @@ async function typeByInputEvent(page, caption) {
   }, caption);
 
   if (!ok) {
-    throw new Error("❌ Gagal mengisi caption (activeElement)");
+    throw new Error("❌ Gagal mengisi caption (activeElement FIX)");
   }
 
   console.log("✅ Caption berhasil diisi");
+  console.log("ACTIVE TAG:", el.tagName, "CONTENTEDITABLE:", el.isContentEditable);
   return true;
-  }
-      
+}
+
 
 
 async function typeByForceReact(page, caption) {
