@@ -390,7 +390,7 @@ async function typeByExecCommand(page, caption) {
     const el = document.activeElement;
     return el && (
       el.isContentEditable ||
-      el.tagName === "TEXTAREA" ||
+      el.tagName === "textArea" ||
       el.getAttribute("role") === "textbox"
     );
   }, { timeout: 20000 });
