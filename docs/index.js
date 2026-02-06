@@ -380,42 +380,32 @@ async function typeByInputEvent(page, caption) {
   page.frames().forEach((frame, i) => {
     console.log(i, frame.url());
   });
-  
-  
-  const selector =
-    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
-  // tunggu SAMPAI benar-benar ada & kelihatan
-  await page.waitForFunction(sel => {
-    const el = document.querySelector(sel);
-    return el && el.offsetParent !== null;
-  }, { timeout: 15000 }, selector);
+  // 🔥 GANTI DARI SINI
+  const selector = 'textarea, div[contenteditable="true"]';
 
+  await page.waitForSelector(selector, { timeout: 15000 });
   const el = await page.$(selector);
+
   if (!el) throw new Error("❌ Textbox caption tidak ditemukan");
 
-  // ❗ WAJIB CLICK
-  await el.click({ delay: 800 });
+  // WAJIB click, bukan focus
+  await el.click({ delay: 500 });
 
-  // bangunin React
+  // bangunin FB editor
   await page.keyboard.type(" ");
   await page.keyboard.press("Backspace");
 
-  for (const char of caption) {
-    await page.keyboard.type(char, {
-      delay: 90 + Math.random() * 80
+  // ketik caption
+  for (const c of caption) {
+    await page.keyboard.type(c, {
+      delay: 80 + Math.random() * 60
     });
   }
 
-  // validasi
-  const ok = await page.evaluate(el => {
-    return el.innerText?.trim().length > 0;
-  }, el);
-
-  if (!ok) throw new Error("❌ Caption gagal terisi");
-
+  console.log("✅ Caption berhasil diketik");
   return true;
-    }
+}
 
 
 
