@@ -348,33 +348,64 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 
-async function typeByInputEvent(page, caption) {
-  await page.evaluate(text => {
-      const el = document.querySelector(
+//async function typeByInputEvent(page, caption) {
+  //await page.evaluate(text => {
+     // const el = document.querySelector(
+//  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+//);
+ // if (!el) return false;
+
+   // el.focus();
+
+   // el.dispatchEvent(new InputEvent("beforeinput", {
+     // inputType: "insertText",
+     // data: text,
+     // bubbles: true,
+    //  cancelable: true
+   // }));
+
+   // el.textContent = text;
+
+  //  el.dispatchEvent(new InputEvent("input", {
+     // inputType: "insertText",
+    //  data: text,
+    //  bubbles: true
+ //   }));
+
+   // return true;
+//  }, caption);
+//}
+
+async function typeByInputEvent(pages, caption) {
+  const selector = 'document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+); ';
+
+  await page.click(selector, { delay: 50 });
+  await page.waitForTimeout(400);
+
+  // wake react
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  for (const char of caption) {
+    await page.keyboard.type(char, {
+      delay: 90 + Math.random() * 80
+    });
+  }
+
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  // VALIDASI PALING AMAN
+  return await page.evaluate(() => {
+    const el =document.querySelector(
   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
 );
-  if (!el) return false;
-
-    el.focus();
-
-    el.dispatchEvent(new InputEvent("beforeinput", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true,
-      cancelable: true
-    }));
-
-    el.textContent = text;
-
-    el.dispatchEvent(new InputEvent("input", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true
-    }));
-
-    return true;
-  }, caption);
+    return el && el.innerText.trim().length > 0;
+  });
 }
+
 
 async function typeByForceReact(page, caption) {
   await page.evaluate(text => {
@@ -407,11 +438,11 @@ async function typeCaptionUltimate(page, caption) {
    //console.log("🧠 Stable gagal → Combo helper");
 
   
-  console.log("🧠 Activate composer + fill caption (combo)");
+//  console.log("🧠 Activate composer + fill caption (combo)");
  // const comboResult = await activateComposerAndFillCaption(page, caption);
   //console.log("COMBO:", comboResult);
 
-  await page.waitForTimeout(2000);
+//  await page.waitForTimeout(2000);
 
 //if (comboResult?.ok) {
   //console.log("✅ Caption OK via combo helper (trust React)");
@@ -419,7 +450,7 @@ async function typeCaptionUltimate(page, caption) {
 //}
   
   
-  console.log("🧠 Try typeCaptionSafe (legacy)");
+//  console.log("🧠 Try typeCaptionSafe (legacy)");
 
  // try {
     //await typeCaptionSafe(page, caption);
