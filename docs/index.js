@@ -379,47 +379,43 @@ async function typeByExecCommand(page, caption) {
 async function typeByInputEvent(page, caption) {
   console.log("✍️ Isi caption via ACTIVE keyboard");
 
-  // 1️⃣ pastikan editor benar-benar aktif
+  // tunggu editor FB AKTIF
   await page.waitForFunction(() => {
     const el = document.activeElement;
-    return (
-      el &&
-      (
-        el.isContentEditable ||
-        el.tagName === "TEXTAREA" ||
-        el.getAttribute("role") === "textbox"
-      )
+    return el && (
+      el.isContentEditable ||
+      el.tagName === "textarea" ||
+      el.getAttribute("role") === "textbox"
     );
   }, { timeout: 20000 });
 
-  // 2️⃣ bangunin editor (INI PENTING)
+  // bangunin editor
   await page.keyboard.type(" ");
   await page.keyboard.press("Backspace");
 
-  // 3️⃣ ketik caption (human-like)
+  // ketik caption
   for (const c of caption) {
     await page.keyboard.type(c, {
       delay: 90 + Math.random() * 80
     });
   }
 
-  // 4️⃣ validasi (bukan selector)
+  // validasi
   const ok = await page.evaluate(() => {
     const el = document.activeElement;
-    if (!el) return false;
-    return (
-      el.innerText?.trim().length > 0 ||
-      el.value?.trim().length > 0
-    );
+    return el &&
+      (
+        el.innerText?.trim().length > 0 ||
+        el.value?.trim().length > 0
+      );
   });
 
   if (!ok) {
-    throw new Error("❌ Gagal mengisi caption (keyboard)");
+    throw new Error("❌ Gagal mengisi caption");
   }
 
   console.log("✅ Caption berhasil diisi");
-  return true;
-}
+    }
 
 
 //isi caption tambahan cara 
@@ -614,56 +610,41 @@ async function clickComposerStatus(page) {
   // 3️⃣ TUNGGU TEXTBOX
   await page.waitForTimeout(2000);
 
-  async function openComposer(page) {
-  const selector = 'div[data-mcomponent="ServerTextArea"]';
-
-  await page.waitForSelector(selector, { timeout: 20000 });
-
-  const el = await page.$(selector);
-  if (!el) throw new Error("❌ Composer wrapper tidak ditemukan");
-
-  // ⚠️ INI PENTING: click fisik
-  await el.click({ delay: 120 });
-
-  // beri waktu FB render editor
-  await page.waitForTimeout(1200);
-
-  console.log("✅ Composer dibuka via real click");
-}
+  
 
 // 1️⃣ Klik placeholder composer
-     // jalan  await page.waitForSelector(
-   // 'div[role="button"][data-mcomponent="ServerTextArea"]',
-//    { timeout: 20000 }
- // );
+     await page.waitForSelector(
+    'div[role="button"][data-mcomponent="ServerTextArea"]',
+     { timeout: 20000 }
+    );
 
-//  await page.evaluate(() => {
-   // const el = document.querySelector(
-      //'div[role="button"][data-mcomponent="ServerTextArea"]'
-   // );
-   // if (!el) return;
+    await page.evaluate(() => {
+    const el = document.querySelector(
+        'div[role="button"][data-mcomponent="ServerTextArea"]'
+    );
+    if (!el) return;
 
-   // el.scrollIntoView({ block: "center" });
+    el.scrollIntoView({ block: "center" });
 
-    //["touchstart","touchend","mousedown","mouseup","click"]
-      //.forEach(e =>
-       // el.dispatchEvent(new Event(e, { bubbles: true }))
-      //);
-  // });
+    ["touchstart","touchend","mousedown","mouseup","click"]
+      .forEach(e =>
+        el.dispatchEvent(new Event(e, { bubbles: true }))
+      );
+   });
 
   
-//await page.waitForFunction(() => {
-  //return (
-    //document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-    //document.querySelector('div[contenteditable="true"]') ||
-    //document.querySelector('textarea') ||
-  //  document.querySelector('textarea[role="combobox"]') ||
-   // document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
-  //  document.querySelector('[aria-label]')
- // );
-//}, { timeout: 30000 });
+  await page.waitForFunction(() => {
+    return (
+     document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+     document.querySelector('div[contenteditable="true"]') ||
+     document.querySelector('textarea') ||
+     document.querySelector('textarea[role="combobox"]') ||
+     document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+     document.querySelector('[aria-label]')
+    );
+  }, { timeout: 30000 });
 
-//console.log("✅ Composer textbox terdeteksi");
+ console.log("✅ Composer textbox terdeteksi");
 
   const boxHandle = await page.evaluateHandle(() => {
   return (
