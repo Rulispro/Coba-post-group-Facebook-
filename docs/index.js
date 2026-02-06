@@ -376,11 +376,6 @@ async function typeByExecCommand(page, caption) {
 //  }, caption);
 //}
 
-// paksa fokus via keyboard (mobile FB suka gini)
-await page.keyboard.press("Tab");
-await page.waitForTimeout(500);
-await page.keyboard.press("Tab");
-await page.waitForTimeout(500);
 
 
   async function typeByInputEvent(page, caption) {
