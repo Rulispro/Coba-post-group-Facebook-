@@ -1065,37 +1065,37 @@ await page.waitForFunction(() => {
 
 console.log("✅ Composer textbox terdeteksi");
 
-  const boxHandle = await page.evaluateHandle(() => {
-  return (
-    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-    document.querySelector('div[contenteditable="true"]') ||
-    document.querySelector('textarea') ||
-    document.querySelector('textarea[role="combobox"]') ||
-    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
-    document.querySelector('[aria-label]')
-  );
-});
-const box = boxHandle.asElement();
-if (!box) {
-  throw new Error("❌ Composer textbox tidak valid");
-}
+  //const boxHandle = await page.evaluateHandle(() => {
+ // return (
+    //document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+    //document.querySelector('div[contenteditable="true"]') ||
+   // document.querySelector('textarea') ||
+   // document.querySelector('textarea[role="combobox"]') ||
+   // document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+    //document.querySelector('[aria-label]')
+  //);
+//});
+//const box = boxHandle.asElement();
+//if (!box) {
+  //throw new Error("❌ Composer textbox tidak valid");
+//}
 
-  await box.focus();
+ // await box.focus();
     
-  await page.keyboard.down("Control");
-  await page.keyboard.press("A");
-  await page.keyboard.up("Control");
-  await page.keyboard.press("Backspace");
+  //await page.keyboard.down("Control");
+  //await page.keyboard.press("A");
+  //await page.keyboard.up("Control");
+  //await page.keyboard.press("Backspace");
 
-  await typeCaptionUltimate(page, caption);
+ // await typeCaptionUltimate(page, caption);
 
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
+  //await page.keyboard.press("Space");
+  //await page.keyboard.press("Backspace");
 
-  console.log("✅ Caption diketik");
+  //console.log("✅ Caption diketik");
 
     
- await delay(3000); // kasih waktu 3 detik minimal
+ //await delay(3000); // kasih waktu 3 detik minimal
 
 
   // ===== 3️⃣ Download + upload media
