@@ -9,38 +9,45 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
-async function debugComposer(page, label = "DEBUG COMPOSER") {
-  console.log(`\n🔎 ${label}`);
 
-  const result = await page.evaluate(() => {
-    const out = [];
+async function debugComposerAll(page) {
+  console.log("\n🔎 DEBUG COMPOSER ALL ELEMENT");
 
-    document.querySelectorAll("*").forEach(el => {
-      const editable =
-        el.isContentEditable ||
-        el.getAttribute("contenteditable") === "true" ||
-        el.tagName === "TEXTAREA";
+  const data = await page.evaluate(() => {
+    const results = [];
 
-      if (!editable) return;
-
+    document.querySelectorAll("div, textarea, span").forEach(el => {
       const r = el.getBoundingClientRect();
       if (r.width < 80 || r.height < 40) return;
 
-      out.push({
+      const attrs = el.getAttributeNames();
+
+      const isCandidate =
+        el.isContentEditable ||
+        el.getAttribute("contenteditable") === "true" ||
+        el.tagName === "TEXTAREA" ||
+        el.getAttribute("role") === "textbox" ||
+        el.getAttribute("role") === "combobox" ||
+        el.getAttribute("data-mcomponent") === "ServerTextArea" ||
+        attrs.some(a => a.includes("aria"));
+
+      if (!isCandidate) return;
+
+      results.push({
         tag: el.tagName,
         role: el.getAttribute("role"),
         aria: el.getAttribute("aria-label"),
+        data: el.getAttribute("data-mcomponent"),
         contenteditable: el.getAttribute("contenteditable"),
-        testid: el.getAttribute("data-testid"),
         class: (el.className || "").toString().slice(0, 60),
-        preview: (el.innerText || el.value || "").slice(0, 30)
+        textPreview: (el.innerText || el.value || "").slice(0, 30)
       });
     });
 
-    return out;
+    return results;
   });
 
-  console.log("🧪 EDITOR CANDIDATES:", JSON.stringify(result, null, 2));
+  console.log("🧪 COMPOSER ALL:", JSON.stringify(data, null, 2));
 }
 
 //Validasinya 
@@ -736,7 +743,18 @@ async function clickComposerStatus(page) {
 
   console.log("✅ Composer textbox terdeteksi");
   
-  await debugComposer(page, "STATUS COMPOSER");
+  await debugComposerAll(page);
+
+const boxHandle = await page.evaluateHandle(() => {
+  return (
+    document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+    document.querySelector('div[contenteditable="true"]') ||
+    document.querySelector('textarea') ||
+    document.querySelector('textarea[role="combobox"]') ||
+    document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+    document.querySelector('[aria-label]')
+  );
+});
   
 
   const boxHandle = await page.evaluateHandle(() => {
