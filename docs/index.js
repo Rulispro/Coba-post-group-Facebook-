@@ -560,7 +560,7 @@ async function typeCaptionUltimate(page, caption) {
     // }
 
    //console.log("🧠 Stable gagal → Combo helper");
-  const caption= await typeCaptionFB(page, caption);
+  await typeCaptionFB(page, caption);
    if (caption?.ok) {
       console.log("✅ Caption OK via Stable");
    return;
@@ -601,7 +601,7 @@ async function typeCaptionUltimate(page, caption) {
   //  { name: "ExecCommand", fn: typeByExecCommand },
     //{name: "InputEvent", fn: typeByInputEvent },
    //  {name: "typeCaptionFinal", fn: typeCaptionFinal },
-     {name: "caption", fn: typeCaptionFB},
+     {name: "captions", fn: typeCaptionFB},
   // { name: "ForceReact", fn: typeByForceReact }
   ];
 
