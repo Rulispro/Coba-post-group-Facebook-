@@ -375,16 +375,30 @@ async function typeByExecCommand(page, caption) {
    // return true;
 //  }, caption);
 //}
-
 async function typeByInputEvent(page, caption) {
-  const selector ='div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
- 
-  await page.waitForSelector(selector, { timeout: 5000 });
-  // await page.click(selector, { delay: 1000 });
- // await page.waitForTimeout(1000);
+  console.log("=== LIST IFRAME ===");
+  page.frames().forEach((frame, i) => {
+    console.log(i, frame.url());
+  });
+  
+  
+  const selector =
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
-  // wake react
-  await page.keyboard.press("Space");
+  // tunggu SAMPAI benar-benar ada & kelihatan
+  await page.waitForFunction(sel => {
+    const el = document.querySelector(sel);
+    return el && el.offsetParent !== null;
+  }, { timeout: 15000 }, selector);
+
+  const el = await page.$(selector);
+  if (!el) throw new Error("❌ Textbox caption tidak ditemukan");
+
+  // ❗ WAJIB CLICK
+  await el.click({ delay: 800 });
+
+  // bangunin React
+  await page.keyboard.type(" ");
   await page.keyboard.press("Backspace");
 
   for (const char of caption) {
@@ -393,15 +407,16 @@ async function typeByInputEvent(page, caption) {
     });
   }
 
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
+  // validasi
+  const ok = await page.evaluate(el => {
+    return el.innerText?.trim().length > 0;
+  }, el);
 
-  // VALIDASI PALING AMAN
-  return await page.evaluate(sel => {
-    const el = document.querySelector(sel);
-    return el && el.innerText.trim().length > 0;
-  }, selector);
-}
+  if (!ok) throw new Error("❌ Caption gagal terisi");
+
+  return true;
+    }
+
 
 
 async function typeByForceReact(page, caption) {
