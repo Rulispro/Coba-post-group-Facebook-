@@ -377,12 +377,14 @@ async function typeByExecCommand(page, caption) {
 //}
 
 
-await page.evaluate(() => {
-  console.log("ACTIVE:", document.activeElement);
-});
+
 
   async function typeByInputEvent(page, caption) {
   console.log("✍️ Isi caption via ACTIVE keyboard");
+    await page.evaluate(() => {
+  console.log("ACTIVE:", document.activeElement);
+});
+
 
   await page.waitForFunction(() => {
     const el = document.activeElement;
@@ -682,10 +684,10 @@ await page.waitForTimeout(400);
     document.querySelector('[aria-label]')
   );
 });
-const box = boxHandle.asElement();
-if (!box) {
-  throw new Error("❌ Composer textbox tidak valid");
-}
+//const box = boxHandle.asElement();
+//if (!box) {
+  //throw new Error("❌ Composer textbox tidak valid");
+//}
 
  // await box.focus();
     
