@@ -376,15 +376,21 @@ async function typeByExecCommand(page, caption) {
 //  }, caption);
 //}
 
-async function typeByInputEvent(page, caption) {
+// paksa fokus via keyboard (mobile FB suka gini)
+await page.keyboard.press("Tab");
+await page.waitForTimeout(500);
+await page.keyboard.press("Tab");
+await page.waitForTimeout(500);
+
+
+  async function typeByInputEvent(page, caption) {
   console.log("✍️ Isi caption via ACTIVE keyboard");
 
-  // tunggu editor FB AKTIF
   await page.waitForFunction(() => {
     const el = document.activeElement;
     return el && (
       el.isContentEditable ||
-      el.tagName === "textarea" ||
+      el.tagName === "TEXTAREA" ||
       el.getAttribute("role") === "textbox"
     );
   }, { timeout: 20000 });
@@ -393,14 +399,12 @@ async function typeByInputEvent(page, caption) {
   await page.keyboard.type(" ");
   await page.keyboard.press("Backspace");
 
-  // ketik caption
   for (const c of caption) {
     await page.keyboard.type(c, {
-      delay: 90 + Math.random() * 80
+      delay: 80 + Math.random() * 60
     });
   }
 
-  // validasi
   const ok = await page.evaluate(() => {
     const el = document.activeElement;
     return el &&
@@ -411,11 +415,12 @@ async function typeByInputEvent(page, caption) {
   });
 
   if (!ok) {
-    throw new Error("❌ Gagal mengisi caption");
+    throw new Error("❌ Caption tidak masuk");
   }
 
-  console.log("✅ Caption berhasil diisi");
-    }
+  console.log("✅ Caption berhasil diketik");
+}
+
 
 
 //isi caption tambahan cara 
