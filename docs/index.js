@@ -456,7 +456,9 @@ async function typeCaptionUltimate(page, caption) {
     }
   }
 
-  throw new Error("❌ Semua metode input caption gagal (akun keras / FB update)");
+  console.log("⚠️ Semua metode caption gagal → lanjut TANPA caption");
+return { ok: false, reason: "caption_blocked" };
+
 }
 
 //Helper isi caption status 
