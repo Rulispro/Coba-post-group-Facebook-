@@ -274,6 +274,71 @@ async function typeByExecCommand(page, caption) {
  //   return true;
 //  }, caption);
 //}
+async function typeCaptionFinal(page, caption) {
+  console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
+
+  // 1️⃣ Cari editor FB yang BENAR-BENAR bisa diketik
+  const editorHandle = await page.waitForFunction(() => {
+    const el =
+      document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+      document.querySelector('div[contenteditable="true"]') ||
+      document.querySelector('textarea');
+
+    if (!el) return null;
+
+    const rect = el.getBoundingClientRect();
+    if (rect.width < 100 || rect.height < 50) return null;
+
+    return el;
+  }, { timeout: 20000 });
+
+  const editor = editorHandle.asElement();
+  if (!editor) {
+    throw new Error("❌ Editor FB tidak ditemukan");
+  }
+
+  // 2️⃣ Isi caption pakai InputEvent (DITERIMA FB)
+  await page.evaluate((el, text) => {
+    el.focus();
+
+    // bersihkan isi
+    el.innerHTML = "";
+    el.dispatchEvent(new InputEvent("input", {
+      bubbles: true,
+      inputType: "deleteContentBackward"
+    }));
+
+    // masukkan teks (char by char)
+    for (const ch of text) {
+      el.dispatchEvent(new InputEvent("beforeinput", {
+        bubbles: true,
+        inputType: "insertText",
+        data: ch
+      }));
+      el.dispatchEvent(new InputEvent("input", {
+        bubbles: true,
+        inputType: "insertText",
+        data: ch
+      }));
+    }
+  }, editor, caption);
+
+  // 3️⃣ Validasi isi (WAJIB)
+  const ok = await page.evaluate(el => {
+    return (
+      el.innerText?.trim().length > 0 ||
+      el.value?.trim().length > 0
+    );
+  }, editor);
+
+  if (!ok) {
+    throw new Error("❌ Caption tidak masuk (FINAL)");
+  }
+
+  console.log("✅ Caption BERHASIL diisi (FINAL)");
+  return true;
+}
+
 
 async function typeByForceReact(page, caption) {
   const selector =
@@ -448,12 +513,13 @@ async function typeCaptionUltimate(page, caption) {
    // }
 //  } catch (e) {
    // console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
- // }
+ // } 
 
   const methods = [
    // { name: "Keyboard", fn: typeByKeyboard },
   //  { name: "ExecCommand", fn: typeByExecCommand },
-    { name: "InputEvent", fn: typeByInputEvent },
+    //{name: "InputEvent", fn: typeByInputEvent },
+     {name: "typeCaptionFinal", fn: typeCaptionFinal },
   //  { name: "ForceReact", fn: typeByForceReact }
   ];
 
@@ -606,53 +672,39 @@ async function clickComposerStatus(page) {
   
 
 // 1️⃣ Klik placeholder composer
-     //await page.waitForSelector(
-   // 'div[role="button"][data-mcomponent="ServerTextArea"]',
-    // { timeout: 20000 }
-   // );
+ await page.waitForSelector(
+    'div[role="button"][data-mcomponent="ServerTextArea"]',
+     { timeout: 20000 }
+    );
 
-   // await page.evaluate(() => {
-    //const el = document.querySelector(
-        //'div[role="button"][data-mcomponent="ServerTextArea"]'
-   // );
-    //if (!el) return;
+    await page.evaluate(() => {
+     const el = document.querySelector(
+        'div[role="button"][data-mcomponent="ServerTextArea"]'
+     );
+     if (!el) return;
 
-   // el.scrollIntoView({ block: "center" });
+     el.scrollIntoView({ block: "center" });
 
-   // ["touchstart","touchend","mousedown","mouseup","click"]
-     // .forEach(e =>
-     //   el.dispatchEvent(new Event(e, { bubbles: true }))
-    //  );
-  // });
+    ["touchstart","touchend","mousedown","mouseup","click"]
+        .forEach(e =>
+        el.dispatchEvent(new Event(e, { bubbles: true }))
+        );
+     });
 
   
- // await page.waitForFunction(() => {
-   // return (
-    // document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-     //document.querySelector('div[contenteditable="true"]') ||
-   //  document.querySelector('textarea') ||
-    // document.querySelector('textarea[role="combobox"]') ||
-    // document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
-    // document.querySelector('[aria-label]')
-  //  );
- // }, { timeout: 30000 });
+   await page.waitForFunction(() => {
+     return (
+     document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+       document.querySelector('div[contenteditable="true"]') ||
+      document.querySelector('textarea') ||
+       document.querySelector('textarea[role="combobox"]') ||
+       document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+       document.querySelector('[aria-label]')
+    );
+  }, { timeout: 30000 });
 
- //console.log("✅ Composer textbox terdeteksi");
-  await page.waitForSelector(
-  'div[contenteditable="true"], textarea, div[aria-label]',
-  { timeout: 20000 }
-);
-
-const editor = await page.$(
-  'div[contenteditable="true"], textarea, div[aria-label]'
-);
-
-if (!editor) throw new Error("❌ Editor isi tidak ditemukan");
-
-// 🔥 CLICK LANGSUNG KE AREA ISI
-await editor.click({ delay: 150 });
-await page.waitForTimeout(600);
-
+  console.log("✅ Composer textbox terdeteksi");
+  
 
   const boxHandle = await page.evaluateHandle(() => {
   return (
@@ -664,25 +716,25 @@ await page.waitForTimeout(600);
     document.querySelector('[aria-label]')
   );
 });
-//const box = boxHandle.asElement();
-//if (!box) {
-  //throw new Error("❌ Composer textbox tidak valid");
-//}
+const box = boxHandle.asElement();
+if (!box) {
+  throw new Error("❌ Composer textbox tidak valid");
+}
 
- // await box.focus();
+   await box.focus();
     
-  //await page.keyboard.down("Control");
-  //await page.keyboard.press("A");
-//  await page.keyboard.up("Control");
- // await page.keyboard.press("Backspace");
+  await page.keyboard.down("Control");
+  await page.keyboard.press("A");
+  await page.keyboard.up("Control");
+  await page.keyboard.press("Backspace");
 
   // 🔥 PAKAI FUNGSI AMAN 
   await typeCaptionUltimate(page, caption);
 
-//  await page.keyboard.press("Space");
-//  await page.keyboard.press("Backspace");
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
 
- // console.log("✅ Caption diketik");
+   console.log("✅ Caption diketik");
 
     
  await delay(3000);
