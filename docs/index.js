@@ -377,46 +377,60 @@ async function typeByExecCommand(page, caption) {
 //}
 
 async function typeByInputEvent(page, caption) {
-  console.log("✍️ Mengisi caption via InputEvent");
+  console.log("✍️ Mengisi caption via activeElement");
 
-  const success = await page.evaluate((text) => {
-    const el =
-      document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-      document.querySelector('div[contenteditable="true"]') ||
-      document.querySelector('textarea');
+  const ok = await page.evaluate(async (text) => {
+    // tunggu sampai FB benar-benar kasih editor aktif
+    let el = document.activeElement;
+
+    for (let i = 0; i < 20; i++) {
+      el = document.activeElement;
+      if (
+        el &&
+        (el.isContentEditable ||
+          el.tagName === "TEXTAREA" ||
+          el.getAttribute("role") === "textbox")
+      ) {
+        break;
+      }
+      await new Promise(r => setTimeout(r, 300));
+    }
 
     if (!el) return false;
 
-    el.focus();
-
-    // bersihin dulu
+    // clear dulu
     if (el.isContentEditable) {
       el.innerHTML = "";
     } else {
       el.value = "";
     }
 
-    // isi text
+    // isi caption (cara yg dipercaya FB)
     if (el.isContentEditable) {
       document.execCommand("insertText", false, text);
     } else {
-      el.value = text;
+      el.setRangeText(text);
     }
 
-    // trigger event yg dipercaya FB
+    // trigger event WAJIB
     el.dispatchEvent(new InputEvent("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
     el.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
 
-    return true;
+    return (
+      el.innerText?.trim().length > 0 ||
+      el.value?.trim().length > 0
+    );
   }, caption);
 
-  if (!success) {
-    throw new Error("❌ Gagal mengisi caption (InputEvent)");
+  if (!ok) {
+    throw new Error("❌ Gagal mengisi caption (activeElement)");
   }
 
   console.log("✅ Caption berhasil diisi");
-}
+  return true;
+  }
+      
 
 
 async function typeByForceReact(page, caption) {
