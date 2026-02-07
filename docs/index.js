@@ -9,6 +9,7 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
+
 async function typeCaptionFB(page, caption) {
   console.log("✍️ Ketik caption (FB stable)");
 
@@ -29,10 +30,10 @@ async function typeCaptionFB(page, caption) {
   // 3️⃣ Ketik caption ala manusia
   for (const ch of caption) {
     await page.keyboard.type(ch, {
-      delay: 60 + Math.random() * 90
+      delay: 100 + Math.random() * 120
     });
 
-    if (Math.random() < 0.05) {
+    if (Math.random() < 0.09) {
       await page.waitForTimeout(300 + Math.random() * 600);
     }
   }
@@ -45,45 +46,45 @@ async function typeCaptionFB(page, caption) {
   }
 
 
-async function debugComposerAll(page) {
-  console.log("\n🔎 DEBUG COMPOSER ALL ELEMENT");
+//$ benar async function debugComposerAll(page) {
+  //console.log("\n🔎 DEBUG COMPOSER ALL ELEMENT");
 
-  const data = await page.evaluate(() => {
-    const results = [];
+  //const data = await page.evaluate(() => {
+    //const results = [];
 
-    document.querySelectorAll("div, textarea, span").forEach(el => {
-      const r = el.getBoundingClientRect();
-      if (r.width < 80 || r.height < 40) return;
+   // document.querySelectorAll("div, textarea, span").forEach(el => {
+      //const r = el.getBoundingClientRect();
+     // if (r.width < 80 || r.height < 40) return;
 
-      const attrs = el.getAttributeNames();
+     // const attrs = el.getAttributeNames();
 
-      const isCandidate =
-        el.isContentEditable ||
-        el.getAttribute("contenteditable") === "true" ||
-        el.tagName === "TEXTAREA" ||
-        el.getAttribute("role") === "textbox" ||
-        el.getAttribute("role") === "combobox" ||
-        el.getAttribute("data-mcomponent") === "ServerTextArea" ||
-        attrs.some(a => a.includes("aria"));
+     // const isCandidate =
+        //el.isContentEditable ||
+     //   el.getAttribute("contenteditable") === "true" ||
+       // el.tagName === "TEXTAREA" ||
+       // el.getAttribute("role") === "textbox" ||
+      //  el.getAttribute("role") === "combobox" ||
+       // el.getAttribute("data-mcomponent") === "ServerTextArea" ||
+        //attrs.some(a => a.includes("aria"));
 
-      if (!isCandidate) return;
+     // if (!isCandidate) return;
 
-      results.push({
-        tag: el.tagName,
-        role: el.getAttribute("role"),
-        aria: el.getAttribute("aria-label"),
-        data: el.getAttribute("data-mcomponent"),
-        contenteditable: el.getAttribute("contenteditable"),
-        class: (el.className || "").toString().slice(0, 60),
-        textPreview: (el.innerText || el.value || "").slice(0, 30)
-      });
-    });
+     // results.push({
+        //tag: el.tagName,
+       // role: el.getAttribute("role"),
+       // aria: el.getAttribute("aria-label"),
+     //   data: el.getAttribute("data-mcomponent"),
+      //  contenteditable: el.getAttribute("contenteditable"),
+        //class: (el.className || "").toString().slice(0, 60),
+      //  textPreview: (el.innerText || el.value || "").slice(0, 30)
+    //  });
+  //  });
 
-    return results;
-  });
+  //  return results;
+//  });
 
-  console.log("🧪 COMPOSER ALL:", JSON.stringify(data, null, 2));
-}
+ // console.log("🧪 COMPOSER ALL:", JSON.stringify(data, null, 2));
+//$sampai sini}
 
 //Validasinya 
 async function validateCaption(page, caption) {
@@ -477,7 +478,7 @@ async function typeByForceReact(page, caption) {
 
 //HELPER ISI CAPTION 
 async function typeByKeyboard(page, caption) {
-  await page.keyboard.type(caption, { delay: 80 });
+  await page.keyboard.type(caption, { delay: 130 });
 }
 
 async function typeByExecCommand(page, caption) {
@@ -486,114 +487,77 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 
-//async function typeByInputEvent(page, caption) {
-  //await page.evaluate(text => {
-     // const el = document.querySelector(
-//  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-//);
- // if (!el) return false;
+async function typeByInputEvent(page, caption) {
+  await page.evaluate(text => {
+      const el = document.querySelector(
+   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+  );
+  if (!el) return false;
 
-   // el.focus();
+    el.focus();
 
-   // el.dispatchEvent(new InputEvent("beforeinput", {
-     // inputType: "insertText",
-     // data: text,
-     // bubbles: true,
-    //  cancelable: true
-   // }));
+    el.dispatchEvent(new InputEvent("beforeinput", {
+      inputType: "insertText",
+      data: text,
+      bubbles: true,
+      cancelable: true
+    }));
 
-   // el.textContent = text;
+    el.textContent = text;
 
-  //  el.dispatchEvent(new InputEvent("input", {
-     // inputType: "insertText",
-    //  data: text,
-    //  bubbles: true
- //   }));
+    el.dispatchEvent(new InputEvent("input", {
+      inputType: "insertText",
+      data: text,
+      bubbles: true
+    }));
 
-   // return true;
-//  }, caption);
-//}
-
-
-
-
-  
-  async function typeByInputEvent(page, caption) {
-  console.log("✍️ Isi caption via keyboard (NO activeElement wait)");
-
-  // bangunin editor
-  await page.keyboard.type(" ");
-  await page.keyboard.press("Backspace");
-
-  for (const c of caption) {
-    await page.keyboard.type(c, {
-      delay: 80 + Math.random() * 60
-    });
-  }
-
-  const ok = await page.evaluate(() => {
-    const el = document.querySelector(
-      'div[contenteditable="true"], textarea'
-    );
-    return el &&
-      (
-        el.innerText?.trim().length > 0 ||
-        el.value?.trim().length > 0
-      );
-  });
-
-  if (!ok) throw new Error("❌ Caption tidak masuk");
-
-  console.log("✅ Caption berhasil diketik");
-  }
-
-
+    return true;
+  }, caption);
+}
 
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
     console.log("🧠 typeCaptionUltimate start");
    
-    //const stable = await typeCaptionStable(page, caption);
-   //if (stable?.ok) {
-      //console.log("✅ Caption OK via Stable");
-   // return;
-    // }
+    const stable = await typeCaptionStable(page, caption);
+   if (stable?.ok) {
+      console.log("✅ Caption OK via Stable");
+    return;
+     }
 
-   //console.log("🧠 Stable gagal → Combo helper");
+   console.log("🧠 Stable gagal → Combo helper");
 
-//  console.log("🧠 Activate composer + fill caption (combo)");
- // const comboResult = await activateComposerAndFillCaption(page, caption);
-  //console.log("COMBO:", comboResult);
+   console.log("🧠 Activate composer + fill caption (combo)");
+   const comboResult = await activateComposerAndFillCaption(page, caption);
+   console.log("COMBO:", comboResult);
 
-//  await page.waitForTimeout(2000);
+    await page.waitForTimeout(2000);
 
-//if (comboResult?.ok) {
-  //console.log("✅ Caption OK via combo helper (trust React)");
- // return;
-//}
-  
-  
-//  console.log("🧠 Try typeCaptionSafe (legacy)");
+  if (comboResult?.ok) {
+    console.log("✅ Caption OK via combo helper (trust React)");
+    return;
+  }
+  console.log("🧠 Try typeCaptionSafe (legacy)");
 
- // try {
-    //await typeCaptionSafe(page, caption);
-   // await page.waitForTimeout(400);
+   try {
+      await typeCaptionSafe(page, caption);
+      await page.waitForTimeout(400);
 
-  //  if (await validateCaption(page, caption)) {
-    //  console.log("✅ typeCaptionSafe OK");
-     // return;
-   // }
-//  } catch (e) {
-   // console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
- // } 
+    if (await validateCaption(page, caption)) {
+       console.log("✅ typeCaptionSafe OK");
+      return;
+      }
+    } catch (e) {
+     console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
+  } 
 
   const methods = [
-    //{ name: "Keyboard", fn: typeByKeyboard },
-  //  { name: "ExecCommand", fn: typeByExecCommand },
-    //{name: "InputEvent", fn: typeByInputEvent },
-   //  {name: "typeCaptionFinal", fn: typeCaptionFinal },
+      { name: "Keyboard", fn: typeByKeyboard },
+      { name: "ExecCommand", fn: typeByExecCommand },
+      {name: "InputEvent", fn: typeByInputEvent },
+      {name: "typeCaptionFinal", fn: typeCaptionFinal },
      {name: "captions", fn: typeCaptionFB},
-  // { name: "ForceReact", fn: typeByForceReact }
+     { name: "ForceReact", fn: typeByForceReact }
   ];
 
   for (const m of methods) {
@@ -657,9 +621,6 @@ async function typeCaptionSafe(page, caption) {
     return value.includes(text.slice(0, 5));
   }, selector, caption);
 
- // if (!ok) {
-   // throw new Error("❌ Caption tidak diterima oleh React FB");
- // }
 if (!ok) {
   console.log("⚠️ React validation skipped (STATUS mode)");
   return;
@@ -778,7 +739,7 @@ async function clickComposerStatus(page) {
 
   console.log("✅ Composer textbox terdeteksi");
   
-  await debugComposerAll(page);
+  // await debugComposerAll(page);
 
   const boxHandle = await page.evaluateHandle(() => {
   return (
@@ -1100,37 +1061,37 @@ await page.waitForFunction(() => {
 
 console.log("✅ Composer textbox terdeteksi");
 
-  //const boxHandle = await page.evaluateHandle(() => {
- // return (
-    //document.querySelector('div[contenteditable="true"][role="textbox"]') ||
-    //document.querySelector('div[contenteditable="true"]') ||
-   // document.querySelector('textarea') ||
-   // document.querySelector('textarea[role="combobox"]') ||
-   // document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
-    //document.querySelector('[aria-label]')
-  //);
-//});
-//const box = boxHandle.asElement();
-//if (!box) {
-  //throw new Error("❌ Composer textbox tidak valid");
-//}
+  const boxHandle = await page.evaluateHandle(() => {
+   return (
+      document.querySelector('div[contenteditable="true"][role="textbox"]') ||
+      document.querySelector('div[contenteditable="true"]') ||
+      document.querySelector('textarea') ||
+      document.querySelector('textarea[role="combobox"]') ||
+      document.querySelector('div[data-mcomponent="ServerTextArea"]') ||
+      document.querySelector('[aria-label]')
+    );
+  });
+const box = boxHandle.asElement();
+  if (!box) {
+    throw new Error("❌ Composer textbox tidak valid");
+  }
 
- // await box.focus();
+   await box.focus();
     
-  //await page.keyboard.down("Control");
-  //await page.keyboard.press("A");
-  //await page.keyboard.up("Control");
-  //await page.keyboard.press("Backspace");
+   await page.keyboard.down("Control");
+   await page.keyboard.press("A");
+   await page.keyboard.up("Control");
+   await page.keyboard.press("Backspace");
 
- // await typeCaptionUltimate(page, caption);
+   await typeCaptionUltimate(page, caption);
 
-  //await page.keyboard.press("Space");
-  //await page.keyboard.press("Backspace");
+   await page.keyboard.press("Space");
+   await page.keyboard.press("Backspace");
 
-  //console.log("✅ Caption diketik");
+   console.log("✅ Caption diketik");
 
     
- //await delay(3000); // kasih waktu 3 detik minimal
+  await delay(3000); // kasih waktu 3 detik minimal
 
 
   // ===== 3️⃣ Download + upload media
