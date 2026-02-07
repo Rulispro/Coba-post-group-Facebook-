@@ -331,6 +331,7 @@ async function typeByExecCommand(page, caption) {
     document.execCommand("insertText", false, text);
   }, caption);
 }
+
 //caption input event 
 //async function typeByInputEvent(page, caption) {
 //  await page.evaluate(text => {
@@ -353,23 +354,23 @@ async function typeByExecCommand(page, caption) {
 ///}
 
 //caption force
-//async function typeByForceReact(page, caption) {
- // await page.evaluate(text => {
-  //   const el = document.querySelector(
-  //'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-//);
-// if (!el) return false;
+async function typeByForceReact(page, caption) {
+   await page.evaluate(text => {
+     const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+ if (!el) return false;
 
-//    el.focus();
-   // el.innerText = text;
+    el.focus();
+    el.innerText = text;
 
-  //  ["input", "change", "keydown", "keyup", "blur"].forEach(evt =>
-  //    el.dispatchEvent(new Event(evt, { bubbles: true }))
-  //  );
+    ["input", "change", "keydown", "keyup", "blur"].forEach(evt =>
+      el.dispatchEvent(new Event(evt, { bubbles: true }))
+    );
 
- //   return true;
-//  }, caption);
-//}
+     return true;
+  }, caption);
+  }
 
 async function typeCaptionFinal(page, caption) {
   console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
@@ -538,47 +539,47 @@ async function typeByInputEvent(page, caption) {
 async function typeCaptionUltimate(page, caption) {
     console.log("🧠 typeCaptionUltimate start");
    
-  //  const stable = await typeCaptionStable(page, caption);
- //  if (stable?.ok) {
-     // console.log("✅ Caption OK via Stable");
-    //return;
-     //}
+    const stable = await typeCaptionStable(page, caption);
+   if (stable?.ok) {
+      console.log("✅ Caption OK via Stable");
+    return;
+     }
 
-  // console.log("🧠 Stable gagal → Combo helper");
+   console.log("🧠 Stable gagal → Combo helper");
 
   
 
-  // console.log("🧠 Activate composer + fill caption (combo)");
-  // const comboResult = await activateComposerAndFillCaption(page, caption);
-   //console.log("COMBO:", comboResult);
+   console.log("🧠 Activate composer + fill caption (combo)");
+   const comboResult = await activateComposerAndFillCaption(page, caption);
+   console.log("COMBO:", comboResult);
 
-    //await page.waitForTimeout(2000);
+    await page.waitForTimeout(2000);
 
-  //if (comboResult?.ok) {
-    //console.log("✅ Caption OK via combo helper (trust React)");
-   // return;
-//  }
- // console.log("🧠 Try typeCaptionSafe (legacy)");
+  if (comboResult?.ok) {
+    console.log("✅ Caption OK via combo helper (trust React)");
+    return;
+ }
+  console.log("🧠 Try typeCaptionSafe (legacy)");
 
-   //try {
-     // await typeCaptionSafe(page, caption);
-      //await page.waitForTimeout(400);
+     try {
+      await typeCaptionSafe(page, caption);
+      await page.waitForTimeout(400);
 
-   // if (await validateCaption(page, caption)) {
-      // console.log("✅ typeCaptionSafe OK");
-     // return;
-      //}
-   // } catch (e) {
-     //console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
-//  } 
+    if (await validateCaption(page, caption)) {
+       console.log("✅ typeCaptionSafe OK");
+      return;
+      }
+     } catch (e) {
+     console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
+  } 
 
   const methods = [
       { name: "Keyboard", fn: typeByKeyboard },
-     // { name: "ExecCommand", fn: typeByExecCommand },
-     // {name: "InputEvent", fn: typeByInputEvent },
-      //{name: "typeCaptionFinal", fn: typeCaptionFinal },
-     // {name: "typeCaption", fn: typeCaptionFB},
-     //{ name: "ForceReact", fn: typeByForceReact }
+      { name: "ExecCommand", fn: typeByExecCommand },
+      {name: "InputEvent", fn: typeByInputEvent },
+      {name: "typeCaptionFinal", fn: typeCaptionFinal },
+      {name: "typeCaption", fn: typeCaptionFB},
+     { name: "ForceReact", fn: typeByForceReact }
   ];
 
  //LAMA
