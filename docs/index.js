@@ -593,7 +593,7 @@ for (const m of methods) {
 
   await page.waitForTimeout(500);
 
-    commit React
+    //commit React
    await page.keyboard.press("Space");
    await page.keyboard.press("Backspace");
 
