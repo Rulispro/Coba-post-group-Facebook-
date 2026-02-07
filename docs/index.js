@@ -519,23 +519,23 @@ async function typeByInputEvent(page, caption) {
 async function typeCaptionUltimate(page, caption) {
     console.log("🧠 typeCaptionUltimate start");
    
-   // const stable = await typeCaptionStable(page, caption);
+  //  const stable = await typeCaptionStable(page, caption);
  //  if (stable?.ok) {
      // console.log("✅ Caption OK via Stable");
-   // return;
-    // }
+    //return;
+     //}
 
- //  console.log("🧠 Stable gagal → Combo helper");
+  // console.log("🧠 Stable gagal → Combo helper");
 
   
 
-   //console.log("🧠 Activate composer + fill caption (combo)");
-   //const comboResult = await activateComposerAndFillCaption(page, caption);
-  // console.log("COMBO:", comboResult);
+  // console.log("🧠 Activate composer + fill caption (combo)");
+  // const comboResult = await activateComposerAndFillCaption(page, caption);
+   //console.log("COMBO:", comboResult);
 
     //await page.waitForTimeout(2000);
 
- // if (comboResult?.ok) {
+  //if (comboResult?.ok) {
     //console.log("✅ Caption OK via combo helper (trust React)");
    // return;
 //  }
@@ -554,11 +554,11 @@ async function typeCaptionUltimate(page, caption) {
 //  } 
 
   const methods = [
-      //{ name: "Keyboard", fn: typeByKeyboard },
+      { name: "Keyboard", fn: typeByKeyboard },
      // { name: "ExecCommand", fn: typeByExecCommand },
      // {name: "InputEvent", fn: typeByInputEvent },
       //{name: "typeCaptionFinal", fn: typeCaptionFinal },
-      {name: "typeCaption", fn: typeCaptionFB},
+     // {name: "typeCaption", fn: typeCaptionFB},
      //{ name: "ForceReact", fn: typeByForceReact }
   ];
 
@@ -1634,8 +1634,8 @@ function delay(ms) {
       await page.setBypassCSP(true);
 
       // 🔊 Monitor console
-      page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
-      page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
+      //page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
+      //page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
 
       // ===== Recorder PER AKUN
       const recorder = new PuppeteerScreenRecorder(page);
@@ -1766,7 +1766,7 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
       console.log(`✅ Posting selesai untuk ${acc.account}`);
     //await delay(6000); // jeda aman antar akun
      const delayRow = rowsForAccount.find(r => r.delay_akun);
-    const delayAkun = Number(delayRow?.delay_akun) || 60000;
+    const delayAkun = Number(delayRow?.delay_akun) || 10000;
    console.log(
   "🕒 Delay dari row tanggal:",
   delayRow?.delay_akun,
