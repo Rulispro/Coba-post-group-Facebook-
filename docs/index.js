@@ -552,12 +552,12 @@ async function typeCaptionUltimate(page, caption) {
   } 
 
   const methods = [
-      { name: "Keyboard", fn: typeByKeyboard },
-      { name: "ExecCommand", fn: typeByExecCommand },
-      {name: "InputEvent", fn: typeByInputEvent },
+      //{ name: "Keyboard", fn: typeByKeyboard },
+     // { name: "ExecCommand", fn: typeByExecCommand },
+     // {name: "InputEvent", fn: typeByInputEvent },
       {name: "typeCaptionFinal", fn: typeCaptionFinal },
-     {name: "captions", fn: typeCaptionFB},
-     { name: "ForceReact", fn: typeByForceReact }
+    // {name: "typeCaption", fn: typeCaptionFB},
+     //{ name: "ForceReact", fn: typeByForceReact }
   ];
 
   for (const m of methods) {
