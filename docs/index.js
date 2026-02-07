@@ -560,21 +560,47 @@ async function typeCaptionUltimate(page, caption) {
      //{ name: "ForceReact", fn: typeByForceReact }
   ];
 
-  for (const m of methods) {
-    console.log(`✍️ Try ${m.name}...`);
+ // ganti dulu for (const m of methods) {
+    //console.log(`✍️ Try ${m.name}...`);
 
-    await m.fn(page, caption);
-    await page.waitForTimeout(500);
+   // await m.fn(page, caption);
+    //await page.waitForTimeout(500);
 
     // trigger commit React
-    await page.keyboard.press("Space");
-    await page.keyboard.press("Backspace");
+   // await page.keyboard.press("Space");
+  //  await page.keyboard.press("Backspace");
 
-    if (await validateCaption(page, caption)) {
-      console.log(`✅ ${m.name} OK`);
-      return;
-    }
+   // if (await validateCaption(page, caption)) {
+      //console.log(`✅ ${m.name} OK`);
+      //return;
+   // }
+ //  sampai sini}
+
+  //Baru 
+for (const m of methods) {
+  console.log(`✍️ Try ${m.name}...`);
+
+  try {
+    await m.fn(page, caption);
+  } catch (err) {
+    console.log(`⚠️ ${m.name} ERROR → lanjut fallback`);
+    console.log("↪", err.message);
+    continue; // ⬅️ INI KUNCI NYA
   }
+
+  await page.waitForTimeout(500);
+
+  // commit React
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  if (await validateCaption(page, caption)) {
+    console.log(`✅ ${m.name} OK`);
+    return;
+  }
+
+  console.log(`❌ ${m.name} tidak valid → lanjut`);
+}
 
   console.log("⚠️ Semua metode caption gagal → lanjut TANPA caption");
 return { ok: false, reason: "caption_blocked" };
