@@ -615,8 +615,8 @@ for (const m of methods) {
   await page.waitForTimeout(500);
 
     //commit React
-   await page.keyboard.press("Space");
-   await page.keyboard.press("Backspace");
+  // await page.keyboard.press("Space");
+   //await page.keyboard.press("Backspace");
 
   if (await validateCaption(page, caption)) {
       console.log(`✅ ${m.name} OK`);
