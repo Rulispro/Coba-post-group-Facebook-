@@ -281,24 +281,35 @@ async function activateComposerAndFillCaption(page, caption) {
 
 //caption keyboard 
 async function typeByKeyboard(page, caption) {
-  const el = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
- await page.click(selector);
-  await page.waitForTimeout(1000);
-    // 3️⃣ TYPE CAPTION (HUMAN-LIKE + RANDOM)
-  for (const char of caption) {
-    const delay = 80 + Math.random() * 120; // 80–200 ms
-    await page.keyboard.type(char, { delay });
+  const selector =
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
-    // jeda mikir kecil (±5%)
-    if (Math.random() < 0.05) {
+  // 1️⃣ Pastikan textbox ada
+  const box = await page.waitForSelector(selector, {
+    visible: true,
+    timeout: 10000
+  });
+  if (!box) throw new Error("Textbox tidak ditemukan");
+
+  // 2️⃣ Fokus (WAJIB di FB)
+  await box.click({ delay: 50 });
+  await page.waitForTimeout(300);
+
+  // 3️⃣ Ketik ala manusia
+  for (const ch of caption) {
+    await page.keyboard.type(ch, {
+      delay: 90 + Math.random() * 120
+    });
+
+    if (Math.random() < 0.08) {
       await page.waitForTimeout(300 + Math.random() * 700);
     }
   }
+
+  // 4️⃣ Commit React
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
-  }
+}
 
 //caption human like 
 async function typeByExecCommand(page, caption) {
