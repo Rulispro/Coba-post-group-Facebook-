@@ -469,6 +469,7 @@ async function typeByForceReact(page, caption) {
   await page.keyboard.press("Backspace");
 
   // 4️⃣ VALIDASI
+  await page.waitForTimeout(800);
   const ok = await validateCaption(page, caption);
   if (ok) {
     return { ok: true, step: "typed_human" };
@@ -545,11 +546,17 @@ async function typeCaptionUltimate(page, caption) {
     return;
      }
 
-   console.log("🧠 Stable gagal → Combo helper");
-
+  try {
+  await typeCaptionFB(page, caption);
+  if (await validateCaption(page, caption)) {
+    console.log("✅ Caption OK via typeCaptionFB");
+    return;
+  }
+} catch {}
   
-
-   console.log("🧠 Activate composer + fill caption (combo)");
+ console.log("🧠 Stable gagal → Combo helper");
+ 
+  console.log("🧠 Activate composer + fill caption (combo)");
    const comboResult = await activateComposerAndFillCaption(page, caption);
    console.log("COMBO:", comboResult);
 
