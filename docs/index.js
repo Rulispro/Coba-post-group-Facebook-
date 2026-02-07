@@ -574,32 +574,14 @@ async function typeCaptionUltimate(page, caption) {
   } 
 
   const methods = [
+      {name: "typeCaption", fn: typeCaptionFB},
       { name: "Keyboard", fn: typeByKeyboard },
       { name: "ExecCommand", fn: typeByExecCommand },
       {name: "InputEvent", fn: typeByInputEvent },
       {name: "typeCaptionFinal", fn: typeCaptionFinal },
-      {name: "typeCaption", fn: typeCaptionFB},
-     { name: "ForceReact", fn: typeByForceReact }
+      { name: "ForceReact", fn: typeByForceReact }
   ];
 
- //LAMA
-  //for (const m of methods) {
-   // console.log(`✍️ Try ${m.name}...`);
-
-    //await m.fn(page, caption);
-  //  await page.waitForTimeout(500);
-
-    // trigger commit React
-  //  await page.keyboard.press("Space");
-   // await page.keyboard.press("Backspace");
-
-   // if (await validateCaption(page, caption)) {
-      //onsole.log(`✅ ${m.name} OK`);
-    //return;
-  //  }
-// }
-
-  //Baru 
 for (const m of methods) {
     console.log(`✍️ Try ${m.name}...`);
 
