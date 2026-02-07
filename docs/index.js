@@ -519,37 +519,37 @@ async function typeByInputEvent(page, caption) {
 async function typeCaptionUltimate(page, caption) {
     console.log("🧠 typeCaptionUltimate start");
    
-    const stable = await typeCaptionStable(page, caption);
-   if (stable?.ok) {
-      console.log("✅ Caption OK via Stable");
-    return;
-     }
+   // const stable = await typeCaptionStable(page, caption);
+ //  if (stable?.ok) {
+     // console.log("✅ Caption OK via Stable");
+   // return;
+    // }
 
-   console.log("🧠 Stable gagal → Combo helper");
+ //  console.log("🧠 Stable gagal → Combo helper");
 
-   console.log("🧠 Activate composer + fill caption (combo)");
-   const comboResult = await activateComposerAndFillCaption(page, caption);
-   console.log("COMBO:", comboResult);
+   //console.log("🧠 Activate composer + fill caption (combo)");
+   //const comboResult = await activateComposerAndFillCaption(page, caption);
+  // console.log("COMBO:", comboResult);
 
-    await page.waitForTimeout(2000);
+    //await page.waitForTimeout(2000);
 
-  if (comboResult?.ok) {
-    console.log("✅ Caption OK via combo helper (trust React)");
-    return;
-  }
-  console.log("🧠 Try typeCaptionSafe (legacy)");
+ // if (comboResult?.ok) {
+    //console.log("✅ Caption OK via combo helper (trust React)");
+   // return;
+//  }
+ // console.log("🧠 Try typeCaptionSafe (legacy)");
 
-   try {
-      await typeCaptionSafe(page, caption);
-      await page.waitForTimeout(400);
+   //try {
+     // await typeCaptionSafe(page, caption);
+      //await page.waitForTimeout(400);
 
-    if (await validateCaption(page, caption)) {
-       console.log("✅ typeCaptionSafe OK");
-      return;
-      }
-    } catch (e) {
-     console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
-  } 
+   // if (await validateCaption(page, caption)) {
+      // console.log("✅ typeCaptionSafe OK");
+     // return;
+      //}
+   // } catch (e) {
+     //console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
+//  } 
 
   const methods = [
       //{ name: "Keyboard", fn: typeByKeyboard },
@@ -777,23 +777,23 @@ async function clickComposerStatus(page) {
     document.querySelector('[aria-label]')
   );
 });
-//const box = boxHandle.asElement();
-//if (!box) {
- // throw new Error("❌ Composer textbox tidak valid");
-//}
+ const box = boxHandle.asElement();
+  if (!box) {
+   throw new Error("❌ Composer textbox tidak valid");
+  }
 
-   //await box.focus();
+    await box.focus();
     
- // await page.keyboard.down("Control");
-  //await page.keyboard.press("A");
-  //await page.keyboard.up("Control");
- // await page.keyboard.press("Backspace");
+    await page.keyboard.down("Control");
+   await page.keyboard.press("A");
+    await page.keyboard.up("Control");
+  await page.keyboard.press("Backspace");
 
   // 🔥 PAKAI FUNGSI AMAN 
   await typeCaptionUltimate(page, caption);
 
-  //await page.keyboard.press("Space");
-  //await page.keyboard.press("Backspace");
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
 
    //console.log("✅ Caption diketik");
 
