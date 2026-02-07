@@ -176,6 +176,11 @@ const focused = await page.evaluate(() => {
   return false;
 });
 
+  if (!focused) {
+      // ❌ gagal sebelum ngetik
+      return { ok: false, typed: false, step: "focus_failed" };
+  }
+  
   //ketik caption 
   // 3️⃣ TYPE CAPTION (WAJIB)
   // 3️⃣ TYPE CAPTION (HUMAN-LIKE + RANDOM)
@@ -202,13 +207,13 @@ if (ok) {
   return { ok: true, step: "stable_ok" };
 }
 
-console.log("⚠️ Caption tidak tervalidasi");
-return { ok: false, step: "validation_failed" };
-                             
-
-
+       //SUDAH NGETIK GAGAL                     
   console.log("⚠️ Caption tidak tervalidasi");
   return { ok: false, step: "validation_failed" };
+    } catch (err) {
+    // ❌ ERROR sebelum / saat proses
+    return { ok: false, typed, step: "exception", error: err.message };
+}
 }
 
 
@@ -552,20 +557,38 @@ async function typeByInputEvent(page, caption) {
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
     console.log("🧠 typeCaptionUltimate start");
-   
-    const stable = await typeCaptionStable(page, caption);
-   if (stable?.ok) {
-      console.log("✅ Caption OK via Stable");
-    return;
-     }
+  
+let fbResult;
 
-  try {
-  await typeCaptionFB(page, caption);
-  if (await validateCaption(page, caption)) {
-    console.log("✅ Caption OK via typeCaptionFB");
-    return;
-  }
-} catch {}
+try {
+  fbResult = await typeCaptionFB(page, caption);
+} catch (e) {
+  console.log("⚠️ typeCaptionFB error → lanjut fallback");
+}
+
+if (fbResult?.ok) {
+  console.log("✅ Caption OK via typeCaptionFB");
+  return fbResult; // ⛔ STOP HANYA JIKA SUKSES
+}
+
+// ❗ JANGAN return di sini
+console.log("❌ typeCaptionFB gagal → lanjut metode berikutnya");
+      
+   
+ const stable = await typeCaptionStable(page, caption);
+
+if (stable?.ok) {
+  console.log("✅ Caption OK via Stable");
+  return stable;
+}
+
+if (stable?.typed) {
+  console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
+  return { ok: true, method: "StableTyped" };
+}
+
+// ⬇️ HANYA MASUK SINI JIKA STABLE GAGAL TANPA NGETIK
+console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
   
  console.log("🧠 Stable gagal → Combo helper");
  
@@ -580,7 +603,8 @@ async function typeCaptionUltimate(page, caption) {
     return;
  }
   console.log("🧠 Try typeCaptionSafe (legacy)");
-
+  await clearComposer(page);
+  
      try {
       await typeCaptionSafe(page, caption);
       await page.waitForTimeout(400);
@@ -603,7 +627,7 @@ async function typeCaptionUltimate(page, caption) {
 
 for (const m of methods) {
     console.log(`✍️ Try ${m.name}...`);
-
+  await clearComposer(page); // ⬅️ INI KUNCI ANTI DOBEL
    try {
       await m.fn(page, caption);
     } catch (err) {
