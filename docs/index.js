@@ -128,93 +128,87 @@ async function validateCaption(page, caption) {
 
 //ISI CAPTION type manusia tahan update 
 
-async function typeCaptionStable(page, caption) {
-  // 1️⃣ AKTIFKAN COMPOSER (WAJIB KLIK)
-  await page.evaluate(() => {
-    // klik area composer (placeholder / container)
-    const candidates = [
-      '[role="textbox"]',
-      '[role="combobox"]',
-      'textarea',
-      'div[contenteditable="true"]',
-      '[aria-label*="Buat postingan publik"]',
-      '[aria-label*="Create a public post"]',
-      '[aria-label*="Submit a post for admin"]',
-      '[aria-label*="Kirim postingan untuk persetujuan admin"]',
-      '[aria-label*="Tulis sesuatu"]',
-      '[aria-label*="Write something"]'
-    ];
 
-    for (const sel of candidates) {
-      const el = document.querySelector(sel);
-      if (el) {
+ async function typeCaptionStable(page, caption) {
+  let typed = false;
+
+  try {
+    // 1️⃣ AKTIFKAN COMPOSER
+    await page.evaluate(() => {
+      const candidates = [
+        '[role="textbox"]',
+        '[role="combobox"]',
+        'textarea',
+        'div[contenteditable="true"]',
+        '[aria-label*="Tulis sesuatu"]',
+        '[aria-label*="Write something"]'
+      ];
+
+      for (const sel of candidates) {
+        const el = document.querySelector(sel);
+        if (el) {
+          el.click();
+          return true;
+        }
+      }
+      return false;
+    });
+
+    await page.waitForTimeout(1500);
+
+    // 2️⃣ PASTIKAN FOCUS
+    const focused = await page.evaluate(() => {
+      const els = document.querySelectorAll(
+        'div[contenteditable="true"], textarea'
+      );
+      for (const el of els) {
         el.click();
-        return true;
+        el.focus();
+        if (document.activeElement === el) return true;
+      }
+      return false;
+    });
+
+    if (!focused) {
+      return { ok: false, typed: false, step: "focus_failed" };
+    }
+
+    // 3️⃣ TYPE CAPTION
+    typed = true;
+    for (const char of caption) {
+      await page.keyboard.type(char, {
+        delay: 80 + Math.random() * 120
+      });
+
+      if (Math.random() < 0.05) {
+        await page.waitForTimeout(300 + Math.random() * 600);
       }
     }
-    return false;
-  });
 
-  await page.waitForTimeout(2000);
+    await page.waitForTimeout(800);
 
-    // 2️⃣ PASTIKAN FOCUS (TANPA SET textContent)
-const focused = await page.evaluate(() => {
-  const candidates = Array.from(
-    document.querySelectorAll(
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-    )
-  );
+    // 4️⃣ COMMIT REACT
+    await page.keyboard.press("Space");
+    await page.keyboard.press("Backspace");
 
-  for (const el of candidates) {
-    el.click();
-    el.focus();
+    // 5️⃣ VALIDASI
+    const ok = await validateCaption(page, caption);
 
-    if (document.activeElement === el) {
-      return true;
+    if (ok) {
+      return { ok: true, typed: true, step: "stable_ok" };
     }
-  }
-  return false;
-});
 
-  if (!focused) {
-      // ❌ gagal sebelum ngetik
-      return { ok: false, typed: false, step: "focus_failed" };
-  }
-  
-  //ketik caption 
-  // 3️⃣ TYPE CAPTION (WAJIB)
-  // 3️⃣ TYPE CAPTION (HUMAN-LIKE + RANDOM)
-  for (const char of caption) {
-    const delay = 80 + Math.random() * 100; // 80–200 ms
-    await page.keyboard.type(char, { delay });
+    console.log("⚠️ Stable ngetik tapi tidak tervalidasi");
+    return { ok: false, typed: true, step: "validation_failed" };
 
-    // jeda mikir kecil (±5%)
-    if (Math.random() < 0.05) {
-      await page.waitForTimeout(300 + Math.random() * 700);
-    }
-  }
-  await page.waitForTimeout(1000);
-
-  
-  // 4️⃣ COMMIT REACT
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
-
-// 5️⃣ VALIDASI
-const ok = await validateCaption(page, caption);
-
-if (ok) {
-  return { ok: true, step: "stable_ok" };
-}
-
-       //SUDAH NGETIK GAGAL                     
-  console.log("⚠️ Caption tidak tervalidasi");
-  return { ok: false, step: "validation_failed" };
-    } catch (err) {
-    // ❌ ERROR sebelum / saat proses
+  } catch (err) {
+    console.log("❌ typeCaptionStable exception:", err.message);
     return { ok: false, typed, step: "exception", error: err.message };
+  }
 }
-}
+   
+  
+
 
 
 //isi caption klik placeholder 
@@ -639,8 +633,8 @@ for (const m of methods) {
   await page.waitForTimeout(500);
 
     //commit React
-  // await page.keyboard.press("Space");
-   //await page.keyboard.press("Backspace");
+   await page.keyboard.press("Space");
+   await page.keyboard.press("Backspace");
 
   if (await validateCaption(page, caption)) {
       console.log(`✅ ${m.name} OK`);
