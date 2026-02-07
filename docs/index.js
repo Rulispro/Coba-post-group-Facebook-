@@ -10,6 +10,16 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
 
+//HELPER ISI CAPTION 
+async function clearComposer(page) {
+  await page.keyboard.down("Control");
+  await page.keyboard.press("A");
+  await page.keyboard.up("Control");
+  await page.keyboard.press("Backspace");
+  await page.waitForTimeout(300);
+}
+
+
 async function typeCaptionFB(page, caption) {
   console.log("✍️ Ketik caption (FB stable)");
 
@@ -42,7 +52,10 @@ async function typeCaptionFB(page, caption) {
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
 
-  console.log("✅ Caption berhasil diketik");
+  console.log("✅ Caption berhasil diketik captiontypeFB");
+
+return { ok: true, method: "typeCaptionFB" };
+
   }
 
 
