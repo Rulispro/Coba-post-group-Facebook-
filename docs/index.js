@@ -43,7 +43,7 @@ async function typeCaptionFB(page, caption) {
       delay: 100 + Math.random() * 120
     });
 
-    if (Math.random() < 0.12) {
+    if (Math.random() < 0.10) {
       await page.waitForTimeout(300 + Math.random() * 800);
     }
   }
