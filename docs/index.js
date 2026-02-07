@@ -30,7 +30,7 @@ async function typeCaptionFB(page, caption) {
   // 3️⃣ Ketik caption ala manusia
   for (const ch of caption) {
     await page.keyboard.type(ch, {
-      delay: 80 + Math.random() * 100
+      delay: 90 + Math.random() * 120
     });
 
     if (Math.random() < 0.09) {
