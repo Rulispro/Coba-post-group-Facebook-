@@ -281,6 +281,14 @@ async function activateComposerAndFillCaption(page, caption) {
 
 //caption keyboard 
 async function typeByKeyboard(page, caption) {
+    // 1️⃣ Tunggu overlay loading hilang
+  await page.waitForFunction(() => {
+    return !(
+      document.querySelector('[aria-label="Loading"]') ||
+      document.querySelector('[aria-busy="true"]') ||
+      document.querySelector('div[role="dialog"]')
+    );
+  }, { timeout: 30000 });
   const selector =
     'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
