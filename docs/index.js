@@ -527,11 +527,7 @@ async function typeCaptionUltimate(page, caption) {
 
  //  console.log("🧠 Stable gagal → Combo helper");
 
-  await typeCaptionFB(page, caption);
-   if (caption?.ok) {
-      console.log("✅ Caption OK via captionFB");
-   return;
-     }
+  
 
    //console.log("🧠 Activate composer + fill caption (combo)");
    //const comboResult = await activateComposerAndFillCaption(page, caption);
