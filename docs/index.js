@@ -365,47 +365,39 @@ async function typeByExecCommand(page, caption) {
  // }, caption);
 ///}
 
-//caption force
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
-  const el = document.querySelector(
-    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-  );
+    const el = document.querySelector(
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+    );
+    if (!el) return false;
 
-  if (!el) return false;
+    el.focus();
 
-  el.focus();
+    // SET CARET DI AKHIR
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
 
-  // ⭐ BUAT CARET
-  const sel = window.getSelection();
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  range.collapse(false);
-  sel.removeAllRanges();
-  sel.addRange(range);
+    // SIMULASI beforeinput (React-friendly)
+    const beforeInputEvent = new Event("beforeinput", { bubbles: true, cancelable: true });
+    el.dispatchEvent(beforeInputEvent);
 
-  // ⭐ BEFOREINPUT
-  el.dispatchEvent(new InputEvent("beforeinput", {
-    inputType: "insertText",
-    data: text,
-    bubbles: true,
-    cancelable: true
-  }));
+    // INSERT TEXT
+    document.execCommand("insertText", false, text);
 
-  // ⭐ INSERT TEXT NATURAL
-  document.execCommand("insertText", false, text);
+    // FIRE INPUT SUPAYA REACT UPDATE
+    const inputEvent = new Event("input", { bubbles: true });
+    el.dispatchEvent(inputEvent);
 
-  // ⭐ INPUT EVENT
-  el.dispatchEvent(new InputEvent("input", {
-    inputType: "insertText",
-    data: text,
-    bubbles: true
-  }));
-
-  return true;
-}, caption);
-  
+    return true;
+  }, caption);
 }
+
+
 //async function typeCaptionFinal(page, caption) {
   //console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
 
@@ -565,34 +557,6 @@ async function typeByKeyboard(page, caption) {
 }
 
 
-
-async function typeByInputEvent(page, caption) {
-  await page.evaluate(text => {
-      const el = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
-  if (!el) return false;
-
-    el.focus();
-
-    el.dispatchEvent(new InputEvent("beforeinput", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true,
-      cancelable: true
-    }));
-
-    el.textContent = text;
-
-    el.dispatchEvent(new InputEvent("input", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true
-    }));
-
-    return true;
-  }, caption);
-        }
 //async function typeByInputEvent(page, caption) {
  // await page.evaluate(text => {
      //const el = document.querySelector(
