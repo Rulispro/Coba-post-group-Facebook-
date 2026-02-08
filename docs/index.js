@@ -365,38 +365,65 @@ async function typeByExecCommand(page, caption) {
  // }, caption);
 ///}
 
-async function typeByInputEvent(page, caption) {
-  await page.evaluate(text => {
-    const el = document.querySelector(
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-    );
-    if (!el) return false;
+async function typeByBeforeInputNoActiveCheck(page, caption) {
+  const selector = 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
+  // 1️⃣ Fokus editor via click & focus
+  await page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.click();
     el.focus();
+  }, selector);
 
-    // SET CARET DI AKHIR
-    const sel = window.getSelection();
+  await page.waitForTimeout(200);
+
+  // 2️⃣ Set caret di akhir
+  await page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const selObj = window.getSelection();
     const range = document.createRange();
     range.selectNodeContents(el);
     range.collapse(false);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    selObj.removeAllRanges();
+    selObj.addRange(range);
+  }, selector);
 
-    // SIMULASI beforeinput (React-friendly)
-    const beforeInputEvent = new Event("beforeinput", { bubbles: true, cancelable: true });
-    el.dispatchEvent(beforeInputEvent);
+  // 3️⃣ Masukkan teks sekaligus (lebih stabil dari per-char)
+  await page.evaluate((text, sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
 
-    // INSERT TEXT
+    // Clear dulu
+    el.innerText = "";
+
+    // INSERT TEXT via execCommand
     document.execCommand("insertText", false, text);
 
-    // FIRE INPUT SUPAYA REACT UPDATE
-    const inputEvent = new Event("input", { bubbles: true });
-    el.dispatchEvent(inputEvent);
+    // FIRE SIMULATED beforeinput event
+    const beforeEvt = new Event("beforeinput", { bubbles: true, cancelable: true });
+    el.dispatchEvent(beforeEvt);
 
-    return true;
-  }, caption);
-}
+    // FIRE input event
+    const inputEvt = new Event("input", { bubbles: true });
+    el.dispatchEvent(inputEvt);
+  }, caption, selector);
 
+  // 4️⃣ Commit terakhir (Space + Backspace) biar React detect perubahan
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  // 5️⃣ Validasi isi caption
+  const ok = await page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+    return (el.innerText && el.innerText.trim().length > 0);
+  }, selector);
+
+  return ok;
+                      }
+      
 
 //async function typeCaptionFinal(page, caption) {
   //console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
