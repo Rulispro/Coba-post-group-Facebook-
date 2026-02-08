@@ -292,7 +292,7 @@ async function activateComposerAndFillCaption(page, caption) {
 }
 
 //caption keyboard 
-async function typeByKeyboard(page, caption) {
+async function typeByKeyboarding(page, caption) {
     // 1️⃣ Tunggu overlay loading hilang
   await page.waitForFunction(() => {
     return !(
@@ -539,24 +539,31 @@ async function typeByExecCommand(page, caption) {
 
 async function typeByKeyboard(page, caption) {
 
-  // 🧠 THINKING DELAY (0.8 - 2 detik)
-  const thinkDelay = 800 + Math.random() * 1200;
-  await page.waitForTimeout(thinkDelay);
+  // THINK BEFORE TYPE
+  await page.waitForTimeout(800 + Math.random() * 1200);
 
-  // WAKE REACT EDITOR
+  // WAKE EDITOR
   await page.keyboard.press("Space");
   await page.waitForTimeout(200);
   await page.keyboard.press("Backspace");
 
-  // 🧠 MINI THINK LAG
   await page.waitForTimeout(300 + Math.random() * 400);
 
-  // TYPE HUMAN
-  await page.keyboard.type(caption, {
-    delay: 90 + Math.random() * 60
-  });
+  // TYPE PER CHAR (biar bisa pause random)
+  for (const char of caption) {
+
+    await page.keyboard.type(char, {
+      delay: 80 + Math.random() * 70
+    });
+
+    // 10% chance pause mikir
+    if (Math.random() < 0.1) {
+      await page.waitForTimeout(400 + Math.random() * 900);
+    }
+  }
 
 }
+
 
 
 async function typeByInputEvent(page, caption) {
