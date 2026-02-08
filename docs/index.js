@@ -344,26 +344,26 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 
-//caption input event 
-async function typeByInputEvent(page, caption) {
-  await page.evaluate(text => {
-     const el = document.querySelector(
-   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-  );
-  if (!el) return;
+///caption input event 
+//async function typeByInputEvent(page, caption) {
+  //await page.evaluate(text => {
+    // const el = document.querySelector(
+  // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+ // );
+  //if (!el) return;
 
-    el.focus();
-    el.textContent = "";
+   // el.focus();
+   // el.textContent = "";
 
-    el.dispatchEvent(new InputEvent("input", {
-      bubbles: true,
-      data: text,
-      inputType: "insertText"
-    }));
+   // el.dispatchEvent(new InputEvent("input", {
+    //  bubbles: true,
+    //  data: text,
+    //  inputType: "insertText"
+  //  }));
 
-    el.textContent = text;
-  }, caption);
-}
+   // el.textContent = text;
+ // }, caption);
+///}
 
 //caption force
 async function typeByForceReact(page, caption) {
@@ -520,33 +520,33 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 
-//async function typeByInputEvent(page, caption) {
- // await page.evaluate(text => {
-    //  const el = document.querySelector(
-  // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-//  );
- // if (!el) return false;
+async function typeByInputEvent(page, caption) {
+  await page.evaluate(text => {
+     const el = document.querySelector(
+   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+  );
+  if (!el) return false;
 
-   // el.focus();
+    el.focus();
 
-   // el.dispatchEvent(new InputEvent("beforeinput", {
-    //  inputType: "insertText",
-    //  data: text,
-    //  bubbles: true,
-     // cancelable: true
-  //  }));
+    el.dispatchEvent(new InputEvent("beforeinput", {
+      inputType: "insertText",
+    data: text,
+      bubbles: true,
+      cancelable: true
+    }));
 
-   // el.textContent = text;
+    el.textContent = text;
 
-  //  el.dispatchEvent(new InputEvent("input", {
-   //   inputType: "insertText",
-   //   data: text,
-   //   bubbles: true
-  //  }));
+   el.dispatchEvent(new InputEvent("input", {
+      inputType: "insertText",
+      data: text,
+      bubbles: true
+    }));
 
-    //return true;
- // }, caption);
-//}
+    return true;
+  }, caption);
+}
 
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
