@@ -368,22 +368,43 @@ async function typeByExecCommand(page, caption) {
 //caption force
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
-     const el = document.querySelector(
-  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-);
-  if (!el) return;
+  const el = document.querySelector(
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+  );
 
-    el.focus();
-    el.textContent = "";
+  if (!el) return false;
 
-    el.dispatchEvent(new InputEvent("input", {
-      bubbles: true,
-      data: text,
-      inputType: "insertText"
-    }));
+  el.focus();
 
-    el.textContent = text;
-  }, caption);
+  // ⭐ BUAT CARET
+  const sel = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  // ⭐ BEFOREINPUT
+  el.dispatchEvent(new InputEvent("beforeinput", {
+    inputType: "insertText",
+    data: text,
+    bubbles: true,
+    cancelable: true
+  }));
+
+  // ⭐ INSERT TEXT NATURAL
+  document.execCommand("insertText", false, text);
+
+  // ⭐ INPUT EVENT
+  el.dispatchEvent(new InputEvent("input", {
+    inputType: "insertText",
+    data: text,
+    bubbles: true
+  }));
+
+  return true;
+}, caption);
+  
 }
 //async function typeCaptionFinal(page, caption) {
   //console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
