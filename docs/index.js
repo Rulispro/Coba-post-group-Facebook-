@@ -520,6 +520,26 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 
+
+async function typeByInputEvent(page, caption) {
+  await page.evaluate(text => {
+     const el = document.querySelector(
+  'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+);
+  if (!el) return;
+
+    el.focus();
+    el.textContent = "";
+
+    el.dispatchEvent(new InputEvent("input", {
+      bubbles: true,
+      data: text,
+      inputType: "insertText"
+    }));
+
+    el.textContent = text;
+  }, caption);
+}
 //async function typeByInputEvent(page, caption) {
  // await page.evaluate(text => {
      //const el = document.querySelector(
@@ -547,33 +567,6 @@ async function typeByExecCommand(page, caption) {
    // return true;
   //}, caption);
 //}
-async function typeByInputEvent(page, caption) {
-  await page.evaluate(text => {
-    const el = document.querySelector(
-      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-    );
-    if (!el) return false;
-
-    el.focus();
-
-    el.dispatchEvent(new InputEvent("beforeinput", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true,
-      cancelable: true
-    }));
-
-    el.textContent = text;
-
-    el.dispatchEvent(new InputEvent("input", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true
-    }));
-
-    return true;
-  }, caption);
-}
 
 
 //isi caption tambahan cara 
