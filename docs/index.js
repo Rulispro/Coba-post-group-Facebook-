@@ -617,50 +617,50 @@ async function typeCaptionUltimate(page, caption) {
 //}
 
 // ❗ JANGAN return di sini
-console.log("❌ typeCaptionFB gagal → lanjut metode berikutnya");
+//console.log("❌ typeCaptionFB gagal → lanjut metode berikutnya");
       
    
  //const stable = await typeCaptionStable(page, caption);
 
-if (stable?.ok) {
-  console.log("✅ Caption OK via Stable");
-  return stable;
-}
+//if (stable?.ok) {
+ // console.log("✅ Caption OK via Stable");
+  //return stable;
+//}
 
-if (stable?.typed) {
-  console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
-  return { ok: true, method: "StableTyped" };
- }
+//if (stable?.typed) {
+//  console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
+  //return { ok: true, method: "StableTyped" };
+// }
 
 // ⬇️ HANYA MASUK SINI JIKA STABLE GAGAL TANPA NGETIK
-console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
+//console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
   
-console.log("🧠 Stable gagal → Combo helper");
+//console.log("🧠 Stable gagal → Combo helper");
  
-console.log("🧠 Activate composer + fill caption (combo)");
+//console.log("🧠 Activate composer + fill caption (combo)");
  // const comboResult = await activateComposerAndFillCaption(page, caption);
-   console.log("COMBO:", comboResult);
+  // console.log("COMBO:", comboResult);
 
   await page.waitForTimeout(2000);
 
-  if (comboResult?.ok) {
-    console.log("✅ Caption OK via combo helper (trust React)");
-    return;
- }
-  console.log("🧠 Try typeCaptionSafe (legacy)");
+ // if (comboResult?.ok) {
+   // console.log("✅ Caption OK via combo helper (trust React)");
+    //return;
+// }
+ // console.log("🧠 Try typeCaptionSafe (legacy)");
   await clearComposer(page);
   
-    try {
+   // try {
      /// await typeCaptionSafe(page, caption);
       await page.waitForTimeout(400);
 
-    if (await validateCaption(page, caption)) {
-       console.log("✅ typeCaptionSafe OK");
-      return;
-      }
-     } catch (e) {
-     console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
-  } 
+  //  if (await validateCaption(page, caption)) {
+      // console.log("✅ typeCaptionSafe OK");
+    //  return;
+     // }
+   //  } catch (e) {
+   //  console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
+ // } 
 
   const methods = [
      // { name: "Keyboard", fn: typeByKeyboard },
