@@ -537,6 +537,19 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 
+async function typeByKeyboard(page, caption) {
+
+  // WAKE REACT EDITOR
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(200);
+  await page.keyboard.press("Backspace");
+
+  // TYPE HUMAN
+  await page.keyboard.type(caption, {
+    delay: 90 + Math.random() * 60
+  });
+
+}
 
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
