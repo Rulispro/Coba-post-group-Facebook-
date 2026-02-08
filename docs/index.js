@@ -366,24 +366,34 @@ async function typeByExecCommand(page, caption) {
 ///}
 
 //caption force
-async function typeByForceReact(page, caption) {
-   await page.evaluate(text => {
-     const el = document.querySelector(
+
+async function typeByInputEvent(page, caption) {
+  await page.evaluate(text => {
+      const el = document.querySelector(
   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
 );
- if (!el) return false;
+  if (!el) return false;
 
     el.focus();
-    el.innerText = text;
 
-    ["input", "change", "keydown", "keyup", "blur"].forEach(evt =>
-      el.dispatchEvent(new Event(evt, { bubbles: true }))
-    );
+    el.dispatchEvent(new InputEvent("beforeinput", {
+      inputType: "insertText",
+      data: text,
+      bubbles: true,
+      cancelable: true
+    }));
 
-     return true;
+    el.textContent = text;
+
+    el.dispatchEvent(new InputEvent("input", {
+      inputType: "insertText",
+      data: text,
+      bubbles: true
+    }));
+
+    return true;
   }, caption);
-  }
-
+      }
 //async function typeCaptionFinal(page, caption) {
   //console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
 
@@ -643,7 +653,7 @@ console.log("🧠 Activate composer + fill caption (combo)");
   const methods = [
      // { name: "Keyboard", fn: typeByKeyboard },
     //  { name: "ExecCommand", fn: typeByExecCommand },
-      {name: "InputEvent", fn: typeByInputEvent },
+        { name: "InputEvent", fn: typeByInputEvent },
      // {name: "typeCaptionFinal", fn: typeCaptionFinal },
      // { name: "ForceReact", fn: typeByForceReact }
   ];
