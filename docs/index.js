@@ -369,68 +369,66 @@ async function typeByInputEvents(page, caption) {
 
   return ok;
 }
-
-                      
-      
-
 async function typeCaptionFinal(page, caption) {
   console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
 
-  // 1️⃣ Tunggu editor muncul (JANGAN pakai waitForFunction)
   const editor = await page.waitForSelector(
     'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea',
     { timeout: 10000, visible: true }
   );
 
-  if (!editor) {
-    throw new Error("❌ Editor FB tidak ditemukan");
- }
+  if (!editor) throw new Error("❌ Editor FB tidak ditemukan");
 
-  // 2️⃣ Pastikan editor AKTIF (FB WAJIB klik)
   await editor.click({ delay: 50 });
   await page.waitForTimeout(300);
 
-  // 3️⃣ Isi caption via InputEvent (cara FB-friendly)
   await page.evaluate((el, text) => {
     el.focus();
 
-    // clear isi
+    // Clear editor
     if (el.innerHTML !== undefined) el.innerHTML = "";
-   if (el.value !== undefined) el.value = "";
+    if (el.value !== undefined) el.value = "";
 
-   el.dispatchEvent(new InputEvent("input", {
-      bubbles: true,
-      inputType: "deleteContentBackward"
-   }));
+    // Set caret di akhir
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
 
-  for (const ch of text) {
+    // Masukkan teks per karakter
+    for (const ch of text) {
       el.dispatchEvent(new InputEvent("beforeinput", {
-       bubbles: true,
+        bubbles: true,
+        cancelable: true,
         inputType: "insertText",
-       data: ch
+        data: ch
       }));
+      document.execCommand("insertText", false, ch); // optional tambahan biar React deteksi
       el.dispatchEvent(new InputEvent("input", {
         bubbles: true,
+        cancelable: true,
         inputType: "insertText",
-        data: text,
-        cancelable:true;
+        data: ch
       }));
     }
   }, editor, caption);
 
-  // 4️⃣ VALIDASI (WAJIB)
+  // Delay sebentar biar React update
+  await page.waitForTimeout(300);
+
+  // Validasi
   const ok = await page.evaluate(el => {
-    return (
-    (el.innerText && el.innerText.trim().length > 0) ||
-      (el.value && el.value.trim().length > 0)
-    );
+    return (el.innerText && el.innerText.trim().length > 0) ||
+           (el.value && el.value.trim().length > 0);
   }, editor);
 
+  if (ok) console.log("✅ Caption BERHASIL diisi (FINAL)");
+  else console.log("❌ Caption gagal masuk");
 
- console.log("✅ Caption BERHASIL diisi (FINAL)");
- return true;
-     }
-       
+  return ok;
+}
 
 
 async function typeByForceReact(page, caption) {
