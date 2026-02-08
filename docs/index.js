@@ -520,25 +520,52 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 
+//async function typeByInputEvent(page, caption) {
+ // await page.evaluate(text => {
+     //const el = document.querySelector(
+   //'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+  //);
+  //if (!el) return false;
+
+  //  el.focus();
+
+   // el.dispatchEvent(new InputEvent("beforeinput", {
+      //inputType: "insertText",
+    //data: text,
+     // bubbles: true,
+      //cancelable: true
+    //}));
+
+   // el.textContent = text;
+
+   //el.dispatchEvent(new InputEvent("input", {
+      //inputType: "insertText",
+      //data: text,
+     // bubbles: true
+  //  }));
+
+   // return true;
+  //}, caption);
+//}
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
-     const el = document.querySelector(
-   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-  );
-  if (!el) return false;
+    const el = document.querySelector(
+      'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+    );
+    if (!el) return false;
 
     el.focus();
 
     el.dispatchEvent(new InputEvent("beforeinput", {
       inputType: "insertText",
-    data: text,
+      data: text,
       bubbles: true,
       cancelable: true
     }));
 
     el.textContent = text;
 
-   el.dispatchEvent(new InputEvent("input", {
+    el.dispatchEvent(new InputEvent("input", {
       inputType: "insertText",
       data: text,
       bubbles: true
@@ -547,6 +574,7 @@ async function typeByInputEvent(page, caption) {
     return true;
   }, caption);
 }
+
 
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
