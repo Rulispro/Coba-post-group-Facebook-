@@ -569,7 +569,7 @@ async function typeCaptionUltimate(page, caption) {
 console.log("❌ typeCaptionFB gagal → lanjut metode berikutnya");
       
    
- const stable = await typeCaptionStable(page, caption);
+ //const stable = await typeCaptionStable(page, caption);
 
 if (stable?.ok) {
   console.log("✅ Caption OK via Stable");
@@ -587,7 +587,7 @@ console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
 console.log("🧠 Stable gagal → Combo helper");
  
  console.log("🧠 Activate composer + fill caption (combo)");
-  const comboResult = await activateComposerAndFillCaption(page, caption);
+ // const comboResult = await activateComposerAndFillCaption(page, caption);
    console.log("COMBO:", comboResult);
 
    await page.waitForTimeout(2000);
@@ -600,7 +600,7 @@ console.log("🧠 Stable gagal → Combo helper");
   await clearComposer(page);
   
     try {
-      await typeCaptionSafe(page, caption);
+     /// await typeCaptionSafe(page, caption);
       await page.waitForTimeout(400);
 
     if (await validateCaption(page, caption)) {
