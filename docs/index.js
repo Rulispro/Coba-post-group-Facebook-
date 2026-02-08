@@ -59,45 +59,45 @@ return { ok: true, method: "typeCaptionFB" };
   }
 
 
- async function debugComposerAll(page) {
-  console.log("\n🔎 DEBUG COMPOSER ALL ELEMENT");
+/// async function debugComposerAll(page) {
+  ///console.log("\n🔎 DEBUG COMPOSER ALL ELEMENT");
 
-  const data = await page.evaluate(() => {
-    const results = [];
+ /// const data = await page.evaluate(() => {
+   /// const results = [];
 
-    document.querySelectorAll("div, textarea, span").forEach(el => {
-      const r = el.getBoundingClientRect();
-      if (r.width < 80 || r.height < 40) return;
+   /// document.querySelectorAll("div, textarea, span").forEach(el => {
+      ///const r = el.getBoundingClientRect();
+     /// if (r.width < 80 || r.height < 40) return;
 
-      const attrs = el.getAttributeNames();
+     /// const attrs = el.getAttributeNames();
 
-      const isCandidate =
-        el.isContentEditable ||
-        el.getAttribute("contenteditable") === "true" ||
-        el.tagName === "TEXTAREA" ||
-        el.getAttribute("role") === "textbox" ||
-        el.getAttribute("role") === "combobox" ||
-        el.getAttribute("data-mcomponent") === "ServerTextArea" ||
-        attrs.some(a => a.includes("aria"));
+      ///const isCandidate =
+       /// el.isContentEditable ||
+       /// el.getAttribute("contenteditable") === "true" ||
+       /// el.tagName === "TEXTAREA" ||
+       //// el.getAttribute("role") === "textbox" ||
+       //// el.getAttribute("role") === "combobox" ||
+       /// el.getAttribute("data-mcomponent") === "ServerTextArea" ||
+       /// attrs.some(a => a.includes("aria"));
 
-      if (!isCandidate) return;
+      ///if (!isCandidate) return;
 
-      results.push({
-        tag: el.tagName,
-        role: el.getAttribute("role"),
-        aria: el.getAttribute("aria-label"),
-        data: el.getAttribute("data-mcomponent"),
-         contenteditable: el.getAttribute("contenteditable"),
-        class: (el.className || "").toString().slice(0, 60),
-        textPreview: (el.innerText || el.value || "").slice(0, 30)
-      });
-    });
+      ///results.push({
+       /// tag: el.tagName,
+        ///role: el.getAttribute("role"),
+       /// aria: el.getAttribute("aria-label"),
+       /// data: el.getAttribute("data-mcomponent"),
+        /// contenteditable: el.getAttribute("contenteditable"),
+        ///class: (el.className || "").toString().slice(0, 60),
+       /// textPreview: (el.innerText || el.value || "").slice(0, 30)
+      ///});
+    ///});
 
-    return results;
-  });
+   //) return results;
+ /// });
 
- console.log("🧪 COMPOSER ALL:", JSON.stringify(data, null, 2));
-}
+//) console.log("🧪 COMPOSER ALL:", JSON.stringify(data, null, 2));
+///}
 
 //Validasinya 
 async function validateCaption(page, caption) {
@@ -291,45 +291,6 @@ async function activateComposerAndFillCaption(page, caption) {
   }, caption);
 }
 
-//caption keyboard 
-//async function typeByKeyboarding(page, caption) {
-    // 1️⃣ Tunggu overlay loading hilang
-  //await page.waitForFunction(() => {
-    //return !(
-      //document.querySelector('[aria-label="Loading"]') ||
-     // document.querySelector('[aria-busy="true"]') ||
-     // document.querySelector('div[role="dialog"]')
-   // );
- // }, { timeout: 30000 });
-  //const selector =
-   // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
-
-  // 1️⃣ Pastikan textbox ada
- // const box = await page.waitForSelector(selector, {
- //   visible: true,
-  //  timeout: 10000
-//  });
-  //if (!box) throw new Error("Textbox tidak ditemukan");
-
-  // 2️⃣ Fokus (WAJIB di FB)
- // await box.click({ delay: 50 });
-  //await page.waitForTimeout(300);
-
-  // 3️⃣ Ketik ala manusia
- // for (const ch of caption) {
-  //  await page.keyboard.type(ch, {
-   //   delay: 90 + Math.random() * 120
-  //  });
-
-   // if (Math.random() < 0.08) {
-    //  await page.waitForTimeout(300 + Math.random() * 700);
-  //  }
-//  }
-
-  // 4️⃣ Commit React
-//  await page.keyboard.press("Space");
-//  await page.keyboard.press("Backspace");
-//}
 
 //caption human like 
 async function typeByExecCommand(page, caption) {
@@ -343,27 +304,6 @@ async function typeByExecCommand(page, caption) {
     document.execCommand("insertText", false, text);
   }, caption);
 }
-
-///caption input event 
-//async function typeByInputEvent(page, caption) {
-  //await page.evaluate(text => {
-    // const el = document.querySelector(
-  // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
- // );
-  //if (!el) return;
-
-   // el.focus();
-   // el.textContent = "";
-
-   // el.dispatchEvent(new InputEvent("input", {
-    //  bubbles: true,
-    //  data: text,
-    //  inputType: "insertText"
-  //  }));
-
-   // el.textContent = text;
- // }, caption);
-///}
 
 async function typeByInputEvents(page, caption) {
   const selector = 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
@@ -433,65 +373,63 @@ async function typeByInputEvents(page, caption) {
                       
       
 
-//async function typeCaptionFinal(page, caption) {
-  //console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
+async function typeCaptionFinal(page, caption) {
+  console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
 
   // 1️⃣ Tunggu editor muncul (JANGAN pakai waitForFunction)
- // const editor = await page.waitForSelector(
-   // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea',
-  //  { timeout: 10000, visible: true }
- // );
+  const editor = await page.waitForSelector(
+    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea',
+    { timeout: 10000, visible: true }
+  );
 
- // if (!editor) {
- //   throw new Error("❌ Editor FB tidak ditemukan");
- // }
+  if (!editor) {
+    throw new Error("❌ Editor FB tidak ditemukan");
+ }
 
   // 2️⃣ Pastikan editor AKTIF (FB WAJIB klik)
- // await editor.click({ delay: 50 });
- // await page.waitForTimeout(300);
+  await editor.click({ delay: 50 });
+  await page.waitForTimeout(300);
 
   // 3️⃣ Isi caption via InputEvent (cara FB-friendly)
-//  await page.evaluate((el, text) => {
-   // el.focus();
+  await page.evaluate((el, text) => {
+    el.focus();
 
     // clear isi
-  //  if (el.innerHTML !== undefined) el.innerHTML = "";
-  //  if (el.value !== undefined) el.value = "";
+    if (el.innerHTML !== undefined) el.innerHTML = "";
+   if (el.value !== undefined) el.value = "";
 
-  //  el.dispatchEvent(new InputEvent("input", {
-   //   bubbles: true,
-    //  inputType: "deleteContentBackward"
-  //  }));
+   el.dispatchEvent(new InputEvent("input", {
+      bubbles: true,
+      inputType: "deleteContentBackward"
+   }));
 
-   // for (const ch of text) {
-    //  el.dispatchEvent(new InputEvent("beforeinput", {
-     //   bubbles: true,
-     //   inputType: "insertText",
-    //    data: ch
-   //   }));
-    //  el.dispatchEvent(new InputEvent("input", {
-        //bubbles: true,
-     //   inputType: "insertText",
-        //data: ch
-   //   }));
-  //  }
- // }, editor, caption);
+  for (const ch of text) {
+      el.dispatchEvent(new InputEvent("beforeinput", {
+       bubbles: true,
+        inputType: "insertText",
+       data: ch
+      }));
+      el.dispatchEvent(new InputEvent("input", {
+        bubbles: true,
+        inputType: "insertText",
+        data: text,
+        cancelable:true;
+      }));
+    }
+  }, editor, caption);
 
   // 4️⃣ VALIDASI (WAJIB)
- // const ok = await page.evaluate(el => {
-  //  return (
-    //  (el.innerText && el.innerText.trim().length > 0) ||
-    //  (el.value && el.value.trim().length > 0)
-  //  );
- // }, editor);
+  const ok = await page.evaluate(el => {
+    return (
+    (el.innerText && el.innerText.trim().length > 0) ||
+      (el.value && el.value.trim().length > 0)
+    );
+  }, editor);
 
-  //if (!ok) {
-   // throw new Error("❌ Caption tidak masuk (FINAL)");
-//  }
 
- // console.log("✅ Caption BERHASIL diisi (FINAL)");
- // return true;
-  //      }
+ console.log("✅ Caption BERHASIL diisi (FINAL)");
+ return true;
+     }
        
 
 
@@ -625,71 +563,71 @@ async function typeByKeyboard(page, caption) {
 async function typeCaptionUltimate(page, caption) {
     console.log("🧠 typeCaptionUltimate start");
   
-//let fbResult;
+let fbResult;
 
-//try {
- // fbResult = await typeCaptionFB(page, caption);
-//} catch (e) {
-  //console.log("⚠️ typeCaptionFB error → lanjut fallback");
-//}
+try {
+ fbResult = await typeCaptionFB(page, caption);
+} catch (e) {
+  console.log("⚠️ typeCaptionFB error → lanjut fallback");
+}
 
-//if (fbResult?.ok) {
- // console.log("✅ Caption OK via typeCaptionFB");
-  //return fbResult; // ⛔ STOP HANYA JIKA SUKSES
-//}
+if (fbResult?.ok) {
+  console.log("✅ Caption OK via typeCaptionFB");
+  return fbResult; // ⛔ STOP HANYA JIKA SUKSES
+}
 
 // ❗ JANGAN return di sini
-//console.log("❌ typeCaptionFB gagal → lanjut metode berikutnya");
+console.log("❌ typeCaptionFB gagal → lanjut metode berikutnya");
       
    
- //const stable = await typeCaptionStable(page, caption);
+ const stable = await typeCaptionStable(page, caption);
 
-//if (stable?.ok) {
- // console.log("✅ Caption OK via Stable");
-  //return stable;
-//}
+if (stable?.ok) {
+ console.log("✅ Caption OK via Stable");
+  return stable;
+}
 
-//if (stable?.typed) {
-//  console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
-  //return { ok: true, method: "StableTyped" };
-// }
+if (stable?.typed) {
+ console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
+  return { ok: true, method: "StableTyped" };
+ }
 
 // ⬇️ HANYA MASUK SINI JIKA STABLE GAGAL TANPA NGETIK
-//console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
+console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
   
-//console.log("🧠 Stable gagal → Combo helper");
+console.log("🧠 Stable gagal → Combo helper");
  
-//console.log("🧠 Activate composer + fill caption (combo)");
- // const comboResult = await activateComposerAndFillCaption(page, caption);
-  // console.log("COMBO:", comboResult);
+console.log("🧠 Activate composer + fill caption (combo)");
+ const comboResult = await activateComposerAndFillCaption(page, caption);
+ console.log("COMBO:", comboResult);
 
   await page.waitForTimeout(2000);
 
- // if (comboResult?.ok) {
-   // console.log("✅ Caption OK via combo helper (trust React)");
-    //return;
-// }
- // console.log("🧠 Try typeCaptionSafe (legacy)");
+  if (comboResult?.ok) {
+   /console.log("✅ Caption OK via combo helper (trust React)");
+    return;
+ }
+ console.log("🧠 Try typeCaptionSafe (legacy)");
   await clearComposer(page);
   
-   // try {
-     /// await typeCaptionSafe(page, caption);
+    try {
+      await typeCaptionSafe(page, caption);
       await page.waitForTimeout(400);
 
-  //  if (await validateCaption(page, caption)) {
-      // console.log("✅ typeCaptionSafe OK");
-    //  return;
-     // }
-   //  } catch (e) {
-   //  console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
- // } 
+    if (await validateCaption(page, caption)) {
+       console.log("✅ typeCaptionSafe OK");
+      return;
+      }
+    } catch (e) {
+     console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
+  } 
 
   const methods = [
-      //{ name: "Keyboard", fn: typeByKeyboard },
-     // { name: "ExecCommand", fn: typeByExecCommand },
-        { name: "InputEvent", fn: typeByInputEvents },
-     // {name: "typeCaptionFinal", fn: typeCaptionFinal },
-     // { name: "ForceReact", fn: typeByForceReact }
+      { name: "Keyboard", fn: typeByKeyboard },
+      { name: "ExecCommand", fn: typeByExecCommand },
+      { name: "InputEvent", fn: typeByInputEvents },
+      {name: "typeCaptionFinal", fn: typeCaptionFinal },
+      { name: "ForceReact", fn: typeByForceReact }
   ];
 
 for (const m of methods) {
@@ -1702,11 +1640,6 @@ function delay(ms) {
     console.log("📑 Sheet terbaca:", Object.keys(templates));
     const groupRows = templates.postGroup || [];
     const statusRows = templates.postStatus || [];
-   // const templateRows = readTemplate(TEMPLATE_PATH);
-
-    //console.log("📦 Template rows siap dipakai:", templateRows.length);
-    
-    
     const browser = await puppeteer.launch({
       headless: "new",
       defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
@@ -1746,8 +1679,8 @@ function delay(ms) {
       await page.setBypassCSP(true);
 
       // 🔊 Monitor console
-      page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
-      page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
+      //page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
+     // page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
 
       // ===== Recorder PER AKUN
       const recorder = new PuppeteerScreenRecorder(page);
