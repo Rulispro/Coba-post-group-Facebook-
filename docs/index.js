@@ -520,33 +520,33 @@ async function typeByExecCommand(page, caption) {
   }, caption);
 }
 
-async function typeByInputEvent(page, caption) {
-  await page.evaluate(text => {
-      const el = document.querySelector(
-   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-  );
-  if (!el) return false;
+//async function typeByInputEvent(page, caption) {
+ // await page.evaluate(text => {
+    //  const el = document.querySelector(
+  // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+//  );
+ // if (!el) return false;
 
-    el.focus();
+   // el.focus();
 
-    el.dispatchEvent(new InputEvent("beforeinput", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true,
-      cancelable: true
-    }));
+   // el.dispatchEvent(new InputEvent("beforeinput", {
+    //  inputType: "insertText",
+    //  data: text,
+    //  bubbles: true,
+     // cancelable: true
+  //  }));
 
-    el.textContent = text;
+   // el.textContent = text;
 
-    el.dispatchEvent(new InputEvent("input", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true
-    }));
+  //  el.dispatchEvent(new InputEvent("input", {
+   //   inputType: "insertText",
+   //   data: text,
+   //   bubbles: true
+  //  }));
 
-    return true;
-  }, caption);
-}
+    //return true;
+ // }, caption);
+//}
 
 //isi caption tambahan cara 
 async function typeCaptionUltimate(page, caption) {
@@ -1788,9 +1788,9 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     await page.reload({ waitUntil: "networkidle2" });
 
       // ✅ LANGSUNG POSTGROUP PAKAI DATA
-    for (const row of rowsForAccount) {
-     await runAccount(page, row);
-    }
+   // for (const row of rowsForAccount) {
+    // await runAccount(page, row);
+   // }
       // POST STATUS (kalau ada)
  for (const row of rowsStatusForAccount) {
     await runStatus(page, row);
