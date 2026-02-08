@@ -366,34 +366,25 @@ async function typeByExecCommand(page, caption) {
 ///}
 
 //caption force
-
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
-      const el = document.querySelector(
+     const el = document.querySelector(
   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
 );
-  if (!el) return false;
+  if (!el) return;
 
     el.focus();
+    el.textContent = "";
 
-    el.dispatchEvent(new InputEvent("beforeinput", {
-      inputType: "insertText",
-      data: text,
+    el.dispatchEvent(new InputEvent("input", {
       bubbles: true,
-      cancelable: true
+      data: text,
+      inputType: "insertText"
     }));
 
     el.textContent = text;
-
-    el.dispatchEvent(new InputEvent("input", {
-      inputType: "insertText",
-      data: text,
-      bubbles: true
-    }));
-
-    return true;
   }, caption);
-      }
+}
 //async function typeCaptionFinal(page, caption) {
   //console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
 
