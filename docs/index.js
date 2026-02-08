@@ -292,44 +292,44 @@ async function activateComposerAndFillCaption(page, caption) {
 }
 
 //caption keyboard 
-async function typeByKeyboarding(page, caption) {
+//async function typeByKeyboarding(page, caption) {
     // 1️⃣ Tunggu overlay loading hilang
-  await page.waitForFunction(() => {
-    return !(
-      document.querySelector('[aria-label="Loading"]') ||
-      document.querySelector('[aria-busy="true"]') ||
-      document.querySelector('div[role="dialog"]')
-    );
-  }, { timeout: 30000 });
-  const selector =
-    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
+  //await page.waitForFunction(() => {
+    //return !(
+      //document.querySelector('[aria-label="Loading"]') ||
+     // document.querySelector('[aria-busy="true"]') ||
+     // document.querySelector('div[role="dialog"]')
+   // );
+ // }, { timeout: 30000 });
+  //const selector =
+   // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
   // 1️⃣ Pastikan textbox ada
-  const box = await page.waitForSelector(selector, {
-    visible: true,
-    timeout: 10000
-  });
-  if (!box) throw new Error("Textbox tidak ditemukan");
+ // const box = await page.waitForSelector(selector, {
+ //   visible: true,
+  //  timeout: 10000
+//  });
+  //if (!box) throw new Error("Textbox tidak ditemukan");
 
   // 2️⃣ Fokus (WAJIB di FB)
-  await box.click({ delay: 50 });
-  await page.waitForTimeout(300);
+ // await box.click({ delay: 50 });
+  //await page.waitForTimeout(300);
 
   // 3️⃣ Ketik ala manusia
-  for (const ch of caption) {
-    await page.keyboard.type(ch, {
-      delay: 90 + Math.random() * 120
-    });
+ // for (const ch of caption) {
+  //  await page.keyboard.type(ch, {
+   //   delay: 90 + Math.random() * 120
+  //  });
 
-    if (Math.random() < 0.08) {
-      await page.waitForTimeout(300 + Math.random() * 700);
-    }
-  }
+   // if (Math.random() < 0.08) {
+    //  await page.waitForTimeout(300 + Math.random() * 700);
+  //  }
+//  }
 
   // 4️⃣ Commit React
-  await page.keyboard.press("Space");
-  await page.keyboard.press("Backspace");
-}
+//  await page.keyboard.press("Space");
+//  await page.keyboard.press("Backspace");
+//}
 
 //caption human like 
 async function typeByExecCommand(page, caption) {
