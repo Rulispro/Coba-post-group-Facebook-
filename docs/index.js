@@ -539,10 +539,17 @@ async function typeByExecCommand(page, caption) {
 
 async function typeByKeyboard(page, caption) {
 
+  // 🧠 THINKING DELAY (0.8 - 2 detik)
+  const thinkDelay = 800 + Math.random() * 1200;
+  await page.waitForTimeout(thinkDelay);
+
   // WAKE REACT EDITOR
   await page.keyboard.press("Space");
   await page.waitForTimeout(200);
   await page.keyboard.press("Backspace");
+
+  // 🧠 MINI THINK LAG
+  await page.waitForTimeout(300 + Math.random() * 400);
 
   // TYPE HUMAN
   await page.keyboard.type(caption, {
@@ -550,6 +557,7 @@ async function typeByKeyboard(page, caption) {
   });
 
 }
+
 
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
