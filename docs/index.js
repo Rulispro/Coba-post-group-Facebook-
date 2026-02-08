@@ -365,64 +365,85 @@ async function typeByExecCommand(page, caption) {
  // }, caption);
 ///}
 
-async function typeByInputEvent(page, caption) {
+async function typeByInputEvents(page, caption) {
   const selector = 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
-  // 1️⃣ Fokus editor via click & focus
-  await page.evaluate(sel => {
+  // 1️⃣ Tunggu overlay/loading hilang
+  await page.waitForFunction(() => {
+    return !(
+      document.querySelector('[aria-label="Loading"]') ||
+      document.querySelector('[aria-busy="true"]') ||
+      document.querySelector('div[role="dialog"]')
+    );
+  }, { timeout: 30000 });
+
+  // 2️⃣ Bangunin editor (WAJIB di FB)
+  await page.keyboard.type(" ");
+  await page.waitForTimeout(150);
+  await page.keyboard.press("Backspace");
+
+  // 3️⃣ Fokus editor & set caret di akhir
+  const focused = await page.evaluate(sel => {
     const el = document.querySelector(sel);
-    if (!el) return;
-    el.click();
+    if (!el) return false;
     el.focus();
-  }, selector);
-
-  await page.waitForTimeout(200);
-
-  // 2️⃣ Set caret di akhir
-  await page.evaluate(sel => {
-    const el = document.querySelector(sel);
-    if (!el) return;
+    el.click(); // pastikan aktif
     const selObj = window.getSelection();
     const range = document.createRange();
     range.selectNodeContents(el);
     range.collapse(false);
     selObj.removeAllRanges();
     selObj.addRange(range);
+    return document.activeElement === el;
   }, selector);
 
-  // 3️⃣ Masukkan teks sekaligus (lebih stabil dari per-char)
-  await page.evaluate((text, sel) => {
-    const el = document.querySelector(sel);
-    if (!el) return;
+  if (!focused) {
+    console.log("❌ Editor tidak bisa fokus");
+    return false;
+  }
 
-    // Clear dulu
-    el.innerText = "";
+  // 4️⃣ Masukkan teks per karakter (human-like)
+  for (const char of caption) {
+    await page.evaluate((ch, sel) => {
+      const el = document.querySelector(sel);
+      if (!el) return;
 
-    // INSERT TEXT via execCommand
-    document.execCommand("insertText", false, text);
+      // INSERT TEXT via execCommand
+      document.execCommand("insertText", false, ch);
 
-    // FIRE SIMULATED beforeinput event
-    const beforeEvt = new Event("beforeinput", { bubbles: true, cancelable: true });
-    el.dispatchEvent(beforeEvt);
+      // FIRE beforeinput & input event
+      const beforeEvt = new InputEvent("beforeinput", { inputType: "insertText", data: ch, bubbles: true, cancelable: true });
+      const inputEvt = new InputEvent("input", { inputType: "insertText", data: ch, bubbles: true });
 
-    // FIRE input event
-    const inputEvt = new Event("input", { bubbles: true });
-    el.dispatchEvent(inputEvt);
-  }, caption, selector);
+      el.dispatchEvent(beforeEvt);
+      el.dispatchEvent(inputEvt);
+    }, char, selector);
 
-  // 4️⃣ Commit terakhir (Space + Backspace) biar React detect perubahan
+    // delay human-like
+    await page.waitForTimeout(50 + Math.random() * 80);
+  }
+
+  // 5️⃣ Commit terakhir (Space + Backspace) supaya React detect perubahan
   await page.keyboard.press("Space");
   await page.keyboard.press("Backspace");
 
-  // 5️⃣ Validasi isi caption
+  // 6️⃣ Validasi isi caption
   const ok = await page.evaluate(sel => {
     const el = document.querySelector(sel);
     if (!el) return false;
     return (el.innerText && el.innerText.trim().length > 0);
   }, selector);
 
+  if (ok) {
+    console.log("✅ Caption berhasil diisi (Ultimate BeforeInput)");
+  } else {
+    console.log("❌ Caption gagal masuk");
+  }
+
   return ok;
-                      }
+}
+
+                      
       
 
 //async function typeCaptionFinal(page, caption) {
@@ -679,7 +700,7 @@ async function typeCaptionUltimate(page, caption) {
   const methods = [
       //{ name: "Keyboard", fn: typeByKeyboard },
      // { name: "ExecCommand", fn: typeByExecCommand },
-        { name: "InputEvent", fn: typeByInputEvent },
+        { name: "InputEvent", fn: typeByInputEvents },
      // {name: "typeCaptionFinal", fn: typeCaptionFinal },
      // { name: "ForceReact", fn: typeByForceReact }
   ];
