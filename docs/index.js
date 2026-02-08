@@ -531,11 +531,6 @@ async function typeByForceReact(page, caption) {
     : { ok: false, step: "all_failed" };
 }
 
-//HELPER ISI CAPTION 
-async function typeByKeyboard(page, caption) {
-  await page.keyboard.type(caption, { delay: 130 });
-}
-
 async function typeByExecCommand(page, caption) {
   await page.evaluate(text => {
     document.execCommand("insertText", false, text);
