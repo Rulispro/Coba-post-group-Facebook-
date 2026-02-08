@@ -384,65 +384,65 @@ async function typeByForceReact(page, caption) {
   }, caption);
   }
 
-async function typeCaptionFinal(page, caption) {
-  console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
+//async function typeCaptionFinal(page, caption) {
+  //console.log("✍️ Isi caption via InputEvent FINAL (SINGLE FUNC)");
 
   // 1️⃣ Tunggu editor muncul (JANGAN pakai waitForFunction)
-  const editor = await page.waitForSelector(
-    'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea',
-    { timeout: 10000, visible: true }
-  );
+ // const editor = await page.waitForSelector(
+   // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea',
+  //  { timeout: 10000, visible: true }
+ // );
 
-  if (!editor) {
-    throw new Error("❌ Editor FB tidak ditemukan");
-  }
+ // if (!editor) {
+ //   throw new Error("❌ Editor FB tidak ditemukan");
+ // }
 
   // 2️⃣ Pastikan editor AKTIF (FB WAJIB klik)
-  await editor.click({ delay: 50 });
-  await page.waitForTimeout(300);
+ // await editor.click({ delay: 50 });
+ // await page.waitForTimeout(300);
 
   // 3️⃣ Isi caption via InputEvent (cara FB-friendly)
-  await page.evaluate((el, text) => {
-    el.focus();
+//  await page.evaluate((el, text) => {
+   // el.focus();
 
     // clear isi
-    if (el.innerHTML !== undefined) el.innerHTML = "";
-    if (el.value !== undefined) el.value = "";
+  //  if (el.innerHTML !== undefined) el.innerHTML = "";
+  //  if (el.value !== undefined) el.value = "";
 
-    el.dispatchEvent(new InputEvent("input", {
-      bubbles: true,
-      inputType: "deleteContentBackward"
-    }));
+  //  el.dispatchEvent(new InputEvent("input", {
+   //   bubbles: true,
+    //  inputType: "deleteContentBackward"
+  //  }));
 
-    for (const ch of text) {
-      el.dispatchEvent(new InputEvent("beforeinput", {
-        bubbles: true,
-        inputType: "insertText",
-        data: ch
-      }));
-      el.dispatchEvent(new InputEvent("input", {
-        bubbles: true,
-        inputType: "insertText",
-        data: ch
-      }));
-    }
-  }, editor, caption);
+   // for (const ch of text) {
+    //  el.dispatchEvent(new InputEvent("beforeinput", {
+     //   bubbles: true,
+     //   inputType: "insertText",
+    //    data: ch
+   //   }));
+    //  el.dispatchEvent(new InputEvent("input", {
+        //bubbles: true,
+     //   inputType: "insertText",
+        //data: ch
+   //   }));
+  //  }
+ // }, editor, caption);
 
   // 4️⃣ VALIDASI (WAJIB)
-  const ok = await page.evaluate(el => {
-    return (
-      (el.innerText && el.innerText.trim().length > 0) ||
-      (el.value && el.value.trim().length > 0)
-    );
-  }, editor);
+ // const ok = await page.evaluate(el => {
+  //  return (
+    //  (el.innerText && el.innerText.trim().length > 0) ||
+    //  (el.value && el.value.trim().length > 0)
+  //  );
+ // }, editor);
 
-  if (!ok) {
-    throw new Error("❌ Caption tidak masuk (FINAL)");
-  }
+  //if (!ok) {
+   // throw new Error("❌ Caption tidak masuk (FINAL)");
+//  }
 
-  console.log("✅ Caption BERHASIL diisi (FINAL)");
-  return true;
-        }
+ // console.log("✅ Caption BERHASIL diisi (FINAL)");
+ // return true;
+  //      }
        
 
 
@@ -571,31 +571,31 @@ console.log("❌ typeCaptionFB gagal → lanjut metode berikutnya");
    
  //const stable = await typeCaptionStable(page, caption);
 
-if (stable?.ok) {
-  console.log("✅ Caption OK via Stable");
-  return stable;
-}
+//if (stable?.ok) {
+  //console.log("✅ Caption OK via Stable");
+ // return stable;
+//}
 
-if (stable?.typed) {
-  console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
-  return { ok: true, method: "StableTyped" };
- }
+//if (stable?.typed) {
+  //console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
+ // return { ok: true, method: "StableTyped" };
+// }
 
 // ⬇️ HANYA MASUK SINI JIKA STABLE GAGAL TANPA NGETIK
-console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
+//console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
   
-console.log("🧠 Stable gagal → Combo helper");
+//console.log("🧠 Stable gagal → Combo helper");
  
- console.log("🧠 Activate composer + fill caption (combo)");
+// console.log("🧠 Activate composer + fill caption (combo)");
  // const comboResult = await activateComposerAndFillCaption(page, caption);
-   console.log("COMBO:", comboResult);
+   //console.log("COMBO:", comboResult);
 
-   await page.waitForTimeout(2000);
+ //  await page.waitForTimeout(2000);
 
-  if (comboResult?.ok) {
-    console.log("✅ Caption OK via combo helper (trust React)");
-    return;
- }
+ // if (comboResult?.ok) {
+  //  console.log("✅ Caption OK via combo helper (trust React)");
+   // return;
+// }
   console.log("🧠 Try typeCaptionSafe (legacy)");
   await clearComposer(page);
   
