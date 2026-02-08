@@ -59,45 +59,45 @@ return { ok: true, method: "typeCaptionFB" };
   }
 
 
-//$ benar async function debugComposerAll(page) {
-  //console.log("\n🔎 DEBUG COMPOSER ALL ELEMENT");
+ async function debugComposerAll(page) {
+  console.log("\n🔎 DEBUG COMPOSER ALL ELEMENT");
 
-  //const data = await page.evaluate(() => {
-    //const results = [];
+  const data = await page.evaluate(() => {
+    const results = [];
 
-   // document.querySelectorAll("div, textarea, span").forEach(el => {
-      //const r = el.getBoundingClientRect();
-     // if (r.width < 80 || r.height < 40) return;
+    document.querySelectorAll("div, textarea, span").forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.width < 80 || r.height < 40) return;
 
-     // const attrs = el.getAttributeNames();
+      const attrs = el.getAttributeNames();
 
-     // const isCandidate =
-        //el.isContentEditable ||
-     //   el.getAttribute("contenteditable") === "true" ||
-       // el.tagName === "TEXTAREA" ||
-       // el.getAttribute("role") === "textbox" ||
-      //  el.getAttribute("role") === "combobox" ||
-       // el.getAttribute("data-mcomponent") === "ServerTextArea" ||
-        //attrs.some(a => a.includes("aria"));
+      const isCandidate =
+        el.isContentEditable ||
+        el.getAttribute("contenteditable") === "true" ||
+        el.tagName === "TEXTAREA" ||
+        el.getAttribute("role") === "textbox" ||
+        el.getAttribute("role") === "combobox" ||
+        el.getAttribute("data-mcomponent") === "ServerTextArea" ||
+        attrs.some(a => a.includes("aria"));
 
-     // if (!isCandidate) return;
+      if (!isCandidate) return;
 
-     // results.push({
-        //tag: el.tagName,
-       // role: el.getAttribute("role"),
-       // aria: el.getAttribute("aria-label"),
-     //   data: el.getAttribute("data-mcomponent"),
-      //  contenteditable: el.getAttribute("contenteditable"),
-        //class: (el.className || "").toString().slice(0, 60),
-      //  textPreview: (el.innerText || el.value || "").slice(0, 30)
-    //  });
-  //  });
+      results.push({
+        tag: el.tagName,
+        role: el.getAttribute("role"),
+        aria: el.getAttribute("aria-label"),
+        data: el.getAttribute("data-mcomponent"),
+         contenteditable: el.getAttribute("contenteditable"),
+        class: (el.className || "").toString().slice(0, 60),
+        textPreview: (el.innerText || el.value || "").slice(0, 30)
+      });
+    });
 
-  //  return results;
-//  });
+    return results;
+  });
 
- // console.log("🧪 COMPOSER ALL:", JSON.stringify(data, null, 2));
-//$sampai sini}
+ console.log("🧪 COMPOSER ALL:", JSON.stringify(data, null, 2));
+}
 
 //Validasinya 
 async function validateCaption(page, caption) {
@@ -366,21 +366,8 @@ async function typeByExecCommand(page, caption) {
 ///}
 
 async function typeByInputEvents(page, caption) {
-  const selector = 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
-
-  // 1️⃣ Tunggu overlay/loading hilang
-  await page.waitForFunction(() => {
-    return !(
-      document.querySelector('[aria-label="Loading"]') ||
-      document.querySelector('[aria-busy="true"]') ||
-      document.querySelector('div[role="dialog"]')
-    );
-  }, { timeout: 30000 });
-
-  // 2️⃣ Bangunin editor (WAJIB di FB)
-  await page.keyboard.type(" ");
-  await page.waitForTimeout(150);
-  await page.keyboard.press("Backspace");
+  const selector = 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+  
 
   // 3️⃣ Fokus editor & set caret di akhir
   const focused = await page.evaluate(sel => {
@@ -1759,8 +1746,8 @@ function delay(ms) {
       await page.setBypassCSP(true);
 
       // 🔊 Monitor console
-      //page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
-      //page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
+      page.on("console", msg => console.log(`📢 [${acc.account}]`, msg.text()));
+      page.on("pageerror", err => console.log("💥 [Browser Error]", err.message));
 
       // ===== Recorder PER AKUN
       const recorder = new PuppeteerScreenRecorder(page);
