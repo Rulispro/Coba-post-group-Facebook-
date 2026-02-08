@@ -365,7 +365,7 @@ async function typeByExecCommand(page, caption) {
  // }, caption);
 ///}
 
-async function typeByBeforeInputNoActiveCheck(page, caption) {
+async function typeByInputEvent(page, caption) {
   const selector = 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea';
 
   // 1️⃣ Fokus editor via click & focus
