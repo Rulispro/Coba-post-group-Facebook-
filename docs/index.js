@@ -345,25 +345,25 @@ async function typeByExecCommand(page, caption) {
 }
 
 //caption input event 
-//async function typeByInputEvent(page, caption) {
-//  await page.evaluate(text => {
-    // const el = document.querySelector(
- // 'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
-//);
- // if (!el) return;
+async function typeByInputEvent(page, caption) {
+  await page.evaluate(text => {
+     const el = document.querySelector(
+   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
+  );
+  if (!el) return;
 
-   // el.focus();
-  ///  el.textContent = "";
+    el.focus();
+    el.textContent = "";
 
-  ///  el.dispatchEvent(new InputEvent("input", {
-   ///   bubbles: true,
-   ///   data: text,
-   ///   inputType: "insertText"
-  ///  }));
+    el.dispatchEvent(new InputEvent("input", {
+      bubbles: true,
+      data: text,
+      inputType: "insertText"
+    }));
 
- //   el.textContent = text;
- /// }, caption);
-///}
+    el.textContent = text;
+  }, caption);
+}
 
 //caption force
 async function typeByForceReact(page, caption) {
@@ -552,71 +552,71 @@ async function typeByInputEvent(page, caption) {
 async function typeCaptionUltimate(page, caption) {
     console.log("🧠 typeCaptionUltimate start");
   
-let fbResult;
+//let fbResult;
 
-try {
-  fbResult = await typeCaptionFB(page, caption);
-} catch (e) {
-  console.log("⚠️ typeCaptionFB error → lanjut fallback");
-}
+//try {
+ // fbResult = await typeCaptionFB(page, caption);
+//} catch (e) {
+  //console.log("⚠️ typeCaptionFB error → lanjut fallback");
+//}
 
-if (fbResult?.ok) {
-  console.log("✅ Caption OK via typeCaptionFB");
-  return fbResult; // ⛔ STOP HANYA JIKA SUKSES
-}
+//if (fbResult?.ok) {
+//  console.log("✅ Caption OK via typeCaptionFB");
+  //return fbResult; // ⛔ STOP HANYA JIKA SUKSES
+//}
 
 // ❗ JANGAN return di sini
 console.log("❌ typeCaptionFB gagal → lanjut metode berikutnya");
       
    
- const stable = await typeCaptionStable(page, caption);
+// const stable = await typeCaptionStable(page, caption);
 
-if (stable?.ok) {
-  console.log("✅ Caption OK via Stable");
-  return stable;
-}
+//if (stable?.ok) {
+//  console.log("✅ Caption OK via Stable");
+//  return stable;
+//}
 
-if (stable?.typed) {
-  console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
-  return { ok: true, method: "StableTyped" };
-}
+//if (stable?.typed) {
+ // console.log("⚠️ Stable sudah mengetik → STOP (hindari dobel)");
+ // return { ok: true, method: "StableTyped" };
+//}
 
 // ⬇️ HANYA MASUK SINI JIKA STABLE GAGAL TANPA NGETIK
-console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
+//console.log("🧠 Stable gagal tanpa ngetik → lanjut metode lain");
   
- console.log("🧠 Stable gagal → Combo helper");
+// console.log("🧠 Stable gagal → Combo helper");
  
-  console.log("🧠 Activate composer + fill caption (combo)");
-   const comboResult = await activateComposerAndFillCaption(page, caption);
-   console.log("COMBO:", comboResult);
+ // console.log("🧠 Activate composer + fill caption (combo)");
+  // const comboResult = await activateComposerAndFillCaption(page, caption);
+  // console.log("COMBO:", comboResult);
 
-    await page.waitForTimeout(2000);
+  //  await page.waitForTimeout(2000);
 
-  if (comboResult?.ok) {
-    console.log("✅ Caption OK via combo helper (trust React)");
-    return;
- }
-  console.log("🧠 Try typeCaptionSafe (legacy)");
-  await clearComposer(page);
+//  if (comboResult?.ok) {
+  //  console.log("✅ Caption OK via combo helper (trust React)");
+   // return;
+// }
+  //console.log("🧠 Try typeCaptionSafe (legacy)");
+ // await clearComposer(page);
   
-     try {
-      await typeCaptionSafe(page, caption);
-      await page.waitForTimeout(400);
+    // try {
+     // await typeCaptionSafe(page, caption);
+    //  await page.waitForTimeout(400);
 
-    if (await validateCaption(page, caption)) {
-       console.log("✅ typeCaptionSafe OK");
-      return;
-      }
-     } catch (e) {
-     console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
-  } 
+   // if (await validateCaption(page, caption)) {
+     //  console.log("✅ typeCaptionSafe OK");
+   //   return;
+   //   }
+   //  } catch (e) {
+   //  console.log("⚠️ typeCaptionSafe gagal, lanjut fallback");
+//  } 
 
   const methods = [
-      { name: "Keyboard", fn: typeByKeyboard },
-      { name: "ExecCommand", fn: typeByExecCommand },
+     // { name: "Keyboard", fn: typeByKeyboard },
+    //  { name: "ExecCommand", fn: typeByExecCommand },
       {name: "InputEvent", fn: typeByInputEvent },
-      {name: "typeCaptionFinal", fn: typeCaptionFinal },
-      { name: "ForceReact", fn: typeByForceReact }
+     // {name: "typeCaptionFinal", fn: typeCaptionFinal },
+     // { name: "ForceReact", fn: typeByForceReact }
   ];
 
 for (const m of methods) {
