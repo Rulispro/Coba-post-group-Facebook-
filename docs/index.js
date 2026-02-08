@@ -523,23 +523,31 @@ async function typeByExecCommand(page, caption) {
 
 async function typeByInputEvent(page, caption) {
   await page.evaluate(text => {
-     const el = document.querySelector(
+      const el = document.querySelector(
   'div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea'
 );
-  if (!el) return;
+  if (!el) return false;
 
     el.focus();
-    el.textContent = "";
 
-    el.dispatchEvent(new InputEvent("input", {
-      bubbles: true,
+    el.dispatchEvent(new InputEvent("beforeinput", {
+      inputType: "insertText",
       data: text,
-      inputType: "insertText"
+      bubbles: true,
+      cancelable: true
     }));
 
     el.textContent = text;
+
+    el.dispatchEvent(new InputEvent("input", {
+      inputType: "insertText",
+      data: text,
+      bubbles: true
+    }));
+
+    return true;
   }, caption);
-}
+        }
 //async function typeByInputEvent(page, caption) {
  // await page.evaluate(text => {
      //const el = document.querySelector(
