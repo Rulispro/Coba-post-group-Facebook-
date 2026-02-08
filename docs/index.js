@@ -602,7 +602,7 @@ console.log("🧠 Activate composer + fill caption (combo)");
   await page.waitForTimeout(2000);
 
   if (comboResult?.ok) {
-   /console.log("✅ Caption OK via combo helper (trust React)");
+   console.log("✅ Caption OK via combo helper (trust React)");
     return;
  }
  console.log("🧠 Try typeCaptionSafe (legacy)");
