@@ -721,6 +721,13 @@ function parseTanggalXLSX(tgl) {
 async function runAddFriendFollowers(page, row) {
   console.log("🧪 ROW RAW:", row);
   console.log("🧪 Object keys:", Object.keys(row));
+ console.log("🧪 LINK DIRECT:", row.link_targetUsername);
+console.log("🧪 LINK LOWER:", row.link_targetusername);
+console.log("🧪 LINK CAMEL:", row.linkTargetUsername);
+  
+  for (const k in row) {
+  console.log("FIELD:", `[${k}]`);
+  }
   
   console.log(`\n📝 Mulai addFriendFollowers → ${row.account}`);
   const account = row.account;
@@ -729,6 +736,11 @@ async function runAddFriendFollowers(page, row) {
   console.log("TOTAL:", row.total);
    const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
  console.log("LINK:", row.link_targetUsername);
+  
+  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
+console.log("🧪 LINK LOWER:", row.link_targetusername);
+console.log("🧪 LINK CAMEL:", row.linkTargetUsername);
+  
   
   if (!total || !linkTargetUsernameUrl) {
   console.log("⚠️ linkTargetUsername kosong, skip");
