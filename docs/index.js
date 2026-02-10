@@ -726,12 +726,12 @@ async function runAddFriendFollowers(page, row) {
   console.log("TOTAL:", row.total);
   const linkTargetUsernameUrl =
   row.link_targetUsername ||
-  row.link_targetusername
+  row.link_targetusername ||
   "";
   
  console.log("LINK:", row.link_targetUsername);
   if (!total || !linkTargetUsernameUrl) {
-  console.log("⚠️ addFriendFollowers kosong, skip");
+  console.log("⚠️ linkTargetUsername kosong, skip");
   return;
 }
 
