@@ -758,7 +758,7 @@ const targets = [linkTargetUsernameUrl];
 for (const profile of targets) {
 
   // 1️⃣ buka profil target
-  await page.goto(profile, { waitUntil: "networkidle2" });
+  await page.goto(targets, { waitUntil: "networkidle2" });
   console.log("👤 Profil dibuka:", profile);
 
   await page.waitForTimeout(3000);
@@ -803,10 +803,10 @@ for (const profile of targets) {
 }
 
 // setelah buka followers → baru add friend
-await addFriendByUsernameFollowers(page);
+await addFriendByUsernameFollowers(page,total);
 
   // FUNGSI ADDFRIEND by target username followers
-async function addFriendByUsernameFollowers(page, totalLimit) {
+async function addFriendByUsernameFollowers(page, total) {
   try {
     const LIMIT = Number(totalLimit) || 0;
 
