@@ -808,10 +808,10 @@ await addFriendByUsernameFollowers(page,total);
   // FUNGSI ADDFRIEND by target username followers
 async function addFriendByUsernameFollowers(page, total) {
   try {
-    const LIMIT = Number(totalLimit) || 0;
+    const LIMIT = Number(total) || 0;
 
     if (LIMIT <= 0) {
-      console.log("⚠️ LIMIT tidak valid:", totalLimit);
+      console.log("⚠️ LIMIT tidak valid:", total);
       return 0;
     }
 
