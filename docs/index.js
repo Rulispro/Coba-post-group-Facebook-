@@ -803,7 +803,7 @@ for (const profile of targets) {
 }
 
 // setelah buka followers → baru add friend
-await addFriendByUsernameFollowers(page,totalLimit);
+await addFriendByUsernameFollowers(page,total);
 
   // FUNGSI ADDFRIEND by target username followers
 async function addFriendByUsernameFollowers(page, total) {
