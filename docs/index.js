@@ -717,7 +717,23 @@ function parseTanggalXLSX(tgl) {
 
   return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
                     }
+//FUNGSI addFriendFollowers 
+async function runAddFriendFollowers(page, row) {
+  console.log(`\n📝 Mulai addFriendFollowers → ${row.account}`);
+  const account = row.account;
+  console.log(`\n📝 Mulai addFriendFollowers → ${account}`);
+  const total = row.total;
+  const linkTargetUsernameUrl = row.linkTargetUsetnameurl ;
 
+  if (! total && !linkTargetUsername) {
+    console.log("⚠️ addFriendFollowers kosong, skip");
+    return;
+  }
+
+  // 1️⃣ BUKA HOME FB (WAJIB)
+  await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
+  
+  await delay(3000);
 
 //FUNGSI POSTING STATUS 
 async function runStatus(page, row) {
@@ -1727,7 +1743,13 @@ console.log("📋 Semua status rows:", statusRows);
     const rowDate = parseTanggalXLSX(row.tanggal);
   return rowDate === today;
  });
-      
+
+    const rowsAddFriendFollowersForAccount = statusRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+});
  // ================== FILTER GROUP BERDASARKAN TANGGAL ==================
 //group/const rowsForAccount = groupRows.filter(row => {
  // if (row.account !== acc.account) return false;
@@ -1765,10 +1787,12 @@ console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
       //baru 
 console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
+console.log(`📋 addFriendFollowers row ${acc.account}:`, rowsAddFriendFollowersForAccount.length);
+      
 
 // kalau dua-duanya kosong → skip akun
-if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0) {
-  console.log("⏭️ Tidak ada jadwal group & status hari ini");
+if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsStatusForAccount.length === 0) {
+  console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers hari ini");
   continue;
 }
       
@@ -1796,10 +1820,14 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     // await runAccount(page, row);
    // }
       // POST STATUS (kalau ada)
- for (const row of rowsStatusForAccount) {
-    await runStatus(page, row);
-  }
+// for (const row of rowsStatusForAccount) {
+   // await runStatus(page, row);
+//  }
 
+for (const row of rowsAddFriendFolliwersForAccount) {
+    await runAddFriendFollowers(page, row);
+}
+      
       // ===== Stop recorder
       await recorder.stop();
      console.log(`🎬 Rekaman selesai: recording_${acc.account}.mp4`);
