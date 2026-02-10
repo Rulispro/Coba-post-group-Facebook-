@@ -735,6 +735,8 @@ async function runAddFriendFollowers(page, row) {
   
   await delay(3000);
 
+}
+
 //FUNGSI POSTING STATUS 
 async function runStatus(page, row) {
   console.log(`\n📝 Post STATUS → ${row.account}`);
