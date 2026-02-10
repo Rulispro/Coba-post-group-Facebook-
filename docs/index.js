@@ -719,21 +719,21 @@ function parseTanggalXLSX(tgl) {
                     }
 //FUNGSI addFriendFollowers 
 async function runAddFriendFollowers(page, row) {
+  console.log("🧪 ROW RAW:", row);
+  console.log("🧪 Object keys:", Object.keys(row));
+  
   console.log(`\n📝 Mulai addFriendFollowers → ${row.account}`);
   const account = row.account;
   console.log(`\n📝 Mulai addFriendFollowers → ${account}`);
   const total = String(row.total || "").trim();
   console.log("TOTAL:", row.total);
-  const linkTargetUsernameUrl =
-  row.link_targetUsername ||
-  row.link_targetusername ||
-  "";
-  
+   const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
  console.log("LINK:", row.link_targetUsername);
+  
   if (!total || !linkTargetUsernameUrl) {
   console.log("⚠️ linkTargetUsername kosong, skip");
   return;
-}
+  }
 
 
   // 1️⃣ BUKA HOME FB (WAJIB)
