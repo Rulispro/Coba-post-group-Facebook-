@@ -723,12 +723,13 @@ async function runAddFriendFollowers(page, row) {
   const account = row.account;
   console.log(`\n📝 Mulai addFriendFollowers → ${account}`);
   const total = row.total;
-  const linkTargetUsernameUrl = row.linkTargetUsetnameurl ;
+  const linkTargetUsernameUrl = row.link_targetUsername;
 
-  if (! total && !linkTargetUsername) {
-    console.log("⚠️ addFriendFollowers kosong, skip");
-    return;
-  }
+  if (!total || !linkTargetUsernameUrl) {
+  console.log("⚠️ addFriendFollowers kosong, skip");
+  return;
+}
+
 
   // 1️⃣ BUKA HOME FB (WAJIB)
   await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
@@ -1656,6 +1657,7 @@ function delay(ms) {
     console.log("📑 Sheet terbaca:", Object.keys(templates));
     const groupRows = templates.postGroup || [];
     const statusRows = templates.postStatus || [];
+    const addFriendRows = templates.addFriendFollowers || [];
     const browser = await puppeteer.launch({
       headless: "new",
       defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
