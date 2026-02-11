@@ -738,16 +738,17 @@ async function runLikeLinkGroups(page, row) {
     return;
   }
 
-  // ===== PARSE LIST GRUP =====
-  const groups = String(row.grup_link || "")
-    .split(",")
-    .map(g => g.replace(/[\s\r\n]+/g, "").trim())
-    .filter(Boolean);
+// ===== PARSE LIST GRUP =====
+const groups = String(row.link_group || "")
+  .split(",")
+  .map(g => g.replace(/[\s\r\n]+/g, "").trim())
+  .filter(Boolean);
 
-  if (groups.length === 0) {
-    console.log("⚠️ Tidak ada grup_link, skip");
-    return;
-  }
+if (groups.length === 0) {
+  console.log("⚠️ Tidak ada link_group, skip");
+  return;
+}
+
 
   console.log(`🧠 Account: ${account}`);
   console.log(`🔢 Total Like per Grup: ${total}`);
