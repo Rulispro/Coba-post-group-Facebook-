@@ -1127,8 +1127,8 @@ async function addFriendFromList(page, total,delayMin, delayMax) {
 }
 }
 
-//FUNGSI addFriendFollowers 
-async function runAddFriendFollowers(page, row) {
+//FUNGSI confirm 
+async function runConfirm(page, row) {
   console.log("🧪 ROW RAW:", row);
   console.log("🧪 Object keys:", Object.keys(row));
  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
@@ -1145,15 +1145,8 @@ async function runAddFriendFollowers(page, row) {
   const delayMax = Number(row.delay_max || 8000);
   console.log("Delay XLSX:", delayMin, delayMax);
   console.log("TOTAL:", row.total);
-  const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
-  console.log("LINK:", row.link_targetUsername);
   
-  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
-console.log("🧪 LINK LOWER:", row.link_targetUsername);
-
-  
-  
-  if (!total || !linkTargetUsernameUrl) {
+  if (!total) {
   console.log("⚠️ linkTargetUsername kosong, skip");
   return;
   }
@@ -1212,11 +1205,8 @@ for (const profile of targets) {
   // tunggu halaman followers load
   await page.waitForTimeout(3000);
 }
-
-// setelah buka followers → baru add friend
-await addFriendByUsernameFollowers(page,total,delayMin, delayMax);
-
-  // FUNGSI ADDFRIEND by target username followers
+  
+// FUNGSI ADDFRIEND by target username followers
 async function addFriendByUsernameFollowers(page, total,delayMin, delayMax) {
   try {
     const LIMIT = Number(total) || 0;
@@ -1297,7 +1287,6 @@ async function addFriendByUsernameFollowers(page, total,delayMin, delayMax) {
     return 0;
   }
 }
-
 }
 
 //FUNGSI addFriendFollowers 
@@ -2603,17 +2592,16 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
      // for (const row of rowsAddFriendFollowingForAccount){
   //await runAddFriendFollowings(page, row);
 //}
-     for (const row of rowsAddFriendFriendsForAccount){
-  await runAddFriendFriends(page, row);
-}
+    // for (const row of rowsAddFriendFriendsForAccount){
+ // await runAddFriendFriends(page, row);
+//}
       
 //for (const row of rowsUndfriendsForAccount){
 //  await runUndfriends(page, row);
 //}
-    //  for (const row of rowsConfirmForAccount){
- // await runConfirm(page, row);
-        
-//}
+      for (const row of rowsConfirmForAccount){
+  await runConfirm(page, row);
+}
       
       
       
