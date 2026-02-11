@@ -2339,7 +2339,7 @@ function delay(ms) {
     const statusRows = templates.postStatus || [];
     const addFriendFollowersRows = templates.addFriendFollowers || [];
     const addFriendFollowingRows = templates.addFriendFollowing || [];
-    const addFriendListRows = templates.addFriendFriendList || [];
+    const addFriendListRows = templates.addFriendFriendlist || [];
     const undFriendRows = templates.undFriend || [];
     const confirmRows = templates.confirm || [];
     const browser = await puppeteer.launch({
