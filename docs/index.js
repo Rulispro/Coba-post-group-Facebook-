@@ -745,7 +745,7 @@ async function runUndfriends(page, row) {
   
   
   if (!total) {
-  console.log("⚠️ linkTargetUsername kosong, skip");
+  console.log("⚠️ total kosong, skip");
   return;
   }
 
@@ -754,7 +754,7 @@ async function runUndfriends(page, row) {
   await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
   console.log("BUKA FACEBOOK");
   await delay(3000);
-}
+
 // contoh daftar target
   const clicked = await page.evaluate(() => {
   // 🔍 cari tombol profile (ID + EN)
