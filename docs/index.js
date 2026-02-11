@@ -1814,7 +1814,10 @@ function delay(ms) {
     console.log("📑 Sheet terbaca:", Object.keys(templates));
     const groupRows = templates.postGroup || [];
     const statusRows = templates.postStatus || [];
-    const addFriendRows = templates.addFriendFollowers || [];
+    const addFriendFollowerRows = templates.addFriendFollowers || [];
+    const addFriendFollowingRows = templates.addFriendFollowings || [];
+    const addFriendListRows = templates.addFriendFriendList || [];
+    const undFriendRows = templates.undFriendFollowers || [];
     const browser = await puppeteer.launch({
       headless: "new",
       defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
@@ -1905,7 +1908,7 @@ console.log("📋 Semua status rows:", statusRows);
   return rowDate === today;
  });
 
-    const addFriendFollowersRows = addFriendRows.filter(row => {
+    const addFriendFollowerRows = addFriendFollowerRows.filter(row => {
   if (row.account !== acc.account) return false;
 
   const rowDate = parseTanggalXLSX(row.tanggal);
@@ -1948,14 +1951,14 @@ console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
       //baru 
 console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
-console.log(`📋 addFriendFollowers row ${acc.account}:`, addFriendFollowersRows.length);
+console.log(`📋 addFriendFollowers row ${acc.account}:`, addFriendFollowerRows.length);
 
       
 
 
 
 // kalau dua-duanya kosong → skip akun
-if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && addFriendFollowersRows.length === 0) {
+if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && addFriendFollowerRows.length === 0) {
   console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers hari ini");
   continue;
 }
@@ -1988,7 +1991,7 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
    // await runStatus(page, row);
 //  }
 
-for (const row of addFriendFollowersRows) {
+for (const row of addFriendFollowerRows) {
   await runAddFriendFollowers(page, row);
 }
       
