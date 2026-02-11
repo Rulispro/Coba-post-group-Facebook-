@@ -1908,7 +1908,7 @@ console.log("📋 Semua status rows:", statusRows);
   return rowDate === today;
  });
 
-    const addFriendFollowersRows = addFriendFollowersRows.filter(row => {
+    const rowsAddFriendFollowersForAccount = addFriendFollowersRows.filter(row => {
   if (row.account !== acc.account) return false;
 
   const rowDate = parseTanggalXLSX(row.tanggal);
@@ -1958,7 +1958,7 @@ console.log(`📋 addFriendFollowers row ${acc.account}:`, addFriendFollowersRow
 
 
 // kalau dua-duanya kosong → skip akun
-if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && addFriendFollowerRows.length === 0) {
+if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0) {
   console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers hari ini");
   continue;
 }
@@ -1990,7 +1990,7 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
    // await runStatus(page, row);
 //  }
 
-for (const row of addFriendFollowersRows) {
+for (const row of rowsAddFriendFollowersForAccount){
   await runAddFriendFollowers(page, row);
 }
       
