@@ -723,6 +723,114 @@ function parseTanggalXLSX(tgl) {
   return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   }
 
+//FUNGSI LIKELINKGROUP
+async function runLikeLinkGroups(page, row) {
+  console.log("\n🧪 runLikeLinkGroups row:", row);
+
+  const account = row.account;
+  const total = Number(row.total || 0);
+  const delayMin = Number(row.delay_min || 4000);
+  const delayMax = Number(row.delay_max || 8000);
+
+  // ===== VALIDASI DATA =====
+  if (!account || total <= 0) {
+    console.log("⚠️ Data XLSX tidak lengkap (account/total), skip");
+    return;
+  }
+
+  // ===== PARSE LIST GRUP =====
+  const groups = String(row.grup_link || "")
+    .split(",")
+    .map(g => g.replace(/[\s\r\n]+/g, "").trim())
+    .filter(Boolean);
+
+  if (groups.length === 0) {
+    console.log("⚠️ Tidak ada grup_link, skip");
+    return;
+  }
+
+  console.log(`🧠 Account: ${account}`);
+  console.log(`🔢 Total Like per Grup: ${total}`);
+  console.log(`⏱️ Delay: ${delayMin} - ${delayMax}`);
+  console.log(`🔗 Jumlah Grup: ${groups.length}`);
+
+  // ===== LOOP SEMUA GRUP =====
+  for (let i = 0; i < groups.length; i++) {
+
+    let groupUrl = groups[i];
+
+    // ✅ Perbaiki URL kalau belum lengkap
+    if (!groupUrl.startsWith("http")) {
+      groupUrl = "https://m.facebook.com/" + groupUrl.replace(/^\/+/, "");
+    }
+
+    if (!groupUrl.includes("/groups/")) {
+      console.log("❌ URL bukan grup, skip:", groupUrl);
+      continue;
+    }
+
+    console.log(`\n📌 [${account}] Grup ${i + 1}/${groups.length}`);
+    console.log("➡️", groupUrl);
+
+    // ===== BUKA GRUP =====
+    await page.goto(groupUrl, { waitUntil: "networkidle2" });
+    await page.waitForTimeout(4000);
+
+    let clicked = 0;
+
+    // ===== LOOP LIKE =====
+    while (clicked < total) {
+
+      const liked = await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('div[role="button"]')]
+          .find(el => {
+            const label = (el.getAttribute("aria-label") || "").toLowerCase();
+            return (
+              label.includes("like") ||
+              label.includes("suka")
+            );
+          });
+
+        if (!btn) return false;
+
+        btn.scrollIntoView({ block: "center" });
+        btn.click();
+        return true;
+      });
+
+      if (!liked) {
+        console.log("🔄 Tidak ada tombol Like, scroll...");
+        await page.evaluate(() =>
+          window.scrollBy(0, window.innerHeight * 0.8)
+        );
+        await page.waitForTimeout(2000);
+        continue;
+      }
+
+      clicked++;
+      console.log(`👍 Like ke-${clicked} dari ${total}`);
+
+      const delay =
+        Math.floor(Math.random() * (delayMax - delayMin + 1)) + delayMin;
+
+      console.log(`⏱️ Delay ${delay} ms`);
+      await page.waitForTimeout(delay);
+
+      // Scroll sedikit biar muncul post baru
+      await page.evaluate(() =>
+        window.scrollBy(0, window.innerHeight * 0.6)
+      );
+
+      await page.waitForTimeout(2000);
+    }
+
+    console.log(`✅ Selesai grup ini (${clicked} like)`);
+  }
+
+  console.log("🎉 Semua grup selesai diproses");
+}
+
+
 //FUNGSI UNDFRIEND 
 async function runUndfriends(page, row) {
   console.log("🧪 ROW RAW:", row);
