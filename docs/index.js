@@ -763,52 +763,55 @@ console.log("🧪 LINK LOWER:", row.link_targetUsername);
 const targets = [linkTargetUsernameUrl];
 
 for (const profile of targets) {
-
   // 1️⃣ buka profil target
   await page.goto(profile, { waitUntil: "networkidle2" });
   console.log("👤 Profil dibuka:", profile);
 
   await page.waitForTimeout(3000);
 
-  // 2️⃣ tap span followers / pengikut
-  const ok = await page.evaluate(() => {
-    const spans = [...document.querySelectorAll("span")];
+  // 2️⃣ tap span FOLLOWING (INLINE, span only)
+const ok = await page.evaluate(() => {
+  const spans = [...document.querySelectorAll("span")];
 
-    const target = spans.find(s => {
-      const t = (s.innerText || "").toLowerCase();
-      return t.includes("followers") || t.includes("pengikut");
-    });
+  const target = spans.find(s => {
+    const t = (s.innerText || "").trim().toLowerCase();
 
-    if (!target) return false;
+    // ⛔ skip span angka
+    if (!t || /^\d+$/.test(t)) return false;
 
-    target.scrollIntoView({ block: "center", behavior: "smooth" });
-
-    const events = [
-      new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
-      new TouchEvent("touchend", { bubbles: true, cancelable: true }),
-      new PointerEvent("pointerdown", { bubbles: true }),
-      new PointerEvent("pointerup", { bubbles: true }),
-      new MouseEvent("mousedown", { bubbles: true }),
-      new MouseEvent("mouseup", { bubbles: true }),
-      new MouseEvent("click", { bubbles: true })
-    ];
-
-    events.forEach(e => target.dispatchEvent(e));
-
-    return true;
+    // ✅ hanya teks following
+    return t === "following" || t === "mengikuti";
   });
 
-  if (!ok) {
-    console.log("❌ span followers / pengikut tidak ditemukan");
-    continue;
-  }
+  if (!target) return false;
 
-  console.log("📂 Halaman following dibuka (via tap span)");
+  target.scrollIntoView({ block: "center", behavior: "smooth" });
 
-  // tunggu halaman followers load
-  await page.waitForTimeout(3000);
+  const events = [
+    new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
+    new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+    new PointerEvent("pointerdown", { bubbles: true }),
+    new PointerEvent("pointerup", { bubbles: true }),
+    new MouseEvent("mousedown", { bubbles: true }),
+    new MouseEvent("mouseup", { bubbles: true }),
+    new MouseEvent("click", { bubbles: true })
+  ];
+
+  events.forEach(e => target.dispatchEvent(e));
+
+  return true;
+});
+
+if (!ok) {
+  console.log("❌ span following / mengikuti tidak ditemukan");
+  continue;
 }
 
+console.log("📂 Halaman following dibuka (via tap span)");
+
+// tunggu halaman followers load
+  await page.waitForTimeout(2000);
+}
 // setelah buka following → baru add friend
 await addFriendByUsernameFollowing(page,total,delayMin, delayMax);
 
