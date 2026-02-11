@@ -723,6 +723,109 @@ function parseTanggalXLSX(tgl) {
   return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   }
 
+// ====== RUN LIKELINKPOST (AMBIL DARI XLSX) ======
+async function runLikeLinkPosts(page, row) {
+  console.log("\n🧪 runLikeLinkPosts row:", row);
+
+  const account = row.account;
+  const total = Number(row.total) || 1;
+  const delayMin = Number(row.delay_min) || 4000;
+  const delayMax = Number(row.delay_max) || 8000;
+
+  // ===== PARSE LINK GROUP =====
+  const groups = String(row.link_group || "")
+    .split(",")
+    .map(g => g.replace(/[\s\r\n]+/g, "").trim())
+    .filter(Boolean);
+
+  if (!account || groups.length === 0) {
+    console.log("⚠️ Row XLSX tidak lengkap, skip");
+    return;
+  }
+
+  console.log(`👤 Account: ${account}`);
+  console.log(`🔢 Total Like per Group: ${total}`);
+  console.log(`⏱ Delay Range: ${delayMin}-${delayMax} ms`);
+  console.log(`🔗 Total Group: ${groups.length}`);
+
+  for (let i = 0; i < groups.length; i++) {
+    let groupUrl = groups[i];
+
+    if (!groupUrl.startsWith("http")) {
+      groupUrl = "https://m.facebook.com/" + groupUrl.replace(/^\/+/, "");
+    }
+
+    console.log(`\n📌 Buka Group ${i + 1}/${groups.length}`);
+    console.log("➡️", groupUrl);
+
+    await linkPost(page, groupUrl, total, delayMin, delayMax);
+  }
+    }
+   // ===== FUNGSI LIKE LINK POSTINGAN =====
+async function linkPost(page, groupUrl, total, delayMin, delayMax) {
+  try {
+    console.log("🚀 Buka halaman target");
+    await page.goto(groupUrl, { waitUntil: "networkidle2" });
+    await page.waitForTimeout(4000);
+
+    let clicked = 0;
+
+    while (clicked < total) {
+
+      const liked = await page.evaluate(() => {
+
+        function humanClick(el) {
+          el.scrollIntoView({ block: "center" });
+          ["pointerdown","touchstart","mousedown","mouseup","touchend","click"]
+            .forEach(ev =>
+              el.dispatchEvent(new Event(ev, { bubbles: true, cancelable: true }))
+            );
+        }
+
+        const btn = [...document.querySelectorAll('div[role="button"]')]
+          .find(el => {
+            const label = (el.getAttribute("aria-label") || "").toLowerCase();
+            return label.includes("like") || label.includes("suka");
+          });
+
+        if (!btn) return false;
+
+        humanClick(btn);
+        return true;
+      });
+
+      if (!liked) {
+        console.log("⚠️ Tombol Like tidak ditemukan, scroll...");
+        await page.evaluate(() => window.scrollBy(0, 600));
+        await page.waitForTimeout(3000);
+        continue;
+      }
+
+      clicked++;
+      console.log(`👍 Like ke-${clicked} dari ${total}`);
+
+      const delay =
+        Math.floor(Math.random() * (delayMax - delayMin + 1)) + delayMin;
+
+      console.log(`⏱ Delay ${delay} ms`);
+      await page.waitForTimeout(delay);
+
+      await page.evaluate(() =>
+        window.scrollBy(0, window.innerHeight * 0.5)
+      );
+    }
+
+    console.log(`🎉 Selesai Like ${clicked} postingan`);
+    return clicked;
+
+  } catch (err) {
+    console.error("❌ Error linkPost:", err.message);
+    return 0;
+  }
+}
+
+
+
 //FUNGSI LIKELINKGROUP
 async function runLikeLinkGroups(page, row) {
   console.log("\n🧪 runLikeLinkGroups row:", row);
@@ -2856,13 +2959,13 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
   //await runConfirm(page, row);
 //}
       
-//for (const row of rowsLikeLinkPostForAccount){
-   //  await runLikeLinkPosts(page, row);
-// }
-      
-for (const row of rowsLikeGroupForAccount){
-     await runLikeLinkGroups(page, row);
+for (const row of rowsLikeLinkPostForAccount){
+     await runLikeLinkPosts(page, row);
  }
+      
+//for (const row of rowsLikeGroupForAccount){
+    // await runLikeLinkGroups(page, row);
+// }
       
       
       // ===== Stop recorder
