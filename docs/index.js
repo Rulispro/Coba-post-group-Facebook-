@@ -723,6 +723,219 @@ function parseTanggalXLSX(tgl) {
   return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   }
 
+//FUNGSI undFriend 
+async function runUndfriends(page, row) {
+  console.log("🧪 ROW RAW:", row);
+  console.log("🧪 Object keys:", Object.keys(row));
+ 
+  for (const k in row) {
+  console.log("FIELD:", `[${k}]`);
+  }
+  
+  console.log(`\n📝 Mulai addUndftiend → ${row.account}`);
+  const account = row.account;
+  console.log(`\n📝 Mulai addUndftiend→ ${account}`);
+  const total = String(row.total || "").trim();
+  const delayMin = Number(row.delay_min || 4000);
+  const delayMax = Number(row.delay_max || 8000);
+  console.log("Delay XLSX:", delayMin, delayMax);
+  console.log("TOTAL:", row.total);
+  
+  
+  
+  
+  if (!total) {
+  console.log("⚠️ linkTargetUsername kosong, skip");
+  return;
+  }
+
+
+  // 1️⃣ BUKA HOME FB (WAJIB)
+  await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
+  console.log("BUKA FACEBOOK");
+  await delay(3000);
+}
+// contoh daftar target
+  const clicked = await page.evaluate(() => {
+  // 🔍 cari tombol profile (ID + EN)
+  const btn = [...document.querySelectorAll('div[role="button"]')]
+    .find(el => {
+      const label = (el.getAttribute("aria-label") || "").toLowerCase();
+      return label.includes("profil") || label.includes("profile");
+    });
+
+  if (!btn) return false;
+
+  // 👁️ pastikan terlihat
+  btn.scrollIntoView({ block: "center", behavior: "smooth" });
+
+  // 🖱️ trigger React / FB event chain
+  const events = [
+    new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
+    new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+    new PointerEvent("pointerdown", { bubbles: true }),
+    new PointerEvent("pointerup", { bubbles: true }),
+    new MouseEvent("mousedown", { bubbles: true }),
+    new MouseEvent("mouseup", { bubbles: true }),
+    new MouseEvent("click", { bubbles: true })
+  ];
+
+  events.forEach(e => btn.dispatchEvent(e));
+  return true;
+});
+
+console.log("👤 Klik profile:", clicked);
+
+  await page.waitForTimeout(1000);
+
+  // 2️⃣ tap span FOLLOWING (INLINE, span only)
+const ok = await page.evaluate(() => {
+  const spans = [...document.querySelectorAll("span")];
+
+  const target = spans.find(s => {
+    const t = (s.innerText || "").trim().toLowerCase();
+
+    // ⛔ skip span angka
+    if (!t || /^\d+$/.test(t)) return false;
+
+    // ✅ hanya teks following
+    return t === "following" || t === "mengikuti";
+  });
+
+  if (!target) return false;
+
+  target.scrollIntoView({ block: "center", behavior: "smooth" });
+
+  const events = [
+    new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
+    new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+    new PointerEvent("pointerdown", { bubbles: true }),
+    new PointerEvent("pointerup", { bubbles: true }),
+    new MouseEvent("mousedown", { bubbles: true }),
+    new MouseEvent("mouseup", { bubbles: true }),
+    new MouseEvent("click", { bubbles: true })
+  ];
+
+  events.forEach(e => target.dispatchEvent(e));
+
+  return true;
+});
+
+if (!ok) {
+  console.log("❌ span following / mengikuti tidak ditemukan");
+} else {
+  console.log("📂 Halaman following dibuka (via tap span)");
+  await page.waitForTimeout(2000);
+}
+await unfriend(page, total, delayMin, delayMax);
+}
+
+async function unfriend(page, total, delayMin, delayMax) {
+  try {
+    const LIMIT = Number(total) || 1;
+    let done = 0;
+
+    await page.waitForTimeout(3000);
+
+    while (done < LIMIT) {
+
+      // 1️⃣ Klik tab Friends
+      const step1 = await page.evaluate(() => {
+        const tab = [...document.querySelectorAll('[role="tab"]')]
+          .find(el => {
+            const label = (el.getAttribute("aria-label") || "").toLowerCase();
+            return label.includes("friends") || label.includes("teman");
+          });
+
+        if (!tab) return false;
+        tab.click();
+        return true;
+      });
+
+      if (!step1) {
+        console.log("⚠️ Friends tab tidak ditemukan");
+        break;
+      }
+
+      await page.waitForTimeout(2000);
+
+      // 2️⃣ Klik tombol Friend settings (titik tiga)
+      const step2 = await page.evaluate(() => {
+        const menu = [...document.querySelectorAll('[role="button"]')]
+          .find(el => {
+            const label = (el.getAttribute("aria-label") || "").toLowerCase();
+            return label.includes("friend settings") || 
+                   label.includes("pengaturan teman");
+          });
+
+        if (!menu) return false;
+        menu.click();
+        return true;
+      });
+
+      if (!step2) {
+        console.log("⚠️ Friend settings tidak muncul");
+        break;
+      }
+
+      await page.waitForTimeout(2000);
+
+      // 3️⃣ Klik Unfriend
+      const step3 = await page.evaluate(() => {
+        const btn = [...document.querySelectorAll("span")]
+          .find(el => {
+            const t = (el.innerText || "").toLowerCase();
+            return t.includes("unfriend") ||
+                   t.includes("hapus pertemanan") ||
+                   t.includes("batalkan pertemanan");
+          });
+
+        if (!btn) return false;
+        btn.click();
+        return true;
+      });
+
+      if (!step3) {
+        console.log("❌ Tombol Unfriend tidak ditemukan");
+        break;
+      }
+
+      await page.waitForTimeout(2000);
+
+      // 4️⃣ Klik konfirmasi Unfriend (popup)
+      await page.evaluate(() => {
+        const confirmBtn = [...document.querySelectorAll('[role="button"] span')]
+          .find(el => {
+            const t = (el.innerText || "").toLowerCase();
+            return t === "unfriend" ||
+                   t === "hapus pertemanan";
+          });
+
+        if (confirmBtn) confirmBtn.click();
+      });
+
+      done++;
+      console.log(`❌ Unfriend ke-${done}`);
+
+      const delay = randomDelay(delayMin, delayMax);
+      console.log(`⏱️ Delay ${delay} ms`);
+      await page.waitForTimeout(delay);
+
+      await page.evaluate(() =>
+        window.scrollBy(0, window.innerHeight * 0.7)
+      );
+
+      await page.waitForTimeout(2000);
+    }
+
+    console.log(`🎯 Total Unfriend selesai: ${done}`);
+    return done;
+
+  } catch (err) {
+    console.error("❌ Error unfriend:", err.message);
+    return 0;
+  }
+
 //FUNGSI addFriendFollowing
 async function runAddFriendFollowings(page, row) {
   console.log("🧪 ROW RAW:", row);
@@ -2507,12 +2720,12 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
  // await runAddFriendFriends(page, row);
 //}
       
-//for (const row of rowsUndfriendsForAccount){
-//  await runUndfriends(page, row);
+for (const row of rowsUndfriendsForAccount){
+     await runUndfriends(page, row);
+ }
+     // for (const row of rowsConfirmForAccount){
+  //await runConfirm(page, row);
 //}
-      for (const row of rowsConfirmForAccount){
-  await runConfirm(page, row);
-}
       
       
       
