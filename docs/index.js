@@ -1817,7 +1817,8 @@ function delay(ms) {
     const addFriendFollowersRows = templates.addFriendFollowers || [];
     const addFriendFollowingRows = templates.addFriendFollowings || [];
     const addFriendListRows = templates.addFriendFriendList || [];
-    const undFriendRows = templates.undFriendFollowers || [];
+    const undFriendRows = templates.undFriend || [];
+    const confirmRows = templates.confirm || [];
     const browser = await puppeteer.launch({
       headless: "new",
       defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
@@ -1891,7 +1892,7 @@ function delay(ms) {
       console.log("📅 TODAY (WIB):", today);
 console.log("📋 Semua status rows:", statusRows);
      
-
+     //filter status 
       const rowsStatusForAccount = statusRows.filter(row => {
   if (row.account !== acc.account) return false;
 
@@ -1899,16 +1900,43 @@ console.log("📋 Semua status rows:", statusRows);
   return rowDate === today;
 });
       
-
-
-      //coba baru filter grup 
+   //coba baru filter grup 
      const rowsForAccount = groupRows.filter(row => {
     if (row.account !== acc.account) return false;
     const rowDate = parseTanggalXLSX(row.tanggal);
   return rowDate === today;
  });
 
+      //filter addFriendFollowers 
     const rowsAddFriendFollowersForAccount = addFriendFollowersRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+});
+      //filter addFriendFollowing
+      const rowsAddFriendFollowingForAccount = addFriendFollowingRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+});
+      //filter friends
+      const rowFriendsForAccount = addFriendListRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+});
+     //filter unfriend 
+      const rowsUndfriendForAccount = undFriendRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+});
+      //filter confirm 
+      const rowsConfirmForAccount = confirmRows.filter(row => {
   if (row.account !== acc.account) return false;
 
   const rowDate = parseTanggalXLSX(row.tanggal);
@@ -1952,14 +1980,22 @@ console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
 console.log(`📋 addFriendFollowers row ${acc.account}:`, rowsAddFriendFollowersForAccount.length);
+console.log(`📋 addFriendFollowing row ${acc.account}:`, rowsAddFriendFollowingForAccount.length); 
+console.log(`📋 addFriendFriends row ${acc.account}:`, rowFriendsForAccount.length);
+console.log(`📋 unfriend row ${acc.account}:`, rowsUnfriendForAccount.length);
+ console.log(`📋 confirm row ${acc.account}:`, rowsConfirmForAccount.length);
+
+      
+
+      
 
       
 
 
 
 // kalau dua-duanya kosong → skip akun
-if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0) {
-  console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers hari ini");
+if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0 && rowsAddFriendFollowingForAccount.length === 0 && .length === 0 && rowFriendsForAccount.length === 0 && rowsUnfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 ) {
+  console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers & addFriendFollowing &  addFriendFriends & unfriend & confirm hari ini");
   continue;
 }
       
@@ -1990,9 +2026,25 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
    // await runStatus(page, row);
 //  }
 
-for (const row of rowsAddFriendFollowersForAccount){
-  await runAddFriendFollowers(page, row);
+//for (const row of rowsAddFriendFollowersForAccount){
+ // await runAddFriendFollowers(page, row);
+//}
+      for (const row of rowsAddFriendFollowingForAccount){
+  await runAddFriendFollowings(page, row);
 }
+      for (const row of rowsAddFriendFriendsForAccount){
+  await runAddFriendFriends(page, row);
+}
+      
+for (const row of rowsUndfriendsForAccount){
+  await runUndfriends(page, row);
+}
+      for (const row of rowsConfirmForAccount){
+  await runConfirm(page, row);
+        
+}
+      
+      
       
       // ===== Stop recorder
       await recorder.stop();
