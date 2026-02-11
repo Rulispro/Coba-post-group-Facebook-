@@ -1157,7 +1157,7 @@ async function runConfirm(page, row) {
   console.log(" buka Facebook ");
   await delay(3000);
   await page.goto("https://m.facebook.com/friends/");
-  console.log("link frends request dibuka);
+  console.log("link frends request dibuka");
   await confirmFriendRequests(page, total, delayMin, delayMax);
 }
 // ==== Fungsi Confirm (ganti Add Friend) ====
