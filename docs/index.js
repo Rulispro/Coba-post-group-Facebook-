@@ -2445,7 +2445,7 @@ console.log("📋 Semua status rows:", statusRows);
   return rowDate === today;
 });
       //filter friends
-      const rowFriendsForAccount = addFriendListRows.filter(row => {
+      const rowsAddFriendFriendsForAccount = addFriendListRows.filter(row => {
   if (row.account !== acc.account) return false;
 
   const rowDate = parseTanggalXLSX(row.tanggal);
@@ -2507,14 +2507,6 @@ console.log(`📋 addFriendFollowings row ${acc.account}:`, rowsAddFriendFollowi
 console.log(`📋 addFriendFriends row ${acc.account}:`, rowFriendsForAccount.length);
 console.log(`📋 undfriend row ${acc.account}:`, rowsUndfriendForAccount.length);
  console.log(`📋 confirm row ${acc.account}:`, rowsConfirmForAccount.length);
-
-      
-
-      
-
-      
-
-
 
 // kalau dua-duanya kosong → skip akun
 if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0 && rowsAddFriendFollowingForAccount.length === 0 && rowFriendsForAccount.length === 0 && rowsUndfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 ) {
