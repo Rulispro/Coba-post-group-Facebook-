@@ -1043,9 +1043,7 @@ if(okFriends){
 
 await page.waitForTimeout(2000);
 // setelah buka friends→ baru add friend
-await addFriendFromList(page,total,delayMin, delayMax);
-
-  // FUNGSI ADDFRIEND by target username followers
+ // FUNGSI ADDFRIEND by target username followers
 async function addFriendFromList(page, total,delayMin, delayMax) {
   try {
     const LIMIT = Number(total) || 0;
@@ -1126,7 +1124,7 @@ async function addFriendFromList(page, total,delayMin, delayMax) {
     return 0;
   }
 }
-
+}
 }
 
 //FUNGSI addFriendFollowers 
