@@ -2511,6 +2511,8 @@ function delay(ms) {
     const addFriendListRows = templates.addFriendFriendlist || [];
     const undFriendRows = templates.undFriend || [];
     const confirmRows = templates.confirm || [];
+    const likeLinkPostRows = templates.likelinkpost || [];
+    const likeGroupRows= templates.likeGroup || [];
     const browser = await puppeteer.launch({
       headless: "new",
       defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
@@ -2633,6 +2635,20 @@ console.log("📋 Semua status rows:", statusRows);
 
   const rowDate = parseTanggalXLSX(row.tanggal);
   return rowDate === today;
+});   
+      //filter likeGroup 
+      const rowsLikeGroupForAccount = likeGroupRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+});
+     //filter likelinkpost 
+      const rowsLikeLinkPostForAccount = likeLinkPostRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
 });
  // ================== FILTER GROUP BERDASARKAN TANGGAL ==================
 //group/const rowsForAccount = groupRows.filter(row => {
@@ -2675,12 +2691,15 @@ console.log(`📋 addFriendFollowers row ${acc.account}:`, rowsAddFriendFollower
 console.log(`📋 addFriendFollowings row ${acc.account}:`, rowsAddFriendFollowingForAccount.length); 
 console.log(`📋 addFriendListRows row ${acc.account}:`, rowsAddFriendFriendsForAccount.length);
 console.log(`📋 undfriend row ${acc.account}:`, rowsUndfriendForAccount.length);
- console.log(`📋 confirm row ${acc.account}:`, rowsConfirmForAccount.length);
+console.log(`📋 confirm row ${acc.account}:`, rowsConfirmForAccount.length);
+console.log(`📋 likelinkpost row ${acc.account}:`, rowsLikeLinkPostForAccount.length);
+console.log(`📋 likeGroup row ${acc.account}:`, rowsLikeGroupForAccount.length);
+
 
 // kalau dua-duanya kosong → skip akun
 if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0 && rowsAddFriendFollowingForAccount.length === 0 && rowsAddFriendFriendsForAccount.length === 0
-  && rowsUndfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 ) {
-  console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers & addFriendFollowing &  addFriendFriends & unfriend & confirm hari ini");
+  && rowsUndfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 && rowsLikeGroupForAccount.length === 0 && rowsLikeLinkPostForAccount.length === 0) {
+  console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers & addFriendFollowing &  addFriendFriends & unfriend & confirm & likelinkpost & likeGroup hari ini");
   continue;
 }
       
@@ -2721,13 +2740,20 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
  // await runAddFriendFriends(page, row);
 //}
       
-for (const row of rowsUndfriendForAccount){
-     await runUndfriends(page, row);
- }
+//for (const row of rowsUndfriendForAccount){
+    // await runUndfriends(page, row);
+// }
      // for (const row of rowsConfirmForAccount){
   //await runConfirm(page, row);
 //}
       
+//for (const row of rowsLikeLinkPostForAccount){
+   //  await runLikeLinkPosts(page, row);
+// }
+      
+for (const row of rowsLikeGroupForAccount){
+     await runLikeLinkGroups(page, row);
+ }
       
       
       // ===== Stop recorder
