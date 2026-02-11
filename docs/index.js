@@ -721,7 +721,526 @@ function parseTanggalXLSX(tgl) {
   const year = Number(y) < 100 ? 2000 + Number(y) : Number(y);
 
   return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-                    }
+  }
+
+//FUNGSI addFriendFollowing
+async function runAddFriendFollowings(page, row) {
+  console.log("🧪 ROW RAW:", row);
+  console.log("🧪 Object keys:", Object.keys(row));
+ console.log("🧪 LINK DIRECT:", row.link_targetUsername);
+  
+  for (const k in row) {
+  console.log("FIELD:", `[${k}]`);
+  }
+  
+  console.log(`\n📝 Mulai addFriendFollowing → ${row.account}`);
+  const account = row.account;
+  console.log(`\n📝 Mulai addFriendFollowing → ${account}`);
+  const total = String(row.total || "").trim();
+  const delayMin = Number(row.delay_min || 4000);
+  const delayMax = Number(row.delay_max || 8000);
+  console.log("Delay XLSX:", delayMin, delayMax);
+  console.log("TOTAL:", row.total);
+  const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
+  console.log("LINK:", row.link_targetUsername);
+  
+  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
+console.log("🧪 LINK LOWER:", row.link_targetUsername);
+
+  
+  
+  if (!total || !linkTargetUsernameUrl) {
+  console.log("⚠️ linkTargetUsername kosong, skip");
+  return;
+  }
+
+
+  // 1️⃣ BUKA HOME FB (WAJIB)
+  await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
+  
+  await delay(3000);
+// bikin array target (kalau cuma 1 link tetap aman)
+const targets = [linkTargetUsernameUrl];
+
+for (const profile of targets) {
+
+  // 1️⃣ buka profil target
+  await page.goto(profile, { waitUntil: "networkidle2" });
+  console.log("👤 Profil dibuka:", profile);
+
+  await page.waitForTimeout(3000);
+
+  // 2️⃣ tap span followers / pengikut
+  const ok = await page.evaluate(() => {
+    const spans = [...document.querySelectorAll("span")];
+
+    const target = spans.find(s => {
+      const t = (s.innerText || "").toLowerCase();
+      return t.includes("followers") || t.includes("pengikut");
+    });
+
+    if (!target) return false;
+
+    target.scrollIntoView({ block: "center", behavior: "smooth" });
+
+    const events = [
+      new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
+      new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+      new PointerEvent("pointerdown", { bubbles: true }),
+      new PointerEvent("pointerup", { bubbles: true }),
+      new MouseEvent("mousedown", { bubbles: true }),
+      new MouseEvent("mouseup", { bubbles: true }),
+      new MouseEvent("click", { bubbles: true })
+    ];
+
+    events.forEach(e => target.dispatchEvent(e));
+
+    return true;
+  });
+
+  if (!ok) {
+    console.log("❌ span followers / pengikut tidak ditemukan");
+    continue;
+  }
+
+  console.log("📂 Halaman following dibuka (via tap span)");
+
+  // tunggu halaman followers load
+  await page.waitForTimeout(3000);
+}
+
+// setelah buka following → baru add friend
+await addFriendByUsernameFollowing(page,total,delayMin, delayMax);
+
+  // FUNGSI ADDFRIEND by target username following
+async function addFriendByUsernameFollowing(page, total,delayMin, delayMax) {
+  try {
+    const LIMIT = Number(total) || 0;
+
+    if (LIMIT <= 0) {
+      console.log("⚠️ LIMIT tidak valid:", total);
+      return 0;
+    }
+
+    console.log(`🚀 Mulai add friend (followers list), target: ${LIMIT}`);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(2000);
+
+    let clicked = 0;
+
+    while (clicked < LIMIT) {
+      const found = await page.evaluate(() => {
+        function humanClick(el) {
+          el.scrollIntoView({ block: "center", behavior: "instant" });
+          ["pointerdown","touchstart","mousedown","mouseup","touchend","click"]
+            .forEach(type =>
+              el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }))
+            );
+        }
+
+        const buttons = [...document.querySelectorAll('div[role="button"]')]
+          .filter(btn => {
+            const text = (btn.innerText || "").toLowerCase();
+            const aria = (btn.getAttribute("aria-label") || "").toLowerCase();
+
+            return (
+              text.includes("add friend") ||
+              text.includes("tambah teman") ||
+              text.includes("tambahkan teman") ||
+              aria.startsWith("send a friend request") ||
+              aria.startsWith("kirim permintaan pertemanan")
+            );
+          });
+
+        // skip tombol Add Friend di profil
+        const listButtons = buttons.slice(1);
+
+        for (const btn of listButtons) {
+          if (btn.dataset.clicked) continue;
+
+          btn.dataset.clicked = "true";
+          humanClick(btn);
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!found) {
+        console.log("⚠️ Tidak ada Add Friend lagi di followers");
+        break;
+      }
+
+      clicked++;
+      console.log(`✅ Klik Add Friend ke-${clicked}`);
+
+    const delay = randomDelay(delayMin, delayMax);
+    console.log(`⏱️ Delay ${delay} ms sebelum klik berikutnya`);
+    await page.waitForTimeout(delay);
+      
+      await page.evaluate(() =>
+        window.scrollBy(0, window.innerHeight * 0.8)
+      );
+      await page.waitForTimeout(3000);
+    }
+
+    console.log(`🎯 Selesai. Total Add Friend: ${clicked}`);
+    return clicked;
+
+  } catch (err) {
+    console.error("❌ Error addFriendByUsernameFollowers:", err.message);
+    return 0;
+  }
+}
+
+}
+//FUNGSI addFriendFollowers 
+async function runAddFriendFollowers(page, row) {
+  console.log("🧪 ROW RAW:", row);
+  console.log("🧪 Object keys:", Object.keys(row));
+ console.log("🧪 LINK DIRECT:", row.link_targetUsername);
+  
+  for (const k in row) {
+  console.log("FIELD:", `[${k}]`);
+  }
+  
+  console.log(`\n📝 Mulai addFriendFollowers → ${row.account}`);
+  const account = row.account;
+  console.log(`\n📝 Mulai addFriendFollowers → ${account}`);
+  const total = String(row.total || "").trim();
+  const delayMin = Number(row.delay_min || 4000);
+  const delayMax = Number(row.delay_max || 8000);
+  console.log("Delay XLSX:", delayMin, delayMax);
+  console.log("TOTAL:", row.total);
+  const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
+  console.log("LINK:", row.link_targetUsername);
+  
+  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
+console.log("🧪 LINK LOWER:", row.link_targetUsername);
+
+  
+  
+  if (!total || !linkTargetUsernameUrl) {
+  console.log("⚠️ linkTargetUsername kosong, skip");
+  return;
+  }
+
+
+  // 1️⃣ BUKA HOME FB (WAJIB)
+  await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
+  
+  await delay(3000);
+// bikin array target (kalau cuma 1 link tetap aman)
+const targets = [linkTargetUsernameUrl];
+
+for (const profile of targets) {
+
+  // 1️⃣ buka profil target
+  await page.goto(profile, { waitUntil: "networkidle2" });
+  console.log("👤 Profil dibuka:", profile);
+
+  await page.waitForTimeout(3000);
+
+  // 2️⃣ tap span followers / pengikut
+  const ok = await page.evaluate(() => {
+    const spans = [...document.querySelectorAll("span")];
+
+    const target = spans.find(s => {
+      const t = (s.innerText || "").toLowerCase();
+      return t.includes("followers") || t.includes("pengikut");
+    });
+
+    if (!target) return false;
+
+    target.scrollIntoView({ block: "center", behavior: "smooth" });
+
+    const events = [
+      new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
+      new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+      new PointerEvent("pointerdown", { bubbles: true }),
+      new PointerEvent("pointerup", { bubbles: true }),
+      new MouseEvent("mousedown", { bubbles: true }),
+      new MouseEvent("mouseup", { bubbles: true }),
+      new MouseEvent("click", { bubbles: true })
+    ];
+
+    events.forEach(e => target.dispatchEvent(e));
+
+    return true;
+  });
+
+  if (!ok) {
+    console.log("❌ span followers / pengikut tidak ditemukan");
+    continue;
+  }
+
+  console.log("📂 Halaman followers dibuka (via tap span)");
+
+  // tunggu halaman followers load
+  await page.waitForTimeout(3000);
+}
+
+// setelah buka followers → baru add friend
+await addFriendByUsernameFollowers(page,total,delayMin, delayMax);
+
+  // FUNGSI ADDFRIEND by target username followers
+async function addFriendByUsernameFollowers(page, total,delayMin, delayMax) {
+  try {
+    const LIMIT = Number(total) || 0;
+
+    if (LIMIT <= 0) {
+      console.log("⚠️ LIMIT tidak valid:", total);
+      return 0;
+    }
+
+    console.log(`🚀 Mulai add friend (followers list), target: ${LIMIT}`);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(2000);
+
+    let clicked = 0;
+
+    while (clicked < LIMIT) {
+      const found = await page.evaluate(() => {
+        function humanClick(el) {
+          el.scrollIntoView({ block: "center", behavior: "instant" });
+          ["pointerdown","touchstart","mousedown","mouseup","touchend","click"]
+            .forEach(type =>
+              el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }))
+            );
+        }
+
+        const buttons = [...document.querySelectorAll('div[role="button"]')]
+          .filter(btn => {
+            const text = (btn.innerText || "").toLowerCase();
+            const aria = (btn.getAttribute("aria-label") || "").toLowerCase();
+
+            return (
+              text.includes("add friend") ||
+              text.includes("tambah teman") ||
+              text.includes("tambahkan teman") ||
+              aria.startsWith("send a friend request") ||
+              aria.startsWith("kirim permintaan pertemanan")
+            );
+          });
+
+        // skip tombol Add Friend di profil
+        const listButtons = buttons.slice(1);
+
+        for (const btn of listButtons) {
+          if (btn.dataset.clicked) continue;
+
+          btn.dataset.clicked = "true";
+          humanClick(btn);
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!found) {
+        console.log("⚠️ Tidak ada Add Friend lagi di followers");
+        break;
+      }
+
+      clicked++;
+      console.log(`✅ Klik Add Friend ke-${clicked}`);
+
+    const delay = randomDelay(delayMin, delayMax);
+    console.log(`⏱️ Delay ${delay} ms sebelum klik berikutnya`);
+    await page.waitForTimeout(delay);
+      
+      await page.evaluate(() =>
+        window.scrollBy(0, window.innerHeight * 0.8)
+      );
+      await page.waitForTimeout(3000);
+    }
+
+    console.log(`🎯 Selesai. Total Add Friend: ${clicked}`);
+    return clicked;
+
+  } catch (err) {
+    console.error("❌ Error addFriendByUsernameFollowers:", err.message);
+    return 0;
+  }
+}
+
+}
+
+//FUNGSI addFriendFollowers 
+async function runAddFriendFollowers(page, row) {
+  console.log("🧪 ROW RAW:", row);
+  console.log("🧪 Object keys:", Object.keys(row));
+ console.log("🧪 LINK DIRECT:", row.link_targetUsername);
+  
+  for (const k in row) {
+  console.log("FIELD:", `[${k}]`);
+  }
+  
+  console.log(`\n📝 Mulai addFriendFollowers → ${row.account}`);
+  const account = row.account;
+  console.log(`\n📝 Mulai addFriendFollowers → ${account}`);
+  const total = String(row.total || "").trim();
+  const delayMin = Number(row.delay_min || 4000);
+  const delayMax = Number(row.delay_max || 8000);
+  console.log("Delay XLSX:", delayMin, delayMax);
+  console.log("TOTAL:", row.total);
+  const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
+  console.log("LINK:", row.link_targetUsername);
+  
+  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
+console.log("🧪 LINK LOWER:", row.link_targetUsername);
+
+  
+  
+  if (!total || !linkTargetUsernameUrl) {
+  console.log("⚠️ linkTargetUsername kosong, skip");
+  return;
+  }
+
+
+  // 1️⃣ BUKA HOME FB (WAJIB)
+  await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
+  
+  await delay(3000);
+// bikin array target (kalau cuma 1 link tetap aman)
+const targets = [linkTargetUsernameUrl];
+
+for (const profile of targets) {
+
+  // 1️⃣ buka profil target
+  await page.goto(profile, { waitUntil: "networkidle2" });
+  console.log("👤 Profil dibuka:", profile);
+
+  await page.waitForTimeout(3000);
+
+  // 2️⃣ tap span followers / pengikut
+  const ok = await page.evaluate(() => {
+    const spans = [...document.querySelectorAll("span")];
+
+    const target = spans.find(s => {
+      const t = (s.innerText || "").toLowerCase();
+      return t.includes("followers") || t.includes("pengikut");
+    });
+
+    if (!target) return false;
+
+    target.scrollIntoView({ block: "center", behavior: "smooth" });
+
+    const events = [
+      new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
+      new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+      new PointerEvent("pointerdown", { bubbles: true }),
+      new PointerEvent("pointerup", { bubbles: true }),
+      new MouseEvent("mousedown", { bubbles: true }),
+      new MouseEvent("mouseup", { bubbles: true }),
+      new MouseEvent("click", { bubbles: true })
+    ];
+
+    events.forEach(e => target.dispatchEvent(e));
+
+    return true;
+  });
+
+  if (!ok) {
+    console.log("❌ span followers / pengikut tidak ditemukan");
+    continue;
+  }
+
+  console.log("📂 Halaman followers dibuka (via tap span)");
+
+  // tunggu halaman followers load
+  await page.waitForTimeout(3000);
+}
+
+// setelah buka followers → baru add friend
+await addFriendByUsernameFollowers(page,total,delayMin, delayMax);
+
+  // FUNGSI ADDFRIEND by target username followers
+async function addFriendByUsernameFollowers(page, total,delayMin, delayMax) {
+  try {
+    const LIMIT = Number(total) || 0;
+
+    if (LIMIT <= 0) {
+      console.log("⚠️ LIMIT tidak valid:", total);
+      return 0;
+    }
+
+    console.log(`🚀 Mulai add friend (followers list), target: ${LIMIT}`);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(2000);
+
+    let clicked = 0;
+
+    while (clicked < LIMIT) {
+      const found = await page.evaluate(() => {
+        function humanClick(el) {
+          el.scrollIntoView({ block: "center", behavior: "instant" });
+          ["pointerdown","touchstart","mousedown","mouseup","touchend","click"]
+            .forEach(type =>
+              el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }))
+            );
+        }
+
+        const buttons = [...document.querySelectorAll('div[role="button"]')]
+          .filter(btn => {
+            const text = (btn.innerText || "").toLowerCase();
+            const aria = (btn.getAttribute("aria-label") || "").toLowerCase();
+
+            return (
+              text.includes("add friend") ||
+              text.includes("tambah teman") ||
+              text.includes("tambahkan teman") ||
+              aria.startsWith("send a friend request") ||
+              aria.startsWith("kirim permintaan pertemanan")
+            );
+          });
+
+        // skip tombol Add Friend di profil
+        const listButtons = buttons.slice(1);
+
+        for (const btn of listButtons) {
+          if (btn.dataset.clicked) continue;
+
+          btn.dataset.clicked = "true";
+          humanClick(btn);
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!found) {
+        console.log("⚠️ Tidak ada Add Friend lagi di followers");
+        break;
+      }
+
+      clicked++;
+      console.log(`✅ Klik Add Friend ke-${clicked}`);
+
+    const delay = randomDelay(delayMin, delayMax);
+    console.log(`⏱️ Delay ${delay} ms sebelum klik berikutnya`);
+    await page.waitForTimeout(delay);
+      
+      await page.evaluate(() =>
+        window.scrollBy(0, window.innerHeight * 0.8)
+      );
+      await page.waitForTimeout(3000);
+    }
+
+    console.log(`🎯 Selesai. Total Add Friend: ${clicked}`);
+    return clicked;
+
+  } catch (err) {
+    console.error("❌ Error addFriendByUsernameFollowers:", err.message);
+    return 0;
+  }
+}
+
+}
+
 //FUNGSI addFriendFollowers 
 async function runAddFriendFollowers(page, row) {
   console.log("🧪 ROW RAW:", row);
@@ -2032,17 +2551,17 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
       for (const row of rowsAddFriendFollowingForAccount){
   await runAddFriendFollowings(page, row);
 }
-      for (const row of rowsAddFriendFriendsForAccount){
-  await runAddFriendFriends(page, row);
-}
+    //  for (const row of rowsAddFriendFriendsForAccount){
+ // await runAddFriendFriends(page, row);
+//}
       
-for (const row of rowsUndfriendsForAccount){
-  await runUndfriends(page, row);
-}
-      for (const row of rowsConfirmForAccount){
-  await runConfirm(page, row);
+//for (const row of rowsUndfriendsForAccount){
+//  await runUndfriends(page, row);
+//}
+    //  for (const row of rowsConfirmForAccount){
+ // await runConfirm(page, row);
         
-}
+//}
       
       
       
