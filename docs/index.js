@@ -723,7 +723,7 @@ function parseTanggalXLSX(tgl) {
   return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   }
 
-//FUNGSI undFriend 
+//FUNGSI UNDFRIEND 
 async function runUndfriends(page, row) {
   console.log("🧪 ROW RAW:", row);
   console.log("🧪 Object keys:", Object.keys(row));
@@ -915,7 +915,7 @@ async function unfriend(page, total, delayMin, delayMax) {
       });
 
       done++;
-      console.log(`❌ Unfriend ke-${done}`);
+      console.log(`🤗 Unfriend ke-${done}`);
 
       const delay = randomDelay(delayMin, delayMax);
       console.log(`⏱️ Delay ${delay} ms`);
