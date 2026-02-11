@@ -2504,12 +2504,13 @@ console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
 console.log(`📋 addFriendFollowers row ${acc.account}:`, rowsAddFriendFollowersForAccount.length);
 console.log(`📋 addFriendFollowings row ${acc.account}:`, rowsAddFriendFollowingForAccount.length); 
-console.log(`📋 addFriendFriends row ${acc.account}:`, rowFriendsForAccount.length);
+console.log(`📋 addFriendFriends row ${acc.account}:`, rowsAddFriendFriendsForAccount.length);
 console.log(`📋 undfriend row ${acc.account}:`, rowsUndfriendForAccount.length);
  console.log(`📋 confirm row ${acc.account}:`, rowsConfirmForAccount.length);
 
 // kalau dua-duanya kosong → skip akun
-if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0 && rowsAddFriendFollowingForAccount.length === 0 && rowFriendsForAccount.length === 0 && rowsUndfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 ) {
+if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0 && rowsAddFriendFollowingForAccount.length === 0 && rowsAddFriendFriendsForAccount.length === 0
+      .length === 0 && rowsUndfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 ) {
   console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers & addFriendFollowing &  addFriendFriends & unfriend & confirm hari ini");
   continue;
 }
