@@ -984,11 +984,15 @@ if (!ok) {
 
 console.log("📂 Halaman following dibuka (via tap span)");
 
-// tunggu halaman followers load
-  await page.waitForTimeout(2000);
+await page.waitForTimeout(2000);
+  // buka friends list
+const okFriends = await openFriendsList(page);
+if(okFriends){
+  // mulai add friend
+  await addFriendFromList(page, total, delayMin, delayMax);
 }
   //buka friendslist 
-  async function addFriendFriendlist(page) {
+  async function openFriendsList(page) {
   try {
     const ok = await page.evaluate(() => {
       const spans = [...document.querySelectorAll("span")];
@@ -1039,10 +1043,10 @@ console.log("📂 Halaman following dibuka (via tap span)");
 
 await page.waitForTimeout(2000);
 // setelah buka friends→ baru add friend
-await addFriendFriendlist(page,total,delayMin, delayMax);
+await addFriendFromList(page,total,delayMin, delayMax);
 
   // FUNGSI ADDFRIEND by target username followers
-async function addFriendFriendlist(page, total,delayMin, delayMax) {
+async function addFriendFromList(page, total,delayMin, delayMax) {
   try {
     const LIMIT = Number(total) || 0;
 
