@@ -706,6 +706,11 @@ if (!ok) {
   console.log("✅ Caption TERISI (React acknowledged)");
 }
 
+//FUNGSI DELAY DARI XLSX 
+function randomDelay(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 //PARSE TANGGAL///
 function parseTanggalXLSX(tgl) {
   if (!tgl) return null;
@@ -722,8 +727,7 @@ async function runAddFriendFollowers(page, row) {
   console.log("🧪 ROW RAW:", row);
   console.log("🧪 Object keys:", Object.keys(row));
  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
-console.log("🧪 LINK LOWER:", row.link_targetusername);
-console.log("🧪 LINK CAMEL:", row.linkTargetUsername);
+  console.log("Delay XLSX:", delayMin, delayMax);
   
   for (const k in row) {
   console.log("FIELD:", `[${k}]`);
@@ -733,9 +737,11 @@ console.log("🧪 LINK CAMEL:", row.linkTargetUsername);
   const account = row.account;
   console.log(`\n📝 Mulai addFriendFollowers → ${account}`);
   const total = String(row.total || "").trim();
+  const delayMin = Number(row.delay_min || 4000);
+  const delayMax = Number(row.delay_max || 8000);
   console.log("TOTAL:", row.total);
-   const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
- console.log("LINK:", row.link_targetUsername);
+  const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
+  console.log("LINK:", row.link_targetUsername);
   
   console.log("🧪 LINK DIRECT:", row.link_targetUsername);
 console.log("🧪 LINK LOWER:", row.link_targetusername);
@@ -803,10 +809,10 @@ for (const profile of targets) {
 }
 
 // setelah buka followers → baru add friend
-await addFriendByUsernameFollowers(page,total);
+await addFriendByUsernameFollowers(page,total,delayMin, delayMax);
 
   // FUNGSI ADDFRIEND by target username followers
-async function addFriendByUsernameFollowers(page, total) {
+async function addFriendByUsernameFollowers(page, total,delayMin, delayMax) {
   try {
     const LIMIT = Number(total) || 0;
 
