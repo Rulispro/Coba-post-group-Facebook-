@@ -2334,7 +2334,7 @@ function delay(ms) {
     const groupRows = templates.postGroup || [];
     const statusRows = templates.postStatus || [];
     const addFriendFollowersRows = templates.addFriendFollowers || [];
-    const addFriendFollowingRows = templates.addFriendFollowings || [];
+    const addFriendFollowingRows = templates.addFriendFollowing || [];
     const addFriendListRows = templates.addFriendFriendList || [];
     const undFriendRows = templates.undFriend || [];
     const confirmRows = templates.confirm || [];
@@ -2499,7 +2499,7 @@ console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
 console.log(`📋 addFriendFollowers row ${acc.account}:`, rowsAddFriendFollowersForAccount.length);
-console.log(`📋 addFriendFollowing row ${acc.account}:`, rowsAddFriendFollowingForAccount.length); 
+console.log(`📋 addFriendFollowings row ${acc.account}:`, rowsAddFriendFollowingForAccount.length); 
 console.log(`📋 addFriendFriends row ${acc.account}:`, rowFriendsForAccount.length);
 console.log(`📋 undfriend row ${acc.account}:`, rowsUndfriendForAccount.length);
  console.log(`📋 confirm row ${acc.account}:`, rowsConfirmForAccount.length);
