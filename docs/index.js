@@ -944,18 +944,18 @@ for (const profile of targets) {
 
   await page.waitForTimeout(3000);
 
-  // 2️⃣ tap span FRIENDS (INLINE, span only)
+  // 2️⃣ tap span FOLLOWING (INLINE, span only)
 const ok = await page.evaluate(() => {
   const spans = [...document.querySelectorAll("span")];
 
   const target = spans.find(s => {
     const t = (s.innerText || "").trim().toLowerCase();
 
-    // ⛔ skip kosong & angka
+    // ⛔ skip span angka
     if (!t || /^\d+$/.test(t)) return false;
 
-    // ✅ khusus FRIENDS
-    return t === "friends" || t === "teman";
+    // ✅ hanya teks following
+    return t === "following" || t === "mengikuti";
   });
 
   if (!target) return false;
@@ -978,13 +978,66 @@ const ok = await page.evaluate(() => {
 });
 
 if (!ok) {
-  console.log("❌ span Friends / Teman tidak ditemukan");
+  console.log("❌ span following / mengikuti tidak ditemukan");
   continue;
 }
 
-console.log("📂 Halaman Friends dibuka (via tap span)");
+console.log("📂 Halaman following dibuka (via tap span)");
+
+// tunggu halaman followers load
   await page.waitForTimeout(2000);
 }
+  //buka friendslist 
+  async function addFriendFriendlist(page) {
+  try {
+    const ok = await page.evaluate(() => {
+      const spans = [...document.querySelectorAll("span")];
+
+      const target = spans.find(s => {
+        const t = (s.innerText || "").trim().toLowerCase();
+
+        // ⛔ skip kosong & angka
+        if (!t || /^\d+$/.test(t)) return false;
+
+        // ✅ khusus FRIENDS
+        return t === "friends" || t === "teman";
+      });
+
+      if (!target) return false;
+
+      target.scrollIntoView({ block: "center", behavior: "smooth" });
+
+      const events = [
+        new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
+        new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+        new PointerEvent("pointerdown", { bubbles: true }),
+        new PointerEvent("pointerup", { bubbles: true }),
+        new MouseEvent("mousedown", { bubbles: true }),
+        new MouseEvent("mouseup", { bubbles: true }),
+        new MouseEvent("click", { bubbles: true })
+      ];
+
+      events.forEach(e => target.dispatchEvent(e));
+
+      return true;
+    });
+
+    if (!ok) {
+      console.log("❌ span Friends / Teman tidak ditemukan");
+      return false;
+    }
+
+    console.log("📂 Halaman Friends dibuka (via tap span)");
+    await page.waitForTimeout(2000);
+    return true;
+
+  } catch (err) {
+    console.log("⚠️ Terjadi error saat membuka halaman Friends:", err);
+    return false;
+  }
+}
+
+await page.waitForTimeout(2000);
 // setelah buka friends→ baru add friend
 await addFriendFriendlist(page,total,delayMin, delayMax);
 
