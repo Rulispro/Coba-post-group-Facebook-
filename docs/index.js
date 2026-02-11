@@ -2513,7 +2513,7 @@ console.log(`📋 undfriend row ${acc.account}:`, rowsUndfriendForAccount.length
 
 
 // kalau dua-duanya kosong → skip akun
-if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0 && rowsAddFriendFollowingForAccount.length === 0 && rowFriendsForAccount.length === 0 && rowsUnfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 ) {
+if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0 && rowsAddFriendFollowingForAccount.length === 0 && rowFriendsForAccount.length === 0 && rowsUndfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 ) {
   console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers & addFriendFollowing &  addFriendFriends & unfriend & confirm hari ini");
   continue;
 }
