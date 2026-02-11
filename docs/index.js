@@ -745,7 +745,7 @@ async function runAddFriendFollowers(page, row) {
   
   console.log("🧪 LINK DIRECT:", row.link_targetUsername);
 console.log("🧪 LINK LOWER:", row.link_targetUsername);
-console.log("🧪 LINK CAMEL:", row.linkTargetUsername);
+
   
   
   if (!total || !linkTargetUsernameUrl) {
@@ -875,6 +875,7 @@ async function addFriendByUsernameFollowers(page, total,delayMin, delayMax) {
       console.log(`✅ Klik Add Friend ke-${clicked}`);
 
     const delay = randomDelay(delayMin, delayMax);
+    console.log(`⏱️ Delay ${delay} ms sebelum klik berikutnya`);
     await page.waitForTimeout(delay);
       
       await page.evaluate(() =>
