@@ -1951,7 +1951,7 @@ console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
       //baru 
 console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
-console.log(`📋 addFriendFollowers row ${acc.account}:`, addFriendFollowersRows.length);
+console.log(`📋 addFriendFollowers row ${acc.account}:`, rowsAddFriendFollowersForAccount.length);
 
       
 
