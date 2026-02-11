@@ -1814,7 +1814,7 @@ function delay(ms) {
     console.log("📑 Sheet terbaca:", Object.keys(templates));
     const groupRows = templates.postGroup || [];
     const statusRows = templates.postStatus || [];
-    const addFriendFollowerRows = templates.addFriendFollowers || [];
+    const addFriendFollowersRows = templates.addFriendFollowers || [];
     const addFriendFollowingRows = templates.addFriendFollowings || [];
     const addFriendListRows = templates.addFriendFriendList || [];
     const undFriendRows = templates.undFriendFollowers || [];
@@ -1908,7 +1908,7 @@ console.log("📋 Semua status rows:", statusRows);
   return rowDate === today;
  });
 
-    const addFriendFollowerRows = addFriendFollowerRows.filter(row => {
+    const addFriendFollowersRows = addFriendFollowersRows.filter(row => {
   if (row.account !== acc.account) return false;
 
   const rowDate = parseTanggalXLSX(row.tanggal);
@@ -1951,7 +1951,7 @@ console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
       //baru 
 console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
-console.log(`📋 addFriendFollowers row ${acc.account}:`, addFriendFollowerRows.length);
+console.log(`📋 addFriendFollowers row ${acc.account}:`, addFriendFollowersRows.length);
 
       
 
@@ -1980,8 +1980,7 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
      }))
      );
 
-    await page.reload({ waitUntil: "networkidle2" });
-
+    
       // ✅ LANGSUNG POSTGROUP PAKAI DATA
    // for (const row of rowsForAccount) {
     // await runAccount(page, row);
@@ -1991,7 +1990,7 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
    // await runStatus(page, row);
 //  }
 
-for (const row of addFriendFollowerRows) {
+for (const row of addFriendFollowersRows) {
   await runAddFriendFollowers(page, row);
 }
       
