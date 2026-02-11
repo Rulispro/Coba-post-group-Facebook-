@@ -898,8 +898,9 @@ async function addFriendByUsernameFollowing(page, total,delayMin, delayMax) {
 }
 
 }
-//FUNGSI addFriendFollowers 
-async function runAddFriendFollowers(page, row) {
+
+//FUNGSI addFriendFriendlist 
+async function runAddFriendFriends(page, row) {
   console.log("🧪 ROW RAW:", row);
   console.log("🧪 Object keys:", Object.keys(row));
  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
@@ -908,9 +909,9 @@ async function runAddFriendFollowers(page, row) {
   console.log("FIELD:", `[${k}]`);
   }
   
-  console.log(`\n📝 Mulai addFriendFollowers → ${row.account}`);
+  console.log(`\n📝 Mulai addFriendFriends→ ${row.account}`);
   const account = row.account;
-  console.log(`\n📝 Mulai addFriendFollowers → ${account}`);
+  console.log(`\n📝 Mulai addFriendFriends → ${account}`);
   const total = String(row.total || "").trim();
   const delayMin = Number(row.delay_min || 4000);
   const delayMax = Number(row.delay_max || 8000);
@@ -936,59 +937,59 @@ console.log("🧪 LINK LOWER:", row.link_targetUsername);
   await delay(3000);
 // bikin array target (kalau cuma 1 link tetap aman)
 const targets = [linkTargetUsernameUrl];
-
 for (const profile of targets) {
-
   // 1️⃣ buka profil target
   await page.goto(profile, { waitUntil: "networkidle2" });
   console.log("👤 Profil dibuka:", profile);
 
   await page.waitForTimeout(3000);
 
-  // 2️⃣ tap span followers / pengikut
-  const ok = await page.evaluate(() => {
-    const spans = [...document.querySelectorAll("span")];
+  // 2️⃣ tap span FRIENDS (INLINE, span only)
+const ok = await page.evaluate(() => {
+  const spans = [...document.querySelectorAll("span")];
 
-    const target = spans.find(s => {
-      const t = (s.innerText || "").toLowerCase();
-      return t.includes("followers") || t.includes("pengikut");
-    });
+  const target = spans.find(s => {
+    const t = (s.innerText || "").trim().toLowerCase();
 
-    if (!target) return false;
+    // ⛔ skip kosong & angka
+    if (!t || /^\d+$/.test(t)) return false;
 
-    target.scrollIntoView({ block: "center", behavior: "smooth" });
-
-    const events = [
-      new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
-      new TouchEvent("touchend", { bubbles: true, cancelable: true }),
-      new PointerEvent("pointerdown", { bubbles: true }),
-      new PointerEvent("pointerup", { bubbles: true }),
-      new MouseEvent("mousedown", { bubbles: true }),
-      new MouseEvent("mouseup", { bubbles: true }),
-      new MouseEvent("click", { bubbles: true })
-    ];
-
-    events.forEach(e => target.dispatchEvent(e));
-
-    return true;
+    // ✅ khusus FRIENDS
+    return t === "friends" || t === "teman";
   });
 
-  if (!ok) {
-    console.log("❌ span followers / pengikut tidak ditemukan");
-    continue;
-  }
+  if (!target) return false;
 
-  console.log("📂 Halaman followers dibuka (via tap span)");
+  target.scrollIntoView({ block: "center", behavior: "smooth" });
 
-  // tunggu halaman followers load
-  await page.waitForTimeout(3000);
+  const events = [
+    new TouchEvent("touchstart", { bubbles: true, cancelable: true }),
+    new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+    new PointerEvent("pointerdown", { bubbles: true }),
+    new PointerEvent("pointerup", { bubbles: true }),
+    new MouseEvent("mousedown", { bubbles: true }),
+    new MouseEvent("mouseup", { bubbles: true }),
+    new MouseEvent("click", { bubbles: true })
+  ];
+
+  events.forEach(e => target.dispatchEvent(e));
+
+  return true;
+});
+
+if (!ok) {
+  console.log("❌ span Friends / Teman tidak ditemukan");
+  continue;
 }
 
-// setelah buka followers → baru add friend
-await addFriendByUsernameFollowers(page,total,delayMin, delayMax);
+console.log("📂 Halaman Friends dibuka (via tap span)");
+  await page.waitForTimeout(2000);
+}
+// setelah buka friends→ baru add friend
+await addFriendFriendlist(page,total,delayMin, delayMax);
 
   // FUNGSI ADDFRIEND by target username followers
-async function addFriendByUsernameFollowers(page, total,delayMin, delayMax) {
+async function addFriendFriendlist(page, total,delayMin, delayMax) {
   try {
     const LIMIT = Number(total) || 0;
 
@@ -2551,12 +2552,12 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
 //for (const row of rowsAddFriendFollowersForAccount){
  // await runAddFriendFollowers(page, row);
 //}
-      for (const row of rowsAddFriendFollowingForAccount){
-  await runAddFriendFollowings(page, row);
-}
-    //  for (const row of rowsAddFriendFriendsForAccount){
- // await runAddFriendFriends(page, row);
+     // for (const row of rowsAddFriendFollowingForAccount){
+  //await runAddFriendFollowings(page, row);
 //}
+     for (const row of rowsAddFriendFriendsForAccount){
+  await runAddFriendFriends(page, row);
+}
       
 //for (const row of rowsUndfriendsForAccount){
 //  await runUndfriends(page, row);
