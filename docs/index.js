@@ -2721,7 +2721,7 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
  // await runAddFriendFriends(page, row);
 //}
       
-for (const row of rowsUndfriendsForAccount){
+for (const row of rowsUndfriendForAccount){
      await runUndfriends(page, row);
  }
      // for (const row of rowsConfirmForAccount){
