@@ -2504,7 +2504,7 @@ console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
 console.log(`📋 addFriendFollowers row ${acc.account}:`, rowsAddFriendFollowersForAccount.length);
 console.log(`📋 addFriendFollowings row ${acc.account}:`, rowsAddFriendFollowingForAccount.length); 
-console.log(`📋 addFriendFriends row ${acc.account}:`, rowsAddFriendFriendsForAccount.length);
+console.log(`📋 addFriendListRows row ${acc.account}:`, rowsAddFriendFriendsForAccount.length);
 console.log(`📋 undfriend row ${acc.account}:`, rowsUndfriendForAccount.length);
  console.log(`📋 confirm row ${acc.account}:`, rowsConfirmForAccount.length);
 
