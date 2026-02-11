@@ -727,7 +727,6 @@ async function runAddFriendFollowers(page, row) {
   console.log("🧪 ROW RAW:", row);
   console.log("🧪 Object keys:", Object.keys(row));
  console.log("🧪 LINK DIRECT:", row.link_targetUsername);
-  console.log("Delay XLSX:", delayMin, delayMax);
   
   for (const k in row) {
   console.log("FIELD:", `[${k}]`);
@@ -739,12 +738,13 @@ async function runAddFriendFollowers(page, row) {
   const total = String(row.total || "").trim();
   const delayMin = Number(row.delay_min || 4000);
   const delayMax = Number(row.delay_max || 8000);
+  console.log("Delay XLSX:", delayMin, delayMax);
   console.log("TOTAL:", row.total);
   const linkTargetUsernameUrl = String(row.link_targetUsername || "").trim();
   console.log("LINK:", row.link_targetUsername);
   
   console.log("🧪 LINK DIRECT:", row.link_targetUsername);
-console.log("🧪 LINK LOWER:", row.link_targetusername);
+console.log("🧪 LINK LOWER:", row.link_targetUsername);
 console.log("🧪 LINK CAMEL:", row.linkTargetUsername);
   
   
@@ -874,7 +874,9 @@ async function addFriendByUsernameFollowers(page, total,delayMin, delayMax) {
       clicked++;
       console.log(`✅ Klik Add Friend ke-${clicked}`);
 
-      await page.waitForTimeout(5000);
+    const delay = randomDelay(delayMin, delayMax);
+    await page.waitForTimeout(delay);
+      
       await page.evaluate(() =>
         window.scrollBy(0, window.innerHeight * 0.8)
       );
