@@ -935,6 +935,7 @@ async function unfriend(page, total, delayMin, delayMax) {
     console.error("❌ Error unfriend:", err.message);
     return 0;
   }
+}
 
 //FUNGSI addFriendFollowing
 async function runAddFriendFollowings(page, row) {
