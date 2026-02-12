@@ -580,8 +580,15 @@ async function typeByKeyboard(page, caption) {
 
 
 //isi caption tambahan cara 
-async function typeCaptionUltimate(page, caption) {
-    console.log("🧠 typeCaptionUltimate start");
+async function typeCaptionUltimate(page,
+  caption,
+  delayMikir,
+  delayKetikMin,
+  delayKetikMax,
+  pauseChance,
+  pauseMin,
+  pauseMax) {
+  console.log("🧠 typeCaptionUltimate start");
   
 let fbResult;
 
@@ -1962,7 +1969,14 @@ async function clickComposerStatus(page) {
   //await typeCaptionUltimate(page, caption);
   let captionResult;
 try {
-  captionResult = await typeCaptionUltimate(page, caption);
+  captionResult = await typeCaptionUltimate(page,
+  caption,
+  delayMikir,
+  delayKetikMin,
+  delayKetikMax,
+  pauseChance,
+  pauseMin,
+  pauseMax);
 } catch (e) {
   console.log("⚠️ Caption fatal error, skip caption:", e.message);
 }
