@@ -2104,9 +2104,16 @@ function readTemplate(file) {
 
 async function runAccount(page, row) {
  console.log("\n🧪 runAccount row:", row);
-    const account = row.account;
+  const account = row.account;
   const caption = row.caption;
   const mediaUrl = row.media_url || row.github_release;
+  const delayMikir = Number(row.delay_mikir);
+  const delayKetikMin = Number(row.delay_ketik_min);
+  const delayKetikMax = Number(row.delay_ketik_max);
+  const pauseChance = Number(row.pause_chance);
+  const pauseMin = Number(row.pause_min);
+  const pauseMax = Number(row.pause_max);
+
 
   // ===== PARSE DELAY GRUP DARI XLSX =====
   const delayGroupList = String(row.delay_grup || "")
