@@ -1821,6 +1821,13 @@ async function runStatus(page, row) {
   console.log(`\n📝 Post STATUS → ${account}`);
   const caption = row.caption;
   const mediaUrl = row.media_url || row.github_release;
+  const delayMikir = Number(row.delay_mikir);
+  const delayKetikMin = Number(row.delay_ketik_min);
+  const delayKetikMax = Number(row.delay_ketik_max);
+  const pauseChance = Number(row.pause_chance);
+  const pauseMin = Number(row.pause_min);
+  const pauseMax = Number(row.pause_max);
+
 
   if (!caption && !mediaUrl) {
     console.log("⚠️ Status kosong, skip");
