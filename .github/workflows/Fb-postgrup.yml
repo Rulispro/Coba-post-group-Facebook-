@@ -1,4 +1,4 @@
-name: Facebook Bot
+name: FB Post Group
 
 on:
   # Manual trigger (WAJIB ada buat test)
@@ -25,8 +25,8 @@ jobs:
         run: npm install --legacy-peer-deps
 
       # Bot jalan, tanggal WIB diambil dari index.js
-      - name: Run Puppeteer bot
-        run: node docs/index.js
+      - name: Run Group Bot 
+        run: node docs/index.js group
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
