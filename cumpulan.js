@@ -9,6 +9,45 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
 
+async function typeCaptionFB(page, caption) {
+  console.log("✍️ Ketik caption (FB stable)");
+
+  // 1️⃣ Tunggu overlay loading hilang
+  await page.waitForFunction(() => {
+    return !(
+      document.querySelector('[aria-label="Loading"]') ||
+      document.querySelector('[aria-busy="true"]') ||
+      document.querySelector('div[role="dialog"]')
+    );
+  }, { timeout: 30000 });
+
+  // 2️⃣ Bangunin editor (WAJIB di FB)
+  await page.keyboard.type(" ");
+  await page.waitForTimeout(150);
+  await page.keyboard.press("Backspace");
+
+  // 3️⃣ Ketik caption ala manusia
+  for (const ch of caption) {
+    await page.keyboard.type(ch, {
+      delay: 100 + Math.random() * 120
+    });
+
+    if (Math.random() < 0.10) {
+      await page.waitForTimeout(300 + Math.random() * 800);
+    }
+  }
+
+  // 4️⃣ Commit React
+  await page.keyboard.press("Space");
+  await page.keyboard.press("Backspace");
+
+  console.log("✅ Caption berhasil diketik captiontypeFB");
+
+return { ok: true, method: "typeCaptionFB" };
+
+  }
+
+
 // ===== HELPER =====
 function getTodayWIB() {
   return new Date(
