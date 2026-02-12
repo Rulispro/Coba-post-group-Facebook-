@@ -2775,22 +2775,6 @@ function delay(ms) {
       console.log("⚠️ Tidak ada mode → stop bot");
       process.exit(0);
     }
-   //MODE STATUS 
-    if (mode === "status") {
-  console.log("📌 Running STATUS...");
-      // POST STATUS (kalau ada)
- for (const row of rowsStatusForAccount) {
-    await runStatus(page, row);
- }
-}
-    //MODE GROUP 
-    if (mode === "group") {
-  console.log("📌 Running STATUS...");
-       // ✅ LANGSUNG POSTGROUP PAKAI DATA
-    for (const row of rowsForAccount) {
-     await runAccount(page, row);
-    }
-}  
 
     const accounts = JSON.parse(
       fs.readFileSync(__dirname + "/accounts.json", "utf8")
@@ -2952,40 +2936,9 @@ console.log("📋 Semua status rows:", statusRows);
   const rowDate = parseTanggalXLSX(row.tanggal);
   return rowDate === today;
 });
- // ================== FILTER GROUP BERDASARKAN TANGGAL ==================
-//group/const rowsForAccount = groupRows.filter(row => {
- // if (row.account !== acc.account) return false;
-
- // if (!row.tanggal) {
-//    console.log("⚠️ Row grup TANPA tanggal, skip:", row);
-  //  return false;
-  //}
-//
- // const rowDate = parseTanggalXLSX(row.tanggal);
-
-//  if (!rowDate) {
-   // console.log("⚠️ Format tanggal grup tidak valid:", row.tanggal);
-  //  return false;
-  //}
-
- // if (rowDate !== today) {
-   // console.log(
-    ///  `⏭️ Skip grup karena beda tanggal → XLSX: ${rowDate}, TODAY: ${today}`
-   // );
-   /// return false;
- /// }
-
- /// return true;
-//$group});
 
 console.log("ACCOUNT JSON:", `[${acc.account}]`);
-   
-
-
-
 console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
-
-
       //baru 
 console.log(`📋 Group row ${acc.account}:`, rowsForAccount.length);
 console.log(`📋 Status row ${acc.account}:`, rowsStatusForAccount.length);
@@ -3056,6 +3009,66 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
 //for (const row of rowsLikeGroupForAccount){
     // await runLikeLinkGroups(page, row);
 // }
+      // ================= MODE EXECUTION =================
+
+if (mode === "status") {
+  console.log("📌 MODE STATUS");
+
+  for (const row of rowsStatusForAccount) {
+    await runStatus(page, row);
+  }
+}
+
+else if (mode === "group") {
+  console.log("📌 MODE GROUP");
+
+  for (const row of rowsForAccount) {
+    await runAccount(page, row);
+  }
+}
+
+else if (mode === "addfriendfollowers") {
+  for (const row of rowsAddFriendFollowersForAccount) {
+    await runAddFriendFollowers(page, row);
+  }
+}
+
+else if (mode === "addfriendfollowing") {
+  for (const row of rowsAddFriendFollowingForAccount) {
+    await runAddFriendFollowings(page, row);
+  }
+}
+
+else if (mode === "addfriendfriends") {
+  for (const row of rowsAddFriendFriendsForAccount) {
+    await runAddFriendFriends(page, row);
+  }
+}
+
+else if (mode === "undfriend") {
+  for (const row of rowsUndfriendForAccount) {
+    await runUndfriends(page, row);
+  }
+}
+
+else if (mode === "confirm") {
+  for (const row of rowsConfirmForAccount) {
+    await runConfirm(page, row);
+  }
+}
+
+else if (mode === "likelinkpost") {
+  for (const row of rowsLikeLinkPostForAccount) {
+    await runLikeLinkPosts(page, row);
+  }
+}
+
+else if (mode === "likegroup") {
+  for (const row of rowsLikeGroupForAccount) {
+    await runLikeLinkGroups(page, row);
+  }
+}
+
       
       
       // ===== Stop recorder
