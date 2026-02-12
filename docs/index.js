@@ -586,7 +586,16 @@ async function typeCaptionUltimate(page, caption) {
 let fbResult;
 
 try {
- fbResult = await typeCaptionFB(page, caption);
+ fbResult = await typeCaptionFB(
+  page,
+  caption,
+  delayMikir,
+  delayKetikMin,
+  delayKetikMax,
+  pauseChance,
+  pauseMin,
+  pauseMax
+);
 } catch (e) {
   console.log("⚠️ typeCaptionFB error → lanjut fallback");
 }
