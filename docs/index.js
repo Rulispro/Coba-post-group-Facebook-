@@ -2312,9 +2312,16 @@ const box = boxHandle.asElement();
    await page.keyboard.up("Control");
    await page.keyboard.press("Backspace");
 
-   let captionResult;
+     let captionResult;
 try {
-  captionResult = await typeCaptionUltimate(page, caption);
+  captionResult = await typeCaptionUltimate(page,
+  caption,
+  delayMikir,
+  delayKetikMin,
+  delayKetikMax,
+  pauseChance,
+  pauseMin,
+  pauseMax);
 } catch (e) {
   console.log("⚠️ Caption fatal error, skip caption:", e.message);
 }
