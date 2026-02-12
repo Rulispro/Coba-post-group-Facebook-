@@ -20,7 +20,14 @@ async function clearComposer(page) {
 }
 
 
-async function typeCaptionFB(page, caption) {
+async function typeCaptionFB(page,
+  caption,
+  delayMikir,
+  delayKetikMin,
+  delayKetikMax,
+  pauseChance,
+  pauseMin,
+  pauseMax) {
   console.log("✍️ Ketik caption (FB stable)");
 
   // 1️⃣ Tunggu overlay loading hilang
@@ -37,16 +44,24 @@ async function typeCaptionFB(page, caption) {
   await page.waitForTimeout(150);
   await page.keyboard.press("Backspace");
 
+  await page.waitForTimeout(delayMikir);
+  
   // 3️⃣ Ketik caption ala manusia
   for (const ch of caption) {
-    await page.keyboard.type(ch, {
-      delay: 100 + Math.random() * 120
-    });
 
-    if (Math.random() < 0.10) {
-      await page.waitForTimeout(300 + Math.random() * 800);
+    const delayHuruf =
+      Math.floor(Math.random() * (delayKetikMax - delayKetikMin + 1)) + delayKetikMin;
+
+    await page.keyboard.type(ch, { delay: delayHuruf });
+
+    // pause random dari XLSX
+    if (Math.random() < pauseChance) {
+      const pause =
+        Math.floor(Math.random() * (pauseMax - pauseMin + 1)) + pauseMin;
+
+      await page.waitForTimeout(pause);
     }
-  }
+ }
 
   // 4️⃣ Commit React
   await page.keyboard.press("Space");
