@@ -1,9 +1,9 @@
-name: FB addfriendfollowers Bot
+name: FB Addfriendfollowers Bot
 
 on:
   workflow_dispatch:
 
-  schedule:
+  #schedule:
     # Contoh: jalan jam 09:00 WIB (02:00 UTC)
     #- cron: "0 2 * * *"
 
@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Run addfriendfollowers Bot
+      - name: Run Wddfriendfollowers Bot
         run: node docs/index.js addfriendfollowers
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
