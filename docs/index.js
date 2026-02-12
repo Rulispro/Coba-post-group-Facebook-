@@ -2767,6 +2767,30 @@ function delay(ms) {
 (async () => {
   try {
     console.log("🚀 Start bot...");
+   //cek mode buat workflows masing-masing 
+    const mode = process.argv[2];
+    console.log("🎯 MODE:", mode);
+
+    if (!mode) {
+      console.log("⚠️ Tidak ada mode → stop bot");
+      process.exit(0);
+    }
+   //MODE STATUS 
+    if (mode === "status") {
+  console.log("📌 Running STATUS...");
+      // POST STATUS (kalau ada)
+ for (const row of rowsStatusForAccount) {
+    await runStatus(page, row);
+ }
+}
+    //MODE GROUP 
+    if (mode === "group") {
+  console.log("📌 Running STATUS...");
+       // ✅ LANGSUNG POSTGROUP PAKAI DATA
+    for (const row of rowsForAccount) {
+     await runAccount(page, row);
+    }
+}  
 
     const accounts = JSON.parse(
       fs.readFileSync(__dirname + "/accounts.json", "utf8")
