@@ -28,6 +28,13 @@ async function typeCaptionFB(page,
   pauseChance,
   pauseMin,
   pauseMax) {
+  delayMikir = Number(delayMikir);
+  delayKetikMin = Number(delayKetikMin);
+  delayKetikMax = Number(delayKetikMax);
+  pauseChance = Number(pauseChance);
+  pauseMin = Number(pauseMin);
+  pauseMax = Number(pauseMax);
+
   console.log("✍️ Ketik caption (FB stable)");
 
   // 1️⃣ Tunggu overlay loading hilang
