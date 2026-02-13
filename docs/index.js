@@ -9,6 +9,16 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
+//ACAK AKUN
+function shuffleArray(array) {
+  const arr = [...array]; // supaya tidak ubah original
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 
 //HELPER ISI CAPTION 
 async function clearComposer(page) {
@@ -2776,10 +2786,19 @@ function delay(ms) {
       process.exit(0);
     }
 
-    const accounts = JSON.parse(
+    const rawAccounts = JSON.parse(
       fs.readFileSync(__dirname + "/accounts.json", "utf8")
     );
 
+// 🔀 SHUFFLE AKUN DI SINI
+const accounts = shuffleArray(rawAccounts);
+
+console.log("🔀 Urutan akun setelah shuffle:");
+accounts.forEach((a, i) => {
+  console.log(`${i + 1}. ${a.account}`);
+});
+    
+    
     // ✅ BACA TEMPLATE SEKALI DI AWAL
     const TEMPLATE_PATH = "./docs/template1.xlsx";
 
