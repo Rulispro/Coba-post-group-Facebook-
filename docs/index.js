@@ -2981,9 +2981,9 @@ await page.goto("https://m.facebook.com", { waitUntil: "networkidle2" });
     // await runAccount(page, row);
    // }
       // POST STATUS (kalau ada)
- for (const row of rowsStatusForAccount) {
-    await runStatus(page, row);
-  }
+// for (const row of rowsStatusForAccount) {
+    //await runStatus(page, row);
+ // }
 
 //for (const row of rowsAddFriendFollowersForAccount){
  // await runAddFriendFollowers(page, row);
