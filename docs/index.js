@@ -10,14 +10,19 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
 //ACAK AKUN
-function shuffleArray(array) {
-  const arr = [...array]; // supaya tidak ubah original
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+function shuffleArray(arr) {
+  if (arr.length === 2) {
+    return [arr[1], arr[0]];
   }
-  return arr;
+
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
 }
+
 
 
 //HELPER ISI CAPTION 
