@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const https = require("https");
 const XLSX = require("xlsx");   
 const puppeteer = require("puppeteer-extra");
@@ -11,17 +12,18 @@ const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 puppeteer.use(StealthPlugin())
 //ACAK AKUN
 function shuffleArray(arr) {
-  if (arr.length === 2) {
-    return [arr[1], arr[0]];
-  }
-
   const shuffled = [...arr];
+
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const rand = crypto.randomBytes(4).readUInt32BE(0);
+    const j = rand % (i + 1);
+
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
+
   return shuffled;
 }
+
 
 
 
