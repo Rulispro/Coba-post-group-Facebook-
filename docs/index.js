@@ -2825,6 +2825,8 @@ accounts.forEach((a, i) => {
     const confirmRows = templates.confirm || [];
     const likeLinkPostRows = templates.likelinkpost || [];
     const likeGroupRows= templates.likeGroup || [];
+    //$BARU BUAT TESTING
+    let dashboardData = [];
     const browser = await puppeteer.launch({
       headless: "new",
       defaultViewport: { width: 390, height: 844, isMobile: true, hasTouch: true },
@@ -3048,9 +3050,56 @@ if (mode === "status") {
 else if (mode === "group") {
   console.log("📌 MODE GROUP");
 
+ //lama tapi jalan
+  //for(const row of rowsForAccount) {
+    //await runAccount(page, row);
+//  }
+///$BARU YANG PAKAI DOLAR
   for (const row of rowsForAccount) {
+
+  const groupLinks = row.link_group
+    .split(",")
+    .map(link => link.trim())
+    .filter(link => link.length > 0);
+
+  for (const link of groupLinks) {
+
+    await page.goto(link, { waitUntil: "networkidle2" });
+    await page.waitForTimeout(3000);
+
+    const groupInfo = await page.evaluate(() => {
+      const title =
+        document.querySelector("h1")?.innerText ||
+        document.title ||
+        "Unknown Group";
+
+      const img =
+        document.querySelector('img[src*="scontent"]') ||
+        document.querySelector("img");
+
+      return {
+        name: title,
+        photo: img ? img.src : null
+      };
+    });
+
+    dashboardData.push({
+      account: acc.account,
+      tanggal: today,
+      mode: "group",
+      group_link: link,
+      group_name: groupInfo.name,
+      group_photo: groupInfo.photo,
+      caption: row.caption,
+      delay_group: row.delay_group,
+      delay_akun: row.delay_akun,
+      status: "done"
+    });
+
     await runAccount(page, row);
   }
+}
+  
 }
 
 else if (mode === "addfriendfollowers") {
@@ -3125,7 +3174,14 @@ console.log(
 );
       
     }
+//BARU $
+    fs.writeFileSync(
+  "./dashboard/data.json",
+  JSON.stringify(dashboardData, null, 2)
+);
 
+console.log("✅ data.json berhasil dibuat");
+    //$
     await browser.close();
     console.log("🎉 Semua akun selesai");
   } catch (err) {
