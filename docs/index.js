@@ -2187,7 +2187,7 @@ async function runAccount(page, row) {
   console.log(`🔗 Grup: ${groups.length}`);
     
   for (let i = 0; i < groups.length; i++) {
-    const groupUrl = groups[i];
+    let groupUrl = groups[i];
    
     console.log(`\n📌 [${account}] Grup ${i + 1}/${groups.length}`);
     console.log(`➡️ ${groupUrl}`);
@@ -2210,6 +2210,38 @@ async function runAccount(page, row) {
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
     // DEBUG SETELAH PAGE SIAP
+    //BARU YANG PAKAI DOLAR
+// ambil info grup DI SINI
+const groupInfo = await page.evaluate(() => {
+  const title =
+    document.querySelector("h1")?.innerText ||
+    document.title ||
+    "Unknown Group";
+
+  const img =
+    document.querySelector('img[src*="scontent"]') ||
+    document.querySelector("img");
+
+  return {
+    name: title,
+    photo: img ? img.src : null
+  };
+});
+
+// push dashboard
+dashboardData.push({
+  account: accountName,
+  tanggal: today,
+  mode: "group",
+  group_link: groupUrl,
+  group_name: groupInfo.name,
+  group_photo: groupInfo.photo,
+  caption: row.caption,
+  delay_group: row.delay_grup,
+  delay_akun: row.delay_akun,
+  status: "done"
+});
+    //$ SAMPAI SINI
 
   await page.evaluate(() => {
   const hits = [];
@@ -3056,51 +3088,11 @@ else if (mode === "group") {
 //  }
 ///$BARU YANG PAKAI DOLAR
   for (const row of rowsForAccount) {
-
-  const groupLinks = row.link_group
-    .split(",")
-    .map(link => link.trim())
-    .filter(link => link.length > 0);
-
-  for (const link of groupLinks) {
-
-    await page.goto(link, { waitUntil: "networkidle2" });
-    await page.waitForTimeout(3000);
-
-    const groupInfo = await page.evaluate(() => {
-      const title =
-        document.querySelector("h1")?.innerText ||
-        document.title ||
-        "Unknown Group";
-
-      const img =
-        document.querySelector('img[src*="scontent"]') ||
-        document.querySelector("img");
-
-      return {
-        name: title,
-        photo: img ? img.src : null
-      };
-    });
-
-    dashboardData.push({
-      account: acc.account,
-      tanggal: today,
-      mode: "group",
-      group_link: link,
-      group_name: groupInfo.name,
-      group_photo: groupInfo.photo,
-      caption: row.caption,
-      delay_group: row.delay_group,
-      delay_akun: row.delay_akun,
-      status: "done"
-    });
-
-    await runAccount(page, row);
+  await runAccount(page, row, acc.account, today);
+    
   }
 }
   
-}
 
 else if (mode === "addfriendfollowers") {
   for (const row of rowsAddFriendFollowersForAccount) {
