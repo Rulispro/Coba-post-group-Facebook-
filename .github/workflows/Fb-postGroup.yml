@@ -12,6 +12,9 @@ jobs:
   run-bot:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write   # 🔥 penting agar bisa push
+      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -35,4 +38,11 @@ jobs:
         with:
           name: recordings
           path: recording_*.mp4
-          
+     
+       - name: Commit dashboard update
+         run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add dashboard/data.json
+          git commit -m "Update dashboard data" || echo "No changes"
+          git push
