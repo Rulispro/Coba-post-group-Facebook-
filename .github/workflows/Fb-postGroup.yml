@@ -1,10 +1,8 @@
 name: FB Post Group
 
 on:
-  # Manual trigger (WAJIB ada buat test)
   workflow_dispatch:
 
-  # Jalan otomatis jam 07:36 WIB (UTC+7 → 00:36 UTC)
   schedule:
     - cron: "0 9 * * *"
 
@@ -13,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write   # 🔥 penting agar bisa push
-      
+      contents: write
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -27,14 +25,24 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # Bot jalan, tanggal WIB diambil dari index.js
-      - name: Run Group Bot 
+      - name: Run Group Bot
         run: node docs/index.js group
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
       - name: Upload recordings
         uses: actions/upload-artifact@v4
+        with:
+          name: recordings
+          path: recording_*.mp4
+
+      - name: Commit dashboard update
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add dashboard/data.json
+          git commit -m "Update dashboard data" || echo "No changes"
+          git push        uses: actions/upload-artifact@v4
         with:
           name: recordings
           path: recording_*.mp4
