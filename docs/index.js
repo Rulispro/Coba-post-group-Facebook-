@@ -10,6 +10,18 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
+//$BARU
+const dashboardDir = path.join(__dirname, "dashboard");
+
+if (!fs.existsSync(dashboardDir)) {
+  fs.mkdirSync(dashboardDir);
+}
+
+fs.writeFileSync(
+  path.join(dashboardDir, "data.json"),
+  JSON.stringify(dashboardData, null, 2)
+);
+//$SAMPAI SINI
 //ACAK AKUN
 function shuffleArray(arr) {
   const shuffled = [...arr];
