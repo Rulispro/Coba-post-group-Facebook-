@@ -10,18 +10,6 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
-//$BARU
-const dashboardDir = path.join(__dirname, "dashboard");
-
-if (!fs.existsSync(dashboardDir)) {
-  fs.mkdirSync(dashboardDir);
-}
-
-fs.writeFileSync(
-  path.join(dashboardDir, "data.json"),
-  JSON.stringify(dashboardData, null, 2)
-);
-//$SAMPAI SINI
 //ACAK AKUN
 function shuffleArray(arr) {
   const shuffled = [...arr];
@@ -2222,38 +2210,7 @@ async function runAccount(page, row) {
     await page.goto(groupUrl, { waitUntil: "networkidle2" });
     await page.waitForTimeout(4000);
     // DEBUG SETELAH PAGE SIAP
-    //BARU YANG PAKAI DOLAR
-// ambil info grup DI SINI
-const groupInfo = await page.evaluate(() => {
-  const title =
-    document.querySelector("h1")?.innerText ||
-    document.title ||
-    "Unknown Group";
-
-  const img =
-    document.querySelector('img[src*="scontent"]') ||
-    document.querySelector("img");
-
-  return {
-    name: title,
-    photo: img ? img.src : null
-  };
-});
-
-// push dashboard
-dashboardData.push({
-  account: accountName,
-  tanggal: today,
-  mode: "group",
-  group_link: groupUrl,
-  group_name: groupInfo.name,
-  group_photo: groupInfo.photo,
-  caption: row.caption,
-  delay_group: row.delay_grup,
-  delay_akun: row.delay_akun,
-  status: "done"
-});
-    //$ SAMPAI SINI
+  
 
   await page.evaluate(() => {
   const hits = [];
@@ -3094,16 +3051,12 @@ if (mode === "status") {
 else if (mode === "group") {
   console.log("📌 MODE GROUP");
 
- //lama tapi jalan
-  //for(const row of rowsForAccount) {
-    //await runAccount(page, row);
-//  }
-///$BARU YANG PAKAI DOLAR
-  for (const row of rowsForAccount) {
-  await runAccount(page, row, acc.account, today);
-    
+ 
+  for(const row of rowsForAccount) {
+    await runAccount(page, row);
   }
 }
+
   
 
 else if (mode === "addfriendfollowers") {
@@ -3178,11 +3131,7 @@ console.log(
 );
       
     }
-//BARU $
-    fs.writeFileSync(
-  "./dashboard/data.json",
-  JSON.stringify(dashboardData, null, 2)
-);
+
 
 console.log("✅ data.json berhasil dibuat");
     //$
