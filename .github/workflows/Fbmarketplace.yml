@@ -2,10 +2,8 @@ name: FB FBMARKETPLACE Bot
 
 on:
   workflow_dispatch:
-
-  #schedule:
-    # Contoh: jalan jam 09:00 WIB (02:00 UTC)
-    #- cron: "0 2 * * *"
+  # schedule:
+  #   - cron: "0 2 * * *"
 
 jobs:
   RUN-FBMARKETPLACE:
@@ -24,7 +22,7 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Run FBMARKETPLACE Bot
-        run: node docs/index.js FBMARKETPLACE
+        run: node docs/index.js marketplace
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
 
