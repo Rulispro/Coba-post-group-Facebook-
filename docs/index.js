@@ -10,6 +10,38 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 
 puppeteer.use(StealthPlugin())
+//FBMARKETPLACE 
+async function switchViewportMarketplaceMobile(page) {
+  console.log("📱 Switch Mobile → Large Viewport 891x1701");
+
+  // Tetap Android UA (SAMA seperti awal)
+  await page.setUserAgent(
+    "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 " +
+    "(KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36"
+  );
+
+  await page.setViewport({
+    width: 891,
+    height: 1701,
+    deviceScaleFactor: 2, // sesuai m_pixel_ratio=2
+    isMobile: true,
+    hasTouch: true
+  });
+
+  // Update cookie wd agar konsisten
+  await page.setCookie({
+    name: "wd",
+    value: "891x1701",
+    domain: ".facebook.com",
+    path: "/",
+    secure: true
+  });
+
+  console.log("✅ Mobile fingerprint tetap konsisten");
+}
+
+
+
 //ACAK AKUN
 function shuffleArray(arr) {
   const shuffled = [...arr];
@@ -2826,6 +2858,7 @@ accounts.forEach((a, i) => {
     const confirmRows = templates.confirm || [];
     const likeLinkPostRows = templates.likelinkpost || [];
     const likeGroupRows= templates.likeGroup || [];
+    const marketplaceRows = templates.FBMARKETPLACE || [];
     //$BARU BUAT TESTING
     let dashboardData = [];
     const browser = await puppeteer.launch({
@@ -2966,6 +2999,14 @@ console.log("📋 Semua status rows:", statusRows);
   return rowDate === today;
 });
 
+      // filter marketplace
+const rowsMarketplaceForAccount = marketplaceRows.filter(row => {
+  if (row.account !== acc.account) return false;
+
+  const rowDate = parseTanggalXLSX(row.tanggal);
+  return rowDate === today;
+});
+      
 console.log("ACCOUNT JSON:", `[${acc.account}]`);
 console.log(`📋 Row untuk ${acc.account}:`, rowsForAccount.length);
       //baru 
@@ -2978,11 +3019,11 @@ console.log(`📋 undfriend row ${acc.account}:`, rowsUndfriendForAccount.length
 console.log(`📋 confirm row ${acc.account}:`, rowsConfirmForAccount.length);
 console.log(`📋 likelinkpost row ${acc.account}:`, rowsLikeLinkPostForAccount.length);
 console.log(`📋 likeGroup row ${acc.account}:`, rowsLikeGroupForAccount.length);
-
+console.log(`📋 marketplace row ${acc.account}:`, rowsMarketplaceForAccount.length);
 
 // kalau dua-duanya kosong → skip akun
 if (rowsForAccount.length === 0 && rowsStatusForAccount.length === 0  && rowsAddFriendFollowersForAccount.length === 0 && rowsAddFriendFollowingForAccount.length === 0 && rowsAddFriendFriendsForAccount.length === 0
-  && rowsUndfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 && rowsLikeGroupForAccount.length === 0 && rowsLikeLinkPostForAccount.length === 0) {
+  && rowsUndfriendForAccount.length === 0 && rowsConfirmForAccount.length === 0 && rowsLikeGroupForAccount.length === 0 && rowsLikeLinkPostForAccount.length === 0 && rowsMarketplaceForAccount.length === 0) {
   console.log("⏭️ Tidak ada jadwal group & status & addFriendFollowers & addFriendFollowing &  addFriendFriends & unfriend & confirm & likelinkpost & likeGroup hari ini");
   continue;
 }
@@ -3101,8 +3142,25 @@ else if (mode === "likegroup") {
   }
 }
 
-      
-      
+else if (mode === "marketplace") {
+  console.log("📌 MODE MARKETPLACE");
+
+  if (rowsMarketplaceForAccount.length === 0) {
+    console.log("⏭️ Tidak ada jadwal marketplace hari ini");
+  } else {
+
+    // 🔥 SWITCH VIEWPORT BESAR
+    await switchViewportMarketplaceMobile(page);
+
+    await page.goto("https://www.facebook.com/marketplace/create/item", {
+      waitUntil: "networkidle2"
+    });
+
+    for (const row of rowsMarketplaceForAccount) {
+      await runMarketplace(page, row);
+    }
+  }
+}
       // ===== Stop recorder
       await recorder.stop();
      console.log(`🎬 Rekaman selesai: recording_${acc.account}.mp4`);
