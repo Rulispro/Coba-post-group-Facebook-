@@ -2297,23 +2297,33 @@ async function runAccount(page, row) {
  // if (!opened) throw new Error("❌ Composer tidak berhasil diklik");
   //console.log("✅ Composer trigger sukses");
 //}
-
-
-    // ===== 1️⃣ Klik composer / write something
-   // let writeClicked =
-    //await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
-    //await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
-   // await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
-    ///klik tulisan diskusi percobaan 
+  //klik wiew diskusi 
     await page.evaluate(() => {
-  const el = [...document.querySelectorAll("span")]
-    .find(s => /view discussion/i.test(s.innerText));
+  const span = [...document.querySelectorAll("span")]
+    .find(s => s.innerText.includes("View"));
 
-  if (el) {
-    const clickable = el.closest("div");
-    clickable?.click();
+  if (!span) return console.log("❌ tidak ketemu");
+
+  const btn = span.closest('[data-focusable="true"]');
+
+  if (btn) {
+    btn.click();
+    console.log("✅ berhasil klik View Discussions");
+  } else {
+    console.log("❌ tidak ada container clickable");
   }
 });
+await page.waitForTimeout(2000);
+    console.log("tunggu 2 detik");
+    
+  }
+    // ===== 1️⃣ Klik composer / write something
+    let writeClicked =
+    await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+    await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+    await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+    
+    
     
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
