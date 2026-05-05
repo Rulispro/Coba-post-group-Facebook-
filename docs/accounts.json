@@ -1,6 +1,6 @@
 [
   {
-    "account": "ayu Wulandari",
+    "disabled account": "ayu Wulandari",
     "file": "ayu_Wulandari",
     "cookies": [
       { "name": "c_user", "value": "61576156023619" },
@@ -24,7 +24,7 @@
     ]
     },
   {
-    "account": "Fitri Yunita Sari",
+    "disabled account": "Fitri Yunita Sari",
     "file": "Fitri_Yunita_Sari",
     "cookies": [
       { "name": "c_user", "value": "61576977154304" },
