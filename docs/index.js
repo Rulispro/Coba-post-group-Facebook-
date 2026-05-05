@@ -2313,8 +2313,10 @@ async function runAccount(page, row) {
     console.log("❌ tidak ada container clickable");
   }
 });
-await page.waitForTimeout(2000);
-    console.log("tunggu 2 detik");
+    console.log("✅ berhasil klik View Discussions");
+          
+await page.waitForTimeout(3000);
+    console.log("tunggu 3 detik");
     
   
     // ===== 1️⃣ Klik composer / write something
