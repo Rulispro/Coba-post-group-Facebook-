@@ -2316,7 +2316,7 @@ async function runAccount(page, row) {
 await page.waitForTimeout(2000);
     console.log("tunggu 2 detik");
     
-  }
+  
     // ===== 1️⃣ Klik composer / write something
     let writeClicked =
     await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
