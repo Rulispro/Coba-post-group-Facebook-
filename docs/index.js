@@ -2298,25 +2298,37 @@ async function runAccount(page, row) {
   //console.log("✅ Composer trigger sukses");
 //}
   //klik wiew diskusi 
-    await page.evaluate(() => {
+    // ===== 1️⃣ Coba klik "View Discussions" (optional)
+const clickedView = await page.evaluate(() => {
   const span = [...document.querySelectorAll("span")]
-    .find(s => s.innerText.includes("View"));
+    .find(s => /view|lihat/i.test(s.innerText));
 
-  if (!span) return console.log("❌ tidak ketemu");
+  if (!span) {
+    console.log("ℹ️ Tidak ada tombol View Discussions");
+    return false;
+  }
 
   const btn = span.closest('[data-focusable="true"]');
 
   if (btn) {
     btn.click();
-    console.log("✅ berhasil klik View Discussions");
-  } else {
-    console.log("❌ tidak ada container clickable");
+    console.log("✅ Klik View Discussions");
+    return true;
   }
+
+  console.log("⚠️ Span ketemu tapi tidak bisa diklik");
+  return false;
 });
+
+// kalau tadi klik → tunggu
+if (clickedView) {
+  await page.waitForTimeout(3000);
+  console.log("⏳ Tunggu setelah klik View Discussions");
+ }
     console.log("✅ berhasil klik View Discussions");
           
-await page.waitForTimeout(3000);
-    console.log("tunggu 3 detik");
+await page.waitForTimeout(2000);
+    console.log("tunggu 2 detik");
     
   
     // ===== 1️⃣ Klik composer / write something
