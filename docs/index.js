@@ -2300,10 +2300,20 @@ async function runAccount(page, row) {
 
 
     // ===== 1️⃣ Klik composer / write something
-    let writeClicked =
-    await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
-    await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
-    await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+   // let writeClicked =
+    //await safeClickXpath(page, "//*[contains(text(),'Write something')]", "Composer") ||
+    //await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu')]", "Composer") ||
+   // await safeClickXpath(page, "//*[contains(text(),'Tulis sesuatu...')]", "Composer");
+    ///klik tulisan diskusi percobaan 
+    await page.evaluate(() => {
+  const el = [...document.querySelectorAll("span")]
+    .find(s => /view discussion/i.test(s.innerText));
+
+  if (el) {
+    const clickable = el.closest("div");
+    clickable?.click();
+  }
+});
     
     await page.waitForTimeout(2000);
    // 1️⃣ Klik placeholder composer
